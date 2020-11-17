@@ -10,7 +10,6 @@ import styles from './inline-toolbar.module.css';
 import { surround } from '../../utils/find-blocks';
 import { useAtom } from 'jotai';
 import { lastRangeAtom } from '../../constants/atom';
-import { restoreSelection } from '../../utils/remove-ranges';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 

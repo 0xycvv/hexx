@@ -129,7 +129,7 @@ export function Block({
             }
           }
         }}
-        ref={ref}
+        ref={ref as any}
         html={block.data}
         onChange={(evt) =>
           update((s) =>

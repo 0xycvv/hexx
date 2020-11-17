@@ -68,6 +68,7 @@ function Elliot() {
         }
       }
     } else {
+      // @ts-ignore
       active?.querySelector('[contenteditable]')?.focus();
     }
   };
@@ -157,7 +158,10 @@ function Elliot() {
 
 export const Editor = (props: EditorProps) => {
   return (
-    <Provider initialValues={[[blocksAtom, props.data || []]]}>
+    <Provider
+      // @ts-ignore
+      initialValues={[[blocksAtom, props.data || []]]}
+    >
       <Elliot />
     </Provider>
   );
