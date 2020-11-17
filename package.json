@@ -1,15 +1,28 @@
 {
-  "name": "elliot",
+  "name": "elliot-editor",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "icons": "svgr --template ./icon-template.js --ext tsx --icon --filename-case 'kebab' --title-prop --ref -d ./components/icons ./components/icons"
   },
   "dependencies": {
+    "@popperjs/core": "^2.5.4",
+    "clsx": "^1.1.1",
+    "jotai": "^0.10.5",
+    "react-contenteditable": "^3.3.5",
+    "react-popper": "^2.2.4",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@svgr/cli": "^5.5.0",
+    "@types/node": "^14.14.7",
+    "@types/react": "^16.9.56",
     "next": "10.0.1",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "typescript": "^4.0.5"
   }
 }

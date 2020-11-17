@@ -1,0 +1,60 @@
+.wrapper {
+  width: 100%;
+  position: relative;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.wrapper .menu {
+  opacity: 0;
+}
+
+.wrapper:hover .menu {
+  opacity: 1;
+}
+
+.plus {
+  user-select: none;
+  transition: opacity 20ms ease-in 0s;
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(55, 53, 47, 0.3);
+  position: absolute;
+  top: 3px;
+  left: -48px;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  pointer-events: auto;
+}
+
+.drag {
+  user-select: none;
+  transition: opacity 20ms ease-in 0s;
+  position: absolute;
+  top: 3px;
+  left: -24px;
+  pointer-events: auto;
+  cursor: -webkit-grab;
+  border-radius: 3px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(55, 53, 47, 0.3);
+}
+
+.select-overlay {
+  position: absolute;
+  pointer-events: none;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: rgba(46, 170, 220, 0.2);
+  z-index: 81;
+  opacity: 1;
+}

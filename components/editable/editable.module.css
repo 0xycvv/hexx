@@ -1,0 +1,25 @@
+.editable {
+  max-width: 100%;
+  width: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+  caret-color: rgb(55, 53, 47);
+  padding: 3px 2px;
+}
+
+.editable:focus {
+  outline: none;
+}
+
+.editable[placeholder]:empty::before {
+  content: attr(placeholder);
+  min-height: 1em;
+  color: rgb(55, 53, 47);
+  -webkit-text-fill-color: rgba(55, 53, 47, 0.4);
+}
+.editable[placeholder]:not(:focus)::before {
+  content: '';
+}
+.editable[placeholder]:not(:empty)::before {
+  content: '';
+}
