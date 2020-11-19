@@ -6,7 +6,6 @@ export const useActiveBlockId = () => {
   const [active, setActive] = useAtom(activeBlockIdAtom);
 
   const handleClick = () => {
-
     if (document.activeElement) {
       // console.log(
       //   document.activeElement,

@@ -6,12 +6,13 @@ import Italic from '../../components/icons/italic';
 import Link from '../../components/icons/link';
 import LinkOff from '../../components/icons/link-off';
 import Underlined from '../../components/icons/underlined';
-import styles from './inline-toolbar.module.css';
 import { surround } from '../../utils/find-blocks';
 import { useAtom } from 'jotai';
 import { lastRangeAtom } from '../../constants/atom';
-import { useEffect, useState } from 'react';
+import { Children, ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';
+import { InlineLink } from './link/link';
 
 const inlineTools = [
   {
@@ -37,60 +38,65 @@ const inlineTools = [
   },
   {
     type: 'link',
-    icon: <Link />,
-    onClick: () => {
-      const selection = document.getSelection();
-      surround('createLink', false, 'https://www.google.com');
-      console.log({ a: selection.anchorNode.parentElement });
-      selection.anchorNode.parentElement.setAttribute(
-        'target',
-        '_blank',
-      );
-      selection.anchorNode.parentElement.setAttribute(
-        'rel',
-        'noopener noreferrer',
-      );
-      selection.anchorNode.parentElement.setAttribute(
-        'contenteditable',
-        'false',
-      );
-    },
+    component: <InlineLink />,
   },
 ];
 
-function InlineTool(props) {
-  const [isActive, setIsActive] = useState(false);
-
-  return (
-    <div
-      onClick={(e) => {
-        props.onClick?.();
-        const yes = document.queryCommandState(props.type);
-        setIsActive(yes);
-      }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-      }}
-      className={styles.icon}
-      style={{ background: isActive ? 'red' : 'blue' }}
-    >
-      {props.children}
-    </div>
-  );
+function DefaultInlineTool(
+  props: UseInlineToolConfig & { children: ReactNode },
+) {
+  const { getProps } = useDefaultInlineTool(props);
+  return <div {...getProps()}>{props.children}</div>;
 }
 
 export function InlineToolBar() {
   return (
-    <div className={styles.wrapper}>
-      {inlineTools.map((tool) => (
-        <InlineTool
-          type={tool.type}
-          onClick={tool.onClick}
-          key={tool.type}
-        >
-          {tool.icon}
-        </InlineTool>
-      ))}
+    <div className="inline-toolbar">
+      {Children.toArray(
+        inlineTools.map((tool) => {
+          if (tool.component) {
+            return tool.component;
+          }
+          return (
+            <DefaultInlineTool
+              type={tool.type}
+              onClick={tool.onClick}
+              key={tool.type}
+            >
+              {tool.icon}
+            </DefaultInlineTool>
+          );
+        }),
+      )}
+      <style jsx>{`
+        :global(.inline-toolbar) {
+          display: grid;
+          grid-auto-flow: column;
+          grid-template-rows: repeat(auto-fill);
+          gap: 16px;
+          background: #242526;
+          border-radius: 8px;
+          padding: 0px 4px;
+        }
+        :global(.inline-toolbar .icon) {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 24px;
+          color: #f3f3f4;
+          cursor: pointer;
+          padding: 8px 4px;
+          transition: all 100ms ease-out;
+        }
+
+        :global(.inline-toolbar .icon:hover) {
+          background-color: #9b9fa4;
+        }
+
+        :global(.inline-toolbar .icon.active) {
+          color: blue;
+        }
+      `}</style>
     </div>
   );
 }

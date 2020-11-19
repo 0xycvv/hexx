@@ -18,7 +18,7 @@ export function findBlockByIndex(i: number) {
   return null;
 }
 
-function findContentEditable(el: HTMLElement) {
+export function findContentEditable(el: HTMLElement) {
   const editable = el.querySelector(
     '[contenteditable]',
   ) as HTMLDivElement;
@@ -64,6 +64,6 @@ export function focusWithCursor(el: Node, cursorIndex: number) {
   sel.addRange(range);
 }
 
-export function surround(commandName: string, showUI?: boolean, value?: string) {
-  document.execCommand(commandName, showUI, value);
+export function surround(commandName: string, selection?: Selection, value?: string) {
+  document.execCommand(commandName, false, value);
 }

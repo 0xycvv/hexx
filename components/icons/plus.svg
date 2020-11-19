@@ -1,29 +1,3 @@
- <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-     width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-  <path fill="#61B3C4"
-        d="M 39, 7
-           H 11
-           c -2.25, 0,   -4, 1.75,   -4, 4
-           v 28
-           C 7, 41.25,   8.75, 43,   11, 43
-           h 28
-           C 41.25, 43,   43, 41.25,   43, 39
-           V 11
-           C 43, 8.75,   41.25, 7,   39, 7
-           z"/>
-  <path fill="#FFFFFF"
-        d="M 35, 27
-           H 27
-           V 35
-           h -4
-           v -8
-           h -8
-           V 23
-           h 8
-           v -8
-           H 27
-           v 8
-           h 8
-           V 27
-           z"/>
-  </svg>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/>
+</svg>

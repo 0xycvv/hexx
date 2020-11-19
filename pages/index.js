@@ -14,28 +14,14 @@ export default function Home() {
         <Editor
           data={[
             {
-              id: '1',
-              data: '1',
+              id: '1asdfs',
+              data:
+                'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
               type: 'paragraph',
             },
           ]}
         />
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img
-            src="/vercel.svg"
-            alt="Vercel Logo"
-            className={styles.logo}
-          />
-        </a>
-      </footer>
     </div>
   );
 }

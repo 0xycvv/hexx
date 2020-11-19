@@ -5,7 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { blocksAtom, isSelectAllAtom } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
 import { useEventListener } from '../../hooks/use-event-listener';
-import { findLastBlock, lastCursor } from '../../utils/find-blocks';
+import {
+  findBlockByIndex,
+  findLastBlock,
+  focusLastBlock,
+  lastCursor,
+} from '../../utils/find-blocks';
 import { removeRanges } from '../../utils/remove-ranges';
 import { Editable } from '../editable';
 import { BlockType } from '../editor';
@@ -54,7 +59,6 @@ export function Block({
     ref.current.dispatchEvent(event);
   };
 
-
   // useEventListener(
   //   'mouseup',
   //   (e) => {
@@ -97,6 +101,15 @@ export function Block({
               focusBlock(index - 1);
             }
           }
+          if (e.key === 'ArrowDown') {
+            let selectedRange = window.getSelection().getRangeAt(0);
+            if (
+              (selectedRange.commonAncestorContainer as Text)
+                ?.length === selectedRange.endOffset
+            ) {
+              focusBlock(index + 1);
+            }
+          }
           if (e[commandKey] && e.key === 'a') {
             if (isEditableSelectAll()) {
               setIsSelectAll(true);
@@ -121,11 +134,15 @@ export function Block({
               update((s) =>
                 s.filter((b) => b.id !== defaultBlock.id),
               );
-              setTimeout(() => {
-                const lastBlock = findLastBlock();
-                lastBlock?.editable?.focus();
+              requestAnimationFrame(() => {
+                const previousBlock = findBlockByIndex(index - 1);
+                if (!previousBlock) {
+                  focusLastBlock();
+                } else {
+                  previousBlock.editable?.focus();
+                }
                 lastCursor();
-              }, 0);
+              });
             }
           }
         }}

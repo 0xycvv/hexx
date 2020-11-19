@@ -1,11 +1,13 @@
-import { atom, Provider, useAtom } from 'jotai';
-import { MouseEvent, useEffect, useRef, useState } from 'react';
-import { v4 } from 'uuid';
+import { Provider, useAtom } from 'jotai';
 import {
-  blocksAtom,
-  isSelectAllAtom,
-  lastRangeAtom,
-} from '../../constants/atom';
+  createContext,
+  MouseEvent,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
+import { v4 } from 'uuid';
+import { blocksAtom, isSelectAllAtom } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import { useEventListener } from '../../hooks/use-event-listener';
@@ -15,10 +17,12 @@ import {
   focusLastBlock,
   lastCursor,
 } from '../../utils/find-blocks';
+import { generateGetBoundingClientRect } from '../../utils/virtual-element';
 import { Block } from '../block/block';
-import styles from './editor.module.css';
 import { InlineToolBar } from '../inline-toolbar';
-import { usePopper } from 'react-popper';
+import { useVirtualPopper } from '../virtual-popper/use-virtual-popper';
+import { VirtualPopper } from '../virtual-popper/virtual-popper';
+
 export type BlockType<T = any> = {
   id: string;
   type: string;
@@ -35,16 +39,13 @@ function Elliot() {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const active = useActiveBlockId();
   const [isSelectAll, setIsSelectAll] = useAtom(isSelectAllAtom);
-  const [selectedRange, setSelectedRange] = useAtom(lastRangeAtom);
-  const [referenceElement, setReferenceElement] = useState(null);
-  const [popperElement, setPopperElement] = useState(null);
-  const popper = usePopper(referenceElement, popperElement, {
+  const popper = useVirtualPopper({
     placement: 'top-start',
     modifiers: [
       {
         name: 'offset',
         options: {
-          offset: [0, 10],
+          offset: [0, 8],
         },
       },
     ],
@@ -78,36 +79,28 @@ function Elliot() {
     if (!selection || !selection.rangeCount) {
       return;
     }
-    try {
-      let selectedRange = window.getSelection().getRangeAt(0);
-      let selectedNode = selectedRange.commonAncestorContainer;
-      if (
-        Math.abs(
-          selectedRange.startOffset - selectedRange.endOffset,
-        ) > 0
-      ) {
-        const rect = selectedRange.getBoundingClientRect();
-        console.log(rect);
-        if (rect) {
-          setReferenceElement({
-            getBoundingClientRect: generateGetBoundingClientRect(
-              rect.x,
-              rect.y,
-            ),
-          });
+    let selectedRange = window.getSelection().getRangeAt(0);
+    if (
+      Math.abs(selectedRange.startOffset - selectedRange.endOffset) >
+      0
+    ) {
+      const rect = selectedRange.getBoundingClientRect();
+      if (rect) {
+        if (!popper.active) {
+          popper.setActive(true);
         }
-      } else {
-        setReferenceElement({
-          getBoundingClientRect: generateGetBoundingClientRect(),
+        popper.setReferenceElement({
+          getBoundingClientRect: generateGetBoundingClientRect(
+            rect.x,
+            rect.y,
+          ),
         });
       }
-    } catch (error) {
-      console.log(error);
     }
   });
 
   useEffect(() => {
-    ref.current?.addEventListener('focus-block', (e: CustomEvent) => {
+    const handler = (e: CustomEvent) => {
       if (e.detail?.index >= 0) {
         const block = findBlockByIndex(e.detail.index);
         if (block) {
@@ -117,42 +110,80 @@ function Elliot() {
           });
         }
       }
-    });
+    };
+    ref.current?.addEventListener('focus-block', handler);
+    return () => {
+      ref.current?.removeEventListener('focus-block', handler);
+    };
   }, []);
 
+  useEventListener('mousedown', (e) => {
+    if (popper.popperElement?.contains(e.target)) {
+      return;
+    }
+    popper.setActive(false);
+  });
+
+  useEventListener('blur', (e) => {
+    popper.setActive(false);
+  });
+
   return (
-    <div
-      ref={ref}
-      className={styles.editor}
-      onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === BackspaceKey && isSelectAll) {
-          setBlocks([
-            {
-              type: 'paragraph',
-              data: '',
-              id: v4(),
-            },
-          ]);
-          setIsSelectAll(false);
-          requestAnimationFrame(() => {
-            focusLastBlock();
-            lastCursor();
-          });
-        }
-      }}
-    >
-      {blocks.map((b, i) => (
-        <Block index={i} key={b.id} block={b} />
-      ))}
+    <>
       <div
-        ref={setPopperElement}
-        style={popper.styles.popper}
-        {...popper.attributes.popper}
+        ref={ref}
+        className="elliot"
+        onClick={handleClick}
+        onKeyDown={(e) => {
+          if (e.key === BackspaceKey && isSelectAll) {
+            setBlocks([
+              {
+                type: 'paragraph',
+                data: '',
+                id: v4(),
+              },
+            ]);
+            setIsSelectAll(false);
+            requestAnimationFrame(() => {
+              focusLastBlock();
+              lastCursor();
+            });
+          }
+        }}
       >
-        <InlineToolBar />
+        {blocks.map((b, i) => (
+          <Block index={i} key={b.id} block={b} />
+        ))}
+        <VirtualPopper popper={popper}>
+          <InlineToolBar />
+        </VirtualPopper>
+        <style jsx global>{`
+          .elliot {
+            flex-shrink: 0;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            font-size: 16px;
+            line-height: 1.5;
+            color: rgb(55, 53, 47);
+            padding-left: calc(96px + env(safe-area-inset-left));
+            padding-right: calc(96px + env(safe-area-inset-right));
+            padding-bottom: 30vh;
+            position: relative;
+          }
+
+          .elliot a {
+            text-decoration: none;
+          }
+          .elliot a:-webkit-any-link {
+            text-decoration: none;
+          }
+        `}</style>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -166,15 +197,3 @@ export const Editor = (props: EditorProps) => {
     </Provider>
   );
 };
-
-function generateGetBoundingClientRect(x = -10000, y = -10000) {
-  console.log(x, y);
-  return () => ({
-    width: 0,
-    height: 0,
-    top: y,
-    right: x,
-    bottom: y,
-    left: x,
-  });
-}

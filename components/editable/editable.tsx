@@ -7,7 +7,9 @@ import styles from './editable.module.css';
 
 export const Editable = forwardRef<ContentEditableProps, any>(
   (props, ref) => (
-    <ContentEditable
+    <div
+      dangerouslySetInnerHTML={{ __html: props.html }}
+      contentEditable
       placeholder="Type something..."
       className={styles.editable}
       ref={ref}
