@@ -11,8 +11,8 @@ import {
   generateGetBoundingClientRect,
   getRectFromTextNode,
 } from '../../../utils/virtual-element';
-import { useVirtualPopper } from '../../virtual-popper/use-virtual-popper';
-import { VirtualPopper } from '../../virtual-popper/virtual-popper';
+import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
+import { PortalPopper } from '../../virtual-popper/virtual-popper';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 import { styled } from 'src/stitches.config';
@@ -50,7 +50,7 @@ export function InlineLink() {
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
-  const popper = useVirtualPopper({ placement: 'bottom' });
+  const popper = useReactPopper({ placement: 'bottom' });
   const selectionWrapper = useRef<HTMLSpanElement>();
   const { getProps, setIsActive } = useInlineTool({
     type: 'link',
@@ -77,7 +77,7 @@ export function InlineLink() {
       <IconWrapper {...getProps()}>
         <Link />
       </IconWrapper>
-      <VirtualPopper
+      <PortalPopper
         onClose={() => {
           if (!hasChanged) {
             editableSnap.current.innerHTML = snapHTML.current;
@@ -118,7 +118,7 @@ export function InlineLink() {
             }, 0);
           }}
         />
-      </VirtualPopper>
+      </PortalPopper>
     </>
   );
 }

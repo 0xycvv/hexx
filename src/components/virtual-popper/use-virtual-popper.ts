@@ -5,8 +5,9 @@ import type {
 } from '@popperjs/core';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
+import { useEventListener } from 'src/hooks/use-event-listener';
 
-export function useVirtualPopper(props: {
+export function useReactPopper(props: {
   defaultActive?: boolean;
   placement: Placement;
   modifiers?: readonly Partial<Modifier<unknown, object>>[];
@@ -14,13 +15,20 @@ export function useVirtualPopper(props: {
   const [active, setActive] = useState(props.defaultActive);
   const [popperElement, setPopperElement] = useState(null);
   const [referenceElement, setReferenceElement] = useState<
-    VirtualElement
+    VirtualElement | Element
   >(null);
 
   const popper = usePopper(referenceElement, popperElement, {
     placement: props.placement,
     modifiers: props.modifiers,
     strategy: 'absolute',
+  });
+
+  useEventListener('mousedown', (e) => {
+    if (popperElement?.contains(e.target)) {
+      return;
+    }
+    setActive(false);
   });
 
   return {

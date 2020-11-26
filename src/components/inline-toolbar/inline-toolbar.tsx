@@ -8,7 +8,6 @@ import LinkOff from '../icons/link-off';
 import Underlined from '../icons/underlined';
 import { surround } from '../../utils/find-blocks';
 import { useAtom } from 'jotai';
-import { lastRangeAtom } from '../../constants/atom';
 import { Children, ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';

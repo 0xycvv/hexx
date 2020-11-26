@@ -1,6 +1,12 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { EditorUsage } from '../src';
+import dynamic from 'next/dynamic';
+const EditorUsage = dynamic(
+  () => import('../components/editor-usage'),
+  {
+    ssr: false,
+  },
+);
 
 export default function Home() {
   return (

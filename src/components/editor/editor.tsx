@@ -1,22 +1,37 @@
 import { Provider, useAtom } from 'jotai';
-import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import { useUpdateAtom } from 'jotai/utils.cjs';
+import {
+  createElement,
+  MouseEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+} from 'react';
+import {
+  DragDropContext,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import composeRefs from 'src/hooks/use-compose-ref';
 import { styled } from 'src/stitches.config';
+import { insert } from 'src/utils/insert';
 import { v4 } from 'uuid';
-import { blocksAtom, isSelectAllAtom } from '../../constants/atom';
+import {
+  blockMapAtom,
+  blocksAtom,
+  editorIdAtom,
+  isSelectAllAtom,
+} from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useActiveBlockId } from '../../hooks/use-active-element';
-import { useEventListener } from '../../hooks/use-event-listener';
 import {
   findBlockByIndex,
   findLastBlock,
   focusLastBlock,
   lastCursor,
 } from '../../utils/find-blocks';
-import { generateGetBoundingClientRect } from '../../utils/virtual-element';
 import { Block } from '../block/block';
-import { InlineToolBar } from '../inline-toolbar';
-import { useVirtualPopper } from '../virtual-popper/use-virtual-popper';
-import { VirtualPopper } from '../virtual-popper/virtual-popper';
+import { TextBlock } from '../block/text';
 
 export type BlockType<T = any> = {
   id: string;
@@ -24,7 +39,11 @@ export type BlockType<T = any> = {
   data: T;
 };
 
-interface EditorProps {
+export const BlockMap = {
+  paragraph: TextBlock,
+};
+
+export interface EditorProps {
   data?: BlockType[];
   defaultData?: BlockType[];
   children?: ReactNode;
@@ -53,13 +72,65 @@ const Wrapper = styled('div', {
   },
 });
 
+export function useEditor() {
+  const update = useUpdateAtom(blocksAtom);
+
+  const insertBlock = ({
+    index,
+    block,
+  }: {
+    index?: number;
+    block: any;
+  }) => {
+    let newBlock = {
+      ...block,
+      id: v4()
+    }
+    if (typeof index === 'undefined') {
+      update((s) => {
+        const result = [
+          ...s,
+          newBlock,
+        ];
+        return result;
+      });
+    } else {
+      update((s) => insert(s, index, newBlock));
+    }
+  };
+
+  const updateBlockDataWithId = ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: any;
+  }) => {
+    update((s) => s.map((b) => (b.id === id ? { ...b, data } : b)));
+  };
+
+  const removeBlockWithId = ({ id }: { id: string }) => {
+    update((s) => s.filter((b) => b.id !== id));
+  };
+
+  return {
+    insertBlock,
+    updateBlockDataWithId,
+    removeBlockWithId,
+  };
+}
+
 function Elliot(props: { children?: ReactNode }) {
+  const [id] = useAtom(editorIdAtom);
   const ref = useRef<HTMLDivElement>(null);
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const active = useActiveBlockId();
   const [isSelectAll, setIsSelectAll] = useAtom(isSelectAllAtom);
 
   const handleClick = (e: MouseEvent) => {
+    if (isSelectAll) {
+      setIsSelectAll(false);
+    }
     if (!active) {
       const lastBlock = findLastBlock();
       if (lastBlock) {
@@ -100,39 +171,53 @@ function Elliot(props: { children?: ReactNode }) {
     };
   }, []);
 
-  // useEventListener('blur', (e) => {
-  //   popper.setActive(false);
-  // });
+  const onDragEndHandler = (result: DropResult) => {
+    const { destination, source } = result;
+
+    if (!destination || destination.index === source.index) {
+      return;
+    }
+
+    const newBlocks = [...blocks];
+    const dragBlock = newBlocks.splice(source.index, 1);
+    newBlocks.splice(destination.index, 0, dragBlock[0]);
+    setBlocks(newBlocks);
+  };
 
   return (
-    <>
-      <Wrapper
-        ref={ref}
-        className="elliot"
-        onClick={handleClick}
-        onKeyDown={(e) => {
-          if (e.key === BackspaceKey && isSelectAll) {
-            setBlocks([
-              {
-                type: 'paragraph',
-                data: '',
-                id: v4(),
-              },
-            ]);
-            setIsSelectAll(false);
-            requestAnimationFrame(() => {
-              focusLastBlock();
-              lastCursor();
-            });
-          }
-        }}
-      >
-        {props.children}
-        {blocks.map((b, i) => (
-          <Block index={i} key={b.id} block={b} />
-        ))}
-      </Wrapper>
-    </>
+    <DragDropContext onDragEnd={onDragEndHandler}>
+      <Droppable droppableId={id}>
+        {(provided) => (
+          <Wrapper
+            ref={composeRefs(ref, provided.innerRef) as any}
+            className="elliot"
+            onClick={handleClick}
+            onKeyDown={(e) => {
+              if (e.key === BackspaceKey && isSelectAll) {
+                setBlocks([
+                  {
+                    type: 'paragraph',
+                    data: '',
+                    id: v4(),
+                  },
+                ]);
+                setIsSelectAll(false);
+                requestAnimationFrame(() => {
+                  focusLastBlock();
+                  lastCursor();
+                });
+              }
+            }}
+            {...provided.droppableProps}
+          >
+            {props.children}
+            {blocks.map((b, i) => (
+              <Block index={i} key={b.id} block={b} />
+            ))}
+          </Wrapper>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 }
 
@@ -140,58 +225,13 @@ export const Editor = (props: EditorProps) => {
   return (
     <Provider
       // @ts-ignore
-      initialValues={[[blocksAtom, props.data || []]]}
+      initialValues={[
+        [blocksAtom, props.data || []],
+        [editorIdAtom, v4()],
+        [blockMapAtom, BlockMap],
+      ]}
     >
       <Elliot>{props.children}</Elliot>
     </Provider>
-  );
-};
-
-export const EditorUsage = (props: EditorProps) => {
-  const popper = useVirtualPopper({
-    placement: 'top',
-    modifiers: [
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 8],
-        },
-      },
-    ],
-  });
-
-  useEventListener('selectionchange', (e) => {
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) {
-      return;
-    }
-    let selectedRange = selection.getRangeAt(0);
-    if (
-      Math.abs(selectedRange.startOffset - selectedRange.endOffset) >
-      0
-    ) {
-      const rect = selectedRange.getBoundingClientRect();
-      if (rect) {
-        if (!popper.active) {
-          popper.setActive(true);
-        }
-        popper.setReferenceElement({
-          getBoundingClientRect: generateGetBoundingClientRect(rect),
-        });
-      }
-    }
-  });
-  useEventListener('mousedown', (e) => {
-    if (popper.popperElement?.contains(e.target)) {
-      return;
-    }
-    popper.setActive(false);
-  });
-  return (
-    <Editor {...props}>
-      <VirtualPopper popper={popper}>
-        <InlineToolBar />
-      </VirtualPopper>
-    </Editor>
   );
 };

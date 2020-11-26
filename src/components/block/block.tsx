@@ -1,21 +1,26 @@
 import clsx from 'clsx';
 import { useAtom } from 'jotai';
 import { useSelector, useUpdateAtom } from 'jotai/utils.cjs';
-import { KeyboardEvent, useEffect, useRef } from 'react';
-import { styled } from 'src/stitches.config';
-import { v4 as uuidv4 } from 'uuid';
-import { blocksAtom, isSelectAllAtom } from '../../constants/atom';
-import { BackspaceKey, commandKey } from '../../constants/key';
 import {
-  findBlockByIndex,
-  focusLastBlock,
-  lastCursor,
-} from '../../utils/find-blocks';
-import { removeRanges } from '../../utils/remove-ranges';
-import { Editable } from '../editable';
-import { BlockType } from '../editor';
+  createElement,
+  forwardRef,
+  Fragment,
+  MouseEvent,
+  useRef,
+} from 'react';
+import { Draggable } from 'react-beautiful-dnd';
+import { styled } from 'src/stitches.config';
+import {
+  blockMapAtom,
+  blocksAtom,
+  editorIdAtom,
+  isSelectAllAtom,
+} from '../../constants/atom';
+import { BlockType, useEditor } from '../editor';
 import DragIndicator from '../icons/drag-indicator';
 import PlusSvg from '../icons/plus';
+import { useReactPopper } from '../virtual-popper/use-virtual-popper';
+import { PortalPopper } from '../virtual-popper/virtual-popper';
 
 const Menu = styled('div', {
   opacity: 0,
@@ -42,7 +47,7 @@ const Plus = styled('div', {
   color: 'rgba(55, 53, 47, 0.3)',
   position: 'absolute',
   top: 3,
-  left: '-48px',
+  left: '-24px',
   width: 24,
   height: 24,
   borderRadius: 3,
@@ -53,7 +58,7 @@ const Drag = styled('div', {
   userSelect: 'none',
   position: 'absolute',
   top: 3,
-  left: '-24px',
+  right: '-24px',
   pointerEvents: 'auto',
   cursor: '-webkit-grab',
   borderRadius: 3,
@@ -76,7 +81,6 @@ const SelectOverlay = styled('div', {
   opacity: 1,
 });
 
-
 function useBlock({
   block: defaultBlock,
   index,
@@ -84,6 +88,8 @@ function useBlock({
   block: BlockType;
   index: number;
 }) {
+  const [blocksMap] = useAtom(blockMapAtom);
+  const [editorId] = useAtom(editorIdAtom);
   const block = useSelector(
     blocksAtom,
     (v) => defaultBlock && v.find((b) => b.id === defaultBlock.id),
@@ -101,95 +107,12 @@ function useBlock({
     ref.current.dispatchEvent(event);
   };
 
-  const isEditableSelectAll = () => {
-    const sel = getSelection();
-    if (sel.type === 'Caret') {
-      if (!sel.anchorOffset && sel.isCollapsed) {
-        return true;
-      }
-      return false;
-    }
-    if (sel.type === 'Range') {
-      if (!sel.anchorOffset) {
-        return true;
-      }
-      return false;
-    }
-  };
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowUp') {
-      let selectedRange = window.getSelection().getRangeAt(0);
-      if (selectedRange.startOffset === 0) {
-        focusBlock(index - 1);
-      }
-    }
-    if (e.key === 'ArrowDown') {
-      let selectedRange = window.getSelection().getRangeAt(0);
-      if (
-        (selectedRange.commonAncestorContainer as Text)?.length ===
-        selectedRange.endOffset
-      ) {
-        focusBlock(index + 1);
-      }
-    }
-    if (e[commandKey] && e.key === 'a') {
-      if (isEditableSelectAll()) {
-        setIsSelectAll(true);
-        removeRanges();
-        e.preventDefault();
-      }
-    }
-    if (!e[commandKey] && e.key === 'Enter') {
-      const newP = {
-        type: 'paragraph',
-        data: '',
-        id: uuidv4(),
-      };
-      update((s) => insert(s, index + 1, newP));
-      e.preventDefault();
-    }
-    if (e.key === BackspaceKey) {
-      if (!block.data) {
-        if (index === 0) {
-          return;
-        }
-        update((s) => s.filter((b) => b.id !== defaultBlock.id));
-        requestAnimationFrame(() => {
-          const previousBlock = findBlockByIndex(index - 1);
-          if (!previousBlock) {
-            focusLastBlock();
-          } else {
-            previousBlock.editable?.focus();
-          }
-          lastCursor();
-        });
-      }
-    }
-  };
-
-  useEffect(() => {
-    ref.current?.focus();
-    lastCursor();
-  }, []);
-
   return {
+    editorId,
+    blockComponent: blocksMap[block.type],
     getBlockProps: () => ({
       'data-block-id': block.id,
       className: clsx('e-block'),
-    }),
-    getEditableProps: () => ({
-      onKeyDown,
-      ref,
-      html: block.data,
-      onChange: (evt) =>
-        update((s) =>
-          s.map((b) =>
-            b.id === defaultBlock.id
-              ? { ...b, data: evt.target.value }
-              : b,
-          ),
-        ),
     }),
     isSelectAll,
   };
@@ -202,44 +125,97 @@ export function Block({
   block: BlockType;
   index: number;
 }) {
-  const { getBlockProps, getEditableProps, isSelectAll } = useBlock({
+  const { getBlockProps, isSelectAll, blockComponent } = useBlock({
     block,
     index,
   });
 
   return (
-    <Wrapper {...getBlockProps()}>
-      <Menu>
-        <DragButton />
-        <PlusButton />
-      </Menu>
-      <Editable {...getEditableProps()} />
-      {isSelectAll && <SelectOverlay />}
-    </Wrapper>
+    <Draggable draggableId={block.id} index={index}>
+      {(provided) => (
+        <Wrapper
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...getBlockProps()}
+        >
+          <Menu>
+            <DragButton {...provided.dragHandleProps} />
+            <PlusButton index={index} />
+          </Menu>
+          {createElement(blockComponent, {
+            block,
+            index,
+          })}
+          {isSelectAll && <SelectOverlay />}
+        </Wrapper>
+      )}
+    </Draggable>
   );
 }
 
-function DragButton() {
+const DragButton = forwardRef((props, ref) => {
   return (
-    <Drag>
+    <Drag ref={ref as any} {...props}>
       <DragIndicator />
     </Drag>
   );
-}
+});
 
-function PlusButton() {
+const AddMenu = styled('div', {
+  background: 'black',
+  borderRadius: 4,
+  display: 'flex',
+  fontSize: '18px',
+  padding: 6,
+  color: 'white',
+  svg: {
+    cursor: 'pointer',
+  },
+});
+
+function PlusButton({
+  onClick,
+  index,
+}: {
+  onClick?: () => void;
+  index: number;
+}) {
+  const [blocksMap] = useAtom(blockMapAtom);
+  const popper = useReactPopper({
+    placement: 'right',
+  });
+  const { insertBlock } = useEditor();
+
   return (
-    <Plus>
-      <PlusSvg />
-    </Plus>
+    <>
+      <Plus
+        ref={popper.setReferenceElement}
+        onClick={(e) => {
+          popper.setActive(true);
+          onClick?.();
+          e.stopPropagation();
+        }}
+      >
+        <PlusSvg />
+      </Plus>
+      <PortalPopper popper={popper}>
+        <AddMenu>
+          {Object.entries(blocksMap).map(([key, blockType]) => (
+            <Fragment key={key}>
+              {createElement(blockType.icon.svg, {
+                onClick: (e: MouseEvent) => {
+                  insertBlock({
+                    block: blockType.defaultValue,
+                    index: index + 1,
+                  });
+                  popper.setActive(false);
+                  e.stopPropagation();
+                },
+              })}
+            </Fragment>
+          ))}
+        </AddMenu>
+      </PortalPopper>
+    </>
   );
 }
-
-const insert = (arr, index, newItem) => [
-  // part of the array before the specified index
-  ...arr.slice(0, index),
-  // inserted item
-  newItem,
-  // part of the array after the specified index
-  ...arr.slice(index),
-];

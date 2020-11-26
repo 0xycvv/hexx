@@ -1,16 +1,18 @@
-import { ReactNode } from 'react';
+import { MouseEvent, ReactNode } from 'react';
+import { styled } from 'src/stitches.config';
 import ClientOnlyPortal from '../client-only-portal';
-import { useVirtualPopper } from './use-virtual-popper';
+import { useReactPopper } from './use-virtual-popper';
+import type { Property } from 'csstype';
 
-type Props = ReturnType<typeof useVirtualPopper>;
+type Props = ReturnType<typeof useReactPopper>;
 
-export function VirtualPopper({
+export function PortalPopper({
   popper,
   ...props
 }: {
   selector?: string;
   children: ReactNode;
-  pointerEvent?: string;
+  pointerEvent?: Property.PointerEvents;
   onClose?: () => void;
 } & { popper: Props }) {
   if (!popper.active) {
@@ -19,7 +21,14 @@ export function VirtualPopper({
   return (
     <ClientOnlyPortal selector={props.selector || 'body'}>
       <Overlay
-        pointerEvent={props.pointerEvent}
+        className="elliot-popper-overlay"
+        style={{
+          pointerEvents: props.pointerEvent || 'none',
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         onClick={(e) => {
           props.onClose?.();
           popper.setActive(false);
@@ -32,30 +41,10 @@ export function VirtualPopper({
   );
 }
 
-function Overlay(props: {
-  onClick?: (e: MouseEvent) => void;
-  pointerEvent?: string;
-}) {
-  return (
-    <>
-      <style jsx>{`
-        .elliot-popper-overlay {
-          position: fixed;
-          top: 0px;
-          left: 0px;
-          width: 100vw;
-          height: 100vh;
-          pointer-events: ${props.pointerEvent || 'none'};
-        }
-      `}</style>
-      <div
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onClick={props.onClick}
-        className="elliot-popper-overlay"
-      ></div>
-    </>
-  );
-}
+const Overlay = styled('div', {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+});
