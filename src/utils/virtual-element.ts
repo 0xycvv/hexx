@@ -1,14 +1,15 @@
+import { Rect } from '@popperjs/core';
+
 export function generateGetBoundingClientRect(
-  x = -10000,
-  y = -10000,
+  rect: Rect = { x: -10000, y: -10000, width: 0, height: 0 },
 ) {
   return () => ({
-    width: 0,
-    height: 0,
-    top: y,
-    right: x,
-    bottom: y,
-    left: x,
+    width: rect.width,
+    height: rect.height,
+    top: rect.y,
+    right: rect.x,
+    bottom: rect.y,
+    left: rect.x,
   });
 }
 

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.5.4",
+    "@stitches/react": "^0.0.2",
     "clsx": "^1.1.1",
     "jotai": "^0.10.5",
     "react-contenteditable": "^3.3.5",

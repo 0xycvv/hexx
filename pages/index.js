@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { Editor } from '../components/editor';
+import { EditorUsage } from '../src';
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <Editor
+        <EditorUsage
           data={[
             {
               id: '1asdfs',

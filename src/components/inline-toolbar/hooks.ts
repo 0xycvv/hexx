@@ -63,14 +63,13 @@ export function useEventChangeSelection(
 }
 
 const isLink = () => {
-  const selection = window.getSelection().getRangeAt(0);
+  const selection = getSelection();
   if (selection) {
-    console.log(selection);
     if (
       // @ts-ignore
-      selection.startContainer.parentNode.tagName === 'A' ||
+      selection.startContainer?.parentNode.tagName === 'A' ||
       // @ts-ignore
-      selection.endContainer.parentNode.tagName === 'A'
+      selection.endContainer?.parentNode.tagName === 'A'
     ) {
       return true;
     } else {

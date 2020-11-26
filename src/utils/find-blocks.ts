@@ -1,3 +1,7 @@
+function isBrowser() {
+  return typeof window !== 'undefined';
+}
+
 function findClosetBlock() {
   return;
 }
@@ -49,8 +53,14 @@ export function focusLastBlock() {
 }
 
 export function lastCursor() {
-  document.execCommand('selectAll', false); // select all the content in the element
-  document.getSelection()?.collapseToEnd(); // collapse selection to the end
+  if (isBrowser) {
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) {
+      return;
+    }
+    document.execCommand('selectAll', false); // select all the content in the element
+    document.getSelection()?.collapseToEnd(); // collapse selection to the end
+  }
 }
 
 export function focusWithCursor(el: Node, cursorIndex: number) {
@@ -64,6 +74,10 @@ export function focusWithCursor(el: Node, cursorIndex: number) {
   sel.addRange(range);
 }
 
-export function surround(commandName: string, selection?: Selection, value?: string) {
+export function surround(
+  commandName: string,
+  selection?: Selection,
+  value?: string,
+) {
   document.execCommand(commandName, false, value);
 }

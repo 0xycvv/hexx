@@ -20,3 +20,20 @@ export function restoreSelection(range?: Range) {
   selection.removeAllRanges();
   selection.addRange(range);
 }
+
+export function getSelectionRange() {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) {
+    return;
+  }
+  return selection.getRangeAt(0);
+}
+
+export function extractFragmentFromPosition(
+  blockEl: Node | HTMLElement,
+) {
+  const range = getSelectionRange();
+  range.selectNodeContents(blockEl);
+  range.setStart(range.endContainer, range.endOffset);
+  return range.extractContents();
+}

@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import Link from '../../../components/icons/link';
+import Link from '../../icons/link';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import {
   findContentEditable,
@@ -14,6 +14,25 @@ import {
 import { useVirtualPopper } from '../../virtual-popper/use-virtual-popper';
 import { VirtualPopper } from '../../virtual-popper/virtual-popper';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
+import { IconWrapper } from '../inline-toolbar';
+import { styled } from 'src/stitches.config';
+
+const LinkWrapper = styled('div', {
+  boxShadow: `rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
+  rgba(15, 15, 15, 0.1) 0px 3px 6px,
+  rgba(15, 15, 15, 0.2) 0px 9px 24px`,
+  overflow: 'hidden',
+  backgroundColor: 'white',
+});
+
+const InputWrapper = styled('div', {
+  paddingTop: 6,
+  paddingBottom: 6,
+  marginTop: 8,
+  marginBottom: 8,
+  marginLeft: 14,
+  marginRight: 14,
+});
 
 function highlight(r: Range | null) {
   if (!r) return;
@@ -26,25 +45,12 @@ function highlight(r: Range | null) {
   return el;
 }
 
-function unwrap(wrapper) {
-  // place childNodes in document fragment
-  var docFrag = document.createDocumentFragment();
-  while (wrapper.firstChild) {
-    var child = wrapper.removeChild(wrapper.firstChild);
-    docFrag.appendChild(child);
-  }
-
-  // replace wrapper with document fragment
-  return wrapper;
-}
-
 export function InlineLink() {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
-  const popper = useVirtualPopper({ placement: 'bottom-start' });
-  const [range, setRange] = useState<Range>();
+  const popper = useVirtualPopper({ placement: 'bottom' });
   const selectionWrapper = useRef<HTMLSpanElement>();
   const { getProps, setIsActive } = useInlineTool({
     type: 'link',
@@ -55,39 +61,22 @@ export function InlineLink() {
       editableSnap.current = editable;
       snapHTML.current = editable.innerHTML;
       const selRange = saveSelection();
-      setRange(selRange);
       selectionWrapper.current = highlight(selRange);
       popper.setActive((s) => !s);
       const rect = getRectFromTextNode();
       popper.setReferenceElement({
-        getBoundingClientRect: rect
-          ? generateGetBoundingClientRect(rect.x, rect.bottom)
-          : generateGetBoundingClientRect(),
+        getBoundingClientRect: generateGetBoundingClientRect(rect),
       });
     },
   });
-
-  const resetSelectionHTML = () => {
-    const childNodes = selectionWrapper.current.childNodes;
-    const r = document.createRange();
-    console.log(childNodes);
-    r.selectNodeContents(childNodes[0]);
-
-    selectionWrapper.current.replaceWith(
-      ...selectionWrapper.current.childNodes,
-    );
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(r);
-  };
 
   useEventChangeSelection(setIsActive);
 
   return (
     <>
-      <div {...getProps()}>
+      <IconWrapper {...getProps()}>
         <Link />
-      </div>
+      </IconWrapper>
       <VirtualPopper
         onClose={() => {
           if (!hasChanged) {
@@ -138,8 +127,8 @@ function LinkInput(props: { onClose: (value: string) => void }) {
   const ref = useRef<HTMLInputElement>();
   return (
     <>
-      <div className="link-wrapper">
-        <div className="input-wrapper">
+      <LinkWrapper>
+        <InputWrapper>
           <input
             onFocus={() => {}}
             autoFocus
@@ -161,25 +150,8 @@ function LinkInput(props: { onClose: (value: string) => void }) {
               }
             }}
           />
-        </div>
-      </div>
-      <style jsx>{`
-        .link-wrapper {
-          box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
-            rgba(15, 15, 15, 0.1) 0px 3px 6px,
-            rgba(15, 15, 15, 0.2) 0px 9px 24px;
-          overflow: hidden;
-          background-color: white;
-        }
-        .input-wrapper {
-          padding-top: 6px;
-          padding-bottom: 6px;
-          margin-top: 8px;
-          margin-bottom: 8px;
-          margin-left: 14px;
-          margin-right: 14px;
-        }
-      `}</style>
+        </InputWrapper>
+      </LinkWrapper>
     </>
   );
 }
