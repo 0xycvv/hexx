@@ -37,13 +37,9 @@ export function extractFragmentFromPosition() {
   range.setStart(selectRange.endContainer, selectRange.endOffset);
 
   let next = range.extractContents();
-  // range.setEndAfter(range.commonAncestorContainer);
 
-  console.log(next);
   const wrapper = document.createElement('div');
   wrapper.append(next);
-  console.log(wrapper.innerHTML);
-  // return {};
   return {
     next: wrapper.innerHTML,
     // @ts-ignore
