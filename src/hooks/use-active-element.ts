@@ -7,15 +7,23 @@ export const useActiveBlockId = () => {
 
   const handleClick = () => {
     if (document.activeElement) {
-      // console.log(
-      //   document.activeElement,
-      //   document.activeElement.closest('[data-block-id]'),
-      // );
+      let editable;
+      const isActiveElementEditable =
+        document.activeElement.getAttribute('contenteditable') ===
+        'true';
+      if (isActiveElementEditable) {
+        editable = document.activeElement;
+      }
       const closetBlockId = document.activeElement.closest(
         '[data-block-id]',
       );
       if (closetBlockId) {
-        setActive(closetBlockId);
+        const blockId = closetBlockId.getAttribute('data-block-id');
+        setActive({
+          id: blockId,
+          blockEl: closetBlockId,
+          editable,
+        });
       } else {
         setActive(null);
       }

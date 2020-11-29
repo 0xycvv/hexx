@@ -1,36 +1,34 @@
 import { Provider, useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils.cjs';
-import {
-  createElement,
-  MouseEvent,
-  ReactNode,
-  useEffect,
-  useRef,
-} from 'react';
+import { MouseEvent, ReactNode, useRef } from 'react';
 import {
   DragDropContext,
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
 import composeRefs from 'src/hooks/use-compose-ref';
+import { useEditor } from 'src/hooks/use-editor';
 import { styled } from 'src/stitches.config';
-import { insert } from 'src/utils/insert';
 import { v4 } from 'uuid';
 import {
+  blockIdListAtom,
   blockMapAtom,
-  blocksAtom,
+  blocksIdMapAtom,
   editorIdAtom,
   isSelectAllAtom,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import {
-  findBlockByIndex,
   findLastBlock,
   focusLastBlock,
   lastCursor,
 } from '../../utils/find-blocks';
+import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
+import { Divider } from '../block/divider';
+import { HeaderBlock } from '../block/header';
+import { ListBlock } from '../block/list';
+import { QuoteBlock } from '../block/quote';
 import { TextBlock } from '../block/text';
 
 export type BlockType<T = any> = {
@@ -39,14 +37,10 @@ export type BlockType<T = any> = {
   data: T;
 };
 
-export const BlockMap = {
-  paragraph: TextBlock,
-};
-
 export interface EditorProps {
   data?: BlockType[];
-  defaultData?: BlockType[];
   children?: ReactNode;
+  blockMap: Record<string, any>;
 }
 
 const Wrapper = styled('div', {
@@ -72,60 +66,14 @@ const Wrapper = styled('div', {
   },
 });
 
-export function useEditor() {
-  const update = useUpdateAtom(blocksAtom);
-
-  const insertBlock = ({
-    index,
-    block,
-  }: {
-    index?: number;
-    block: any;
-  }) => {
-    let newBlock = {
-      ...block,
-      id: v4()
-    }
-    if (typeof index === 'undefined') {
-      update((s) => {
-        const result = [
-          ...s,
-          newBlock,
-        ];
-        return result;
-      });
-    } else {
-      update((s) => insert(s, index, newBlock));
-    }
-  };
-
-  const updateBlockDataWithId = ({
-    id,
-    data,
-  }: {
-    id: string;
-    data: any;
-  }) => {
-    update((s) => s.map((b) => (b.id === id ? { ...b, data } : b)));
-  };
-
-  const removeBlockWithId = ({ id }: { id: string }) => {
-    update((s) => s.filter((b) => b.id !== id));
-  };
-
-  return {
-    insertBlock,
-    updateBlockDataWithId,
-    removeBlockWithId,
-  };
-}
-
 function Elliot(props: { children?: ReactNode }) {
   const [id] = useAtom(editorIdAtom);
+  const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
+  const [blockIdMap] = useAtom(blocksIdMapAtom);
   const ref = useRef<HTMLDivElement>(null);
-  const [blocks, setBlocks] = useAtom(blocksAtom);
   const active = useActiveBlockId();
   const [isSelectAll, setIsSelectAll] = useAtom(isSelectAllAtom);
+  const { insertBlock, clear } = useEditor();
 
   const handleClick = (e: MouseEvent) => {
     if (isSelectAll) {
@@ -134,42 +82,35 @@ function Elliot(props: { children?: ReactNode }) {
     if (!active) {
       const lastBlock = findLastBlock();
       if (lastBlock) {
-        const activeBlocks = blocks.find(
-          (b) => b.id === lastBlock.blockId,
-        );
-        if (activeBlocks && activeBlocks.data) {
-          setBlocks((s) => [
-            ...s,
-            { id: v4(), type: 'paragraph', data: '' },
-          ]);
-          lastBlock.editable.focus();
+        if (lastBlock.editable) {
+          if (lastBlock.editable?.textContent?.length > 0) {
+            insertBlock({
+              block: {
+                type: 'paragraph',
+                data: {
+                  text: '',
+                },
+              },
+            });
+            lastBlock.editable?.focus();
+          } else {
+            lastBlock.editable?.focus();
+          }
         } else {
-          lastBlock.editable.focus();
-        }
-      }
-    } else {
-      // @ts-ignore
-      active?.querySelector('[contenteditable]')?.focus();
-    }
-  };
-
-  useEffect(() => {
-    const handler = (e: CustomEvent) => {
-      if (e.detail?.index >= 0) {
-        const block = findBlockByIndex(e.detail.index);
-        if (block) {
-          block.editable.focus();
-          requestAnimationFrame(() => {
-            lastCursor();
+          insertBlock({
+            block: {
+              type: 'paragraph',
+              data: {
+                text: '',
+              },
+            },
           });
         }
       }
-    };
-    ref.current?.addEventListener('focus-block', handler);
-    return () => {
-      ref.current?.removeEventListener('focus-block', handler);
-    };
-  }, []);
+    } else {
+      active?.editable?.focus();
+    }
+  };
 
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result;
@@ -178,10 +119,10 @@ function Elliot(props: { children?: ReactNode }) {
       return;
     }
 
-    const newBlocks = [...blocks];
+    const newBlocks = [...blockIdList];
     const dragBlock = newBlocks.splice(source.index, 1);
     newBlocks.splice(destination.index, 0, dragBlock[0]);
-    setBlocks(newBlocks);
+    setBlockIdList(newBlocks);
   };
 
   return (
@@ -194,13 +135,7 @@ function Elliot(props: { children?: ReactNode }) {
             onClick={handleClick}
             onKeyDown={(e) => {
               if (e.key === BackspaceKey && isSelectAll) {
-                setBlocks([
-                  {
-                    type: 'paragraph',
-                    data: '',
-                    id: v4(),
-                  },
-                ]);
+                clear();
                 setIsSelectAll(false);
                 requestAnimationFrame(() => {
                   focusLastBlock();
@@ -211,8 +146,8 @@ function Elliot(props: { children?: ReactNode }) {
             {...provided.droppableProps}
           >
             {props.children}
-            {blocks.map((b, i) => (
-              <Block index={i} key={b.id} block={b} />
+            {blockIdList.map((bId, i) => (
+              <Block index={i} key={bId} block={blockIdMap[bId]} />
             ))}
           </Wrapper>
         )}
@@ -222,13 +157,15 @@ function Elliot(props: { children?: ReactNode }) {
 }
 
 export const Editor = (props: EditorProps) => {
+  const { byId, ids } = normalize(props.data || [], 'id');
   return (
     <Provider
       // @ts-ignore
       initialValues={[
-        [blocksAtom, props.data || []],
+        [blockIdListAtom, ids],
+        [blocksIdMapAtom, byId],
         [editorIdAtom, v4()],
-        [blockMapAtom, BlockMap],
+        [blockMapAtom, props.blockMap],
       ]}
     >
       <Elliot>{props.children}</Elliot>

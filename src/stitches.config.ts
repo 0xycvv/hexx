@@ -6,3 +6,7 @@ export const { styled, css } = createStyled({
   breakpoints: {},
   utils: {},
 });
+
+export const theme = css.theme({
+  select: '#2BC3A8',
+});

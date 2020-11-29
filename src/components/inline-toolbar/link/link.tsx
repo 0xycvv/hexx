@@ -55,9 +55,7 @@ export function InlineLink() {
   const { getProps, setIsActive } = useInlineTool({
     type: 'link',
     onClick: () => {
-      const editable = findContentEditable(
-        activeBlock as HTMLElement,
-      );
+      const editable = activeBlock.editable;
       editableSnap.current = editable;
       snapHTML.current = editable.innerHTML;
       const selRange = saveSelection();

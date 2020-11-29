@@ -4,6 +4,7 @@ import { useEventListener } from 'src/hooks/use-event-listener';
 import { generateGetBoundingClientRect } from 'src/utils/virtual-element';
 import { PortalPopper } from 'src/components/virtual-popper/virtual-popper';
 import { InlineToolBar } from 'src/components/inline-toolbar';
+import { BlockMap } from 'src/components/default-block-map';
 
 const EditorUsage = (props: EditorProps) => {
   const popper = useReactPopper({
@@ -41,7 +42,7 @@ const EditorUsage = (props: EditorProps) => {
   });
 
   return (
-    <Editor {...props}>
+    <Editor {...props} blockMap={BlockMap}>
       <PortalPopper popper={popper}>
         <InlineToolBar />
       </PortalPopper>

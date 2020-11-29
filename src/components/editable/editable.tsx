@@ -1,7 +1,9 @@
-import clsx from 'clsx';
 import { forwardRef } from 'react';
 import { css } from 'src/stitches.config';
-import { ContentEditableProps } from '../contenteditable';
+import {
+  ContentEditableProps,
+  ContentEditable,
+} from '../contenteditable';
 
 const styles = css({
   maxWidth: '100%',
@@ -9,8 +11,7 @@ const styles = css({
   whiteSpace: 'pre-wrap',
   wordBreak: 'break-word',
   caretColor: 'rgb(55, 53, 47)',
-  padding: '3px 2px',
-  ':focus': {
+  '&:focus': {
     outline: 'none',
   },
   '&[placeholder]:empty::before': {
@@ -28,13 +29,11 @@ const styles = css({
 });
 export const Editable = forwardRef<any, ContentEditableProps>(
   (props, ref) => (
-    <div
-      dangerouslySetInnerHTML={{ __html: props.html }}
-      contentEditable
-      placeholder="Type something..."
-      className={clsx('e-editable', styles.toString())}
-      ref={ref}
+    <ContentEditable
       {...props}
+      placeholder={props.placeholder || 'Type something...'}
+      className={`e-editable ${props.className || ''} ${styles}`}
+      ref={ref as any}
     />
   ),
 );

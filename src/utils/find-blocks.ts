@@ -6,12 +6,12 @@ function findClosetBlock() {
   return;
 }
 
-export function findBlockByIndex(i: number) {
+export function findBlockByIndex(i: number, first?: boolean) {
   const el = document.querySelector(
     `[data-block-id]:nth-of-type(${i + 1})`,
   );
   if (el instanceof HTMLElement) {
-    const editable = findContentEditable(el);
+    const editable = findContentEditable(el, first);
     const blockId = el.dataset?.blockId;
     return {
       el,
@@ -22,11 +22,27 @@ export function findBlockByIndex(i: number) {
   return null;
 }
 
-export function findContentEditable(el: HTMLElement) {
-  const editable = el.querySelector(
-    '[contenteditable]',
-  ) as HTMLDivElement;
-  return editable;
+export function focusBlockByIndex(i: number, first?: boolean) {
+  findBlockByIndex(i, first)?.editable?.focus();
+  requestAnimationFrame(() => {
+    lastCursor();
+  });
+}
+
+export function findContentEditable(
+  el?: HTMLElement,
+  first?: boolean,
+) {
+  if (!el) {
+    return;
+  }
+  if (first) {
+    const editable = el.querySelector('[contenteditable');
+    return editable as HTMLDivElement;
+  }
+  const editableNodeList = el.querySelectorAll('[contenteditable]');
+  const editable = editableNodeList[editableNodeList.length - 1];
+  return editable as HTMLDivElement;
 }
 
 export function findLastBlock() {
@@ -48,7 +64,7 @@ export function findLastBlock() {
 export function focusLastBlock() {
   const lastBlock = findLastBlock();
   if (lastBlock) {
-    lastBlock.editable.focus();
+    lastBlock.editable?.focus();
   }
 }
 

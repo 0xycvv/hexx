@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "icons": "svgr --template ./icon-template.js --ext tsx --icon --filename-case 'kebab' --title-prop --ref -d ./components/icons ./components/icons"
+    "icons": "svgr --template ./icon-template.js --ext tsx --icon --filename-case 'kebab' --title-prop --ref -d ./src/components/icons ./src/components/icons"
   },
   "dependencies": {
     "@popperjs/core": "^2.5.4",
