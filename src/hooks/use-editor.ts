@@ -53,6 +53,22 @@ export function useEditor() {
     updateIdList((s) => s.filter((s) => s !== id));
   };
 
+  const splitBlock = ({
+    index,
+    block,
+    newBlock,
+  }: {
+    index: number;
+    block: any;
+    newBlock: any;
+  }) => {
+    insertBlock({ index: index + 1, block: newBlock });
+    updateBlockDataWithId({
+      id: block.id,
+      data: block.data,
+    });
+  };
+
   const clear = (defaultValue?: any) => {
     const value = {
       type: 'paragraph',
@@ -64,6 +80,7 @@ export function useEditor() {
   };
 
   return {
+    splitBlock,
     insertBlock,
     updateBlockDataWithId,
     removeBlockWithId,

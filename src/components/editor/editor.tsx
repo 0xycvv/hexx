@@ -1,5 +1,5 @@
 import { Provider, useAtom } from 'jotai';
-import { MouseEvent, ReactNode, useRef } from 'react';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -12,9 +12,10 @@ import { v4 } from 'uuid';
 import {
   blockIdListAtom,
   blockMapAtom,
+  blockSelectAtom,
   blocksIdMapAtom,
   editorIdAtom,
-  isSelectAllAtom,
+  isEditorSelectAllAtom,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useActiveBlockId } from '../../hooks/use-active-element';
@@ -72,10 +73,17 @@ function Elliot(props: { children?: ReactNode }) {
   const [blockIdMap] = useAtom(blocksIdMapAtom);
   const ref = useRef<HTMLDivElement>(null);
   const active = useActiveBlockId();
-  const [isSelectAll, setIsSelectAll] = useAtom(isSelectAllAtom);
+  const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
+  const [isSelectAll, setIsSelectAll] = useAtom(
+    isEditorSelectAllAtom,
+  );
   const { insertBlock, clear } = useEditor();
 
   const handleClick = (e: MouseEvent) => {
+    if (blockSelect > -1) {
+      setBlockSelect(-1);
+      return;
+    }
     if (isSelectAll) {
       setIsSelectAll(false);
     }
@@ -116,8 +124,10 @@ function Elliot(props: { children?: ReactNode }) {
     const { destination, source } = result;
 
     if (!destination || destination.index === source.index) {
+      setBlockSelect(-1);
       return;
     }
+    setBlockSelect(destination.index);
 
     const newBlocks = [...blockIdList];
     const dragBlock = newBlocks.splice(source.index, 1);

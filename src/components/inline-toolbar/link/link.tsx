@@ -1,21 +1,20 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import Link from '../../icons/link';
+import { styled } from 'src/stitches.config';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import {
-  findContentEditable,
-  surround,
+  surround
 } from '../../../utils/find-blocks';
-import { saveSelection } from '../../../utils/remove-ranges';
+import { saveSelection } from '../../../utils/ranges';
 import {
   generateGetBoundingClientRect,
-  getRectFromTextNode,
+  getRectFromTextNode
 } from '../../../utils/virtual-element';
+import Link from '../../icons/link';
 import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
 import { PortalPopper } from '../../virtual-popper/virtual-popper';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
-import { styled } from 'src/stitches.config';
 
 const LinkWrapper = styled('div', {
   boxShadow: `rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,

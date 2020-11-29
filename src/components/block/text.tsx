@@ -1,26 +1,26 @@
-import { useAtom } from 'jotai';
-import { useEffect, useRef } from 'react';
-import { isSelectAllAtom } from 'src/constants/atom';
+import { KeyboardEvent, useEffect, useRef } from 'react';
 import { useEditor } from 'src/hooks/use-editor';
 import { css } from 'src/stitches.config';
 import { lastCursor } from 'src/utils/find-blocks';
+import { extractFragmentFromPosition } from 'src/utils/ranges';
 import { Editable } from '../editable';
-import { BlockType } from '../editor';
 import { text as TextIcon } from '../icons';
 import { BlockProps } from './block';
 
 export function TextBlock({ index, block }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
   const {
-    insertBlock,
-    removeBlockWithId,
     updateBlockDataWithId,
+    splitBlock,
+    insertBlock,
   } = useEditor();
 
   useEffect(() => {
     ref.current?.focus();
-    lastCursor();
-  }, []);
+    if (!block.data.text) {
+      lastCursor();
+    }
+  }, [block.data.text]);
 
   const props = {
     ref,

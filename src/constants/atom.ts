@@ -13,7 +13,8 @@ type ActiveBlock = {
 // active block id
 export const activeBlockIdAtom = atom<ActiveBlock>({});
 
-export const isSelectAllAtom = atom<boolean>(false);
+export const isEditorSelectAllAtom = atom<boolean>(false);
+export const blockSelectAtom = atom(-1);
 
 export const blockMapAtom = atom<Record<string, any>>({});
 

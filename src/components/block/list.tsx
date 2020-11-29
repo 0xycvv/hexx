@@ -6,6 +6,7 @@ import {
   findContentEditable,
   lastCursor,
 } from 'src/utils/find-blocks';
+import { extractFragmentFromPosition } from 'src/utils/ranges';
 import { Editable } from '../editable';
 import { list as ListSvg } from '../icons';
 import { BlockProps } from './block';
@@ -14,7 +15,6 @@ const commonListStyle = {
   paddingLeft: 40,
   outline: 'none',
   position: 'relative',
-  left: 18,
 } as const;
 
 const styles = {
@@ -70,18 +70,26 @@ export function ListBlock({ index, block, config }: BlockProps) {
   );
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!e.shiftKey && e.key === 'Enter') {
-      updateBlockDataWithId({
-        id: block.id,
-        data: {
-          ...block.data,
-          items: replaceItemAtIndex(
-            block.data.items,
-            activeListItemIndex + 1,
-            '',
-          ),
-        },
-      });
-      e.preventDefault();
+      if (!!block.data.items[activeListItemIndex]) {
+        const { current, next } = extractFragmentFromPosition();
+        updateBlockDataWithId({
+          id: block.id,
+          data: {
+            ...block.data,
+            items: replaceItemAtIndex(
+              replaceItemAtIndex(
+                block.data.items,
+                activeListItemIndex,
+                current,
+              ),
+              activeListItemIndex + 1,
+              next,
+            ),
+          },
+        });
+        e.stopPropagation();
+        e.preventDefault();
+      }
     } else if (e.key === BackspaceKey) {
       if (!block.data.items[activeListItemIndex]) {
         updateBlockDataWithId({

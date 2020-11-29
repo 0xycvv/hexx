@@ -13,13 +13,15 @@ import { Draggable } from 'react-beautiful-dnd';
 import { useEditor } from 'src/hooks/use-editor';
 import { styled } from 'src/stitches.config';
 import {
+  extractFragmentFromPosition,
   getSelectionRange,
   removeRanges,
-} from 'src/utils/remove-ranges';
+} from 'src/utils/ranges';
 import {
   blockMapAtom,
+  blockSelectAtom,
   editorIdAtom,
-  isSelectAllAtom,
+  isEditorSelectAllAtom,
 } from '../../constants/atom';
 import { BlockType } from '../editor';
 import DragIndicator from '../icons/drag-indicator';
@@ -105,13 +107,18 @@ function useBlock({
   block: BlockType;
   index: number;
 }) {
-  const { insertBlock, removeBlockWithId } = useEditor();
+  const { insertBlock, removeBlockWithId, splitBlock } = useEditor();
   const [blocksMap] = useAtom(blockMapAtom);
   const [editorId] = useAtom(editorIdAtom);
-  const [isSelectAll, setIsSelectAll] = useAtom(isSelectAllAtom);
+  const [isEditorSelectAll, setIsEditorSelectAll] = useAtom(
+    isEditorSelectAllAtom,
+  );
+  const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const ref = useRef<HTMLDivElement>(null);
+  const selectInputRef = useRef<HTMLInputElement>(null);
 
   const currentBlock = blocksMap[block.type];
+  const isBlockSelect = blockSelect === index;
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowUp') {
@@ -132,34 +139,48 @@ function useBlock({
       }
     }
     if (!e.shiftKey && e.key === 'Enter') {
-      insertBlock({
-        index: index + 1,
+      const { current, next } = extractFragmentFromPosition();
+      splitBlock({
+        index,
         block: {
+          ...block,
+          data: {
+            ...block.data,
+            text: current,
+          },
+        },
+        newBlock: {
           type: TextBlock.block.type,
-          data: TextBlock.block.defaultValue,
+          data: {
+            ...TextBlock.block.defaultValue,
+            text: next,
+          },
         },
       });
       e.preventDefault();
     }
     if (e[commandKey] && e.key === 'a') {
-      if (isSelectAll) {
+      if (isEditorSelectAll) {
         e.preventDefault();
       }
       if (isEditableSelectAll()) {
-        setIsSelectAll(true);
+        setIsEditorSelectAll(true);
         removeRanges();
         e.preventDefault();
       }
       return;
     }
     if (e.key === BackspaceKey) {
+      // TODO: handle if caret on start
       if (
         ((typeof currentBlock.block.isEmpty === 'function' &&
           currentBlock.block.isEmpty(block.data)) ||
-          Object.keys(block.data).length === 0) &&
+          Object.keys(block.data).length === 0 ||
+          isBlockSelect) &&
         index !== 0
       ) {
         removeBlockWithId({ id: block.id });
+        setBlockSelect(-1);
         requestAnimationFrame(() => {
           const previousBlock = findBlockByIndex(index - 1);
           if (!previousBlock) {
@@ -171,18 +192,38 @@ function useBlock({
         });
       }
     }
-    setIsSelectAll(false);
+    setIsEditorSelectAll(false);
   };
 
+  useEffect(() => {
+    if (isBlockSelect) {
+      selectInputRef.current?.focus();
+    }
+  }, [isBlockSelect]);
+
   return {
+    ref,
+    selectInputRef,
     editorId,
     blockComponent: currentBlock,
     getBlockProps: () => ({
       'data-block-id': block.id,
       className: 'e-block',
       onKeyDown,
+      onClick: (e) => {
+        const editable = findContentEditable(ref.current);
+        if (!editable) {
+          setBlockSelect(index);
+          e.stopPropagation();
+        }
+      },
     }),
-    isSelectAll,
+    isBlockSelect,
+    isEditorSelectAll,
+    setIsBlockSelect: (value: boolean) => {
+      console.log(value);
+      setBlockSelect(value ? index : -1);
+    },
   };
 }
 
@@ -192,13 +233,20 @@ export interface BlockProps<T = any> {
   config?: T;
 }
 export function Block({ block, index }: BlockProps) {
-  const { getBlockProps, isSelectAll, blockComponent } = useBlock({
+  const {
+    selectInputRef,
+    getBlockProps,
+    isBlockSelect,
+    setIsBlockSelect,
+    isEditorSelectAll,
+    blockComponent,
+    ref,
+  } = useBlock({
     block,
     index,
   });
 
   const [fontSize, setFontSize] = useState<number>(null);
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let wrapper = ref.current;
@@ -232,7 +280,14 @@ export function Block({ block, index }: BlockProps) {
                 : 0,
             }}
           >
-            <DragButton {...provided.dragHandleProps} />
+            <DragButton
+              {...provided.dragHandleProps}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsBlockSelect(true);
+              }}
+            />
             <PlusButton index={index} />
           </Menu>
           {createElement(blockComponent, {
@@ -240,14 +295,22 @@ export function Block({ block, index }: BlockProps) {
             index,
             config: blockComponent.block.config,
           })}
-          {isSelectAll && <SelectOverlay />}
+          {(isBlockSelect || isEditorSelectAll) && (
+            <SelectOverlay>
+              <input
+                ref={selectInputRef}
+                autoFocus
+                style={{ opacity: 0 }}
+              />
+            </SelectOverlay>
+          )}
         </Wrapper>
       )}
     </Draggable>
   );
 }
 
-const DragButton = forwardRef((props, ref) => {
+const DragButton = forwardRef((props: any, ref) => {
   return (
     <Drag ref={ref as any} {...props}>
       <DragIndicator />

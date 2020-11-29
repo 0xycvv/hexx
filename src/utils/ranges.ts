@@ -29,11 +29,24 @@ export function getSelectionRange() {
   return selection.getRangeAt(0);
 }
 
-export function extractFragmentFromPosition(
-  blockEl: Node | HTMLElement,
-) {
-  const range = getSelectionRange();
-  range.selectNodeContents(blockEl);
-  range.setStart(range.endContainer, range.endOffset);
-  return range.extractContents();
+export function extractFragmentFromPosition() {
+  const selectRange = getSelectionRange();
+  selectRange.deleteContents();
+  const range = selectRange.cloneRange();
+  range.selectNodeContents(document.activeElement);
+  range.setStart(selectRange.endContainer, selectRange.endOffset);
+
+  let next = range.extractContents();
+  // range.setEndAfter(range.commonAncestorContainer);
+
+  console.log(next);
+  const wrapper = document.createElement('div');
+  wrapper.append(next);
+  console.log(wrapper.innerHTML);
+  // return {};
+  return {
+    next: wrapper.innerHTML,
+    // @ts-ignore
+    current: range.commonAncestorContainer.innerHTML,
+  };
 }
