@@ -1,6 +1,5 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils.cjs';
-import { BlockType } from '../components/editor';
 
 // editor id
 export const editorIdAtom = atom('');
@@ -11,6 +10,7 @@ type ActiveBlock = {
   blockEl: HTMLDivElement;
 };
 // active block id
+// @ts-ignore
 export const activeBlockIdAtom = atom<ActiveBlock>({});
 
 export const isEditorSelectAllAtom = atom<boolean>(false);
