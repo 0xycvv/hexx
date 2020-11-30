@@ -10,7 +10,8 @@
   },
   "scripts": {
     "dev": "yarn preconstruct dev && yarn workspace example dev",
-    "build": "yarn preconstruct build"
+    "build": "yarn preconstruct build && yarn workspace example build",
+    "start": "yarn workspace example start"
   },
   "devDependencies": {
     "@preconstruct/cli": "^2.0.0",
