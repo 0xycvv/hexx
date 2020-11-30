@@ -1,1 +1,4 @@
-{ "babelrcRoots": [".", "packages/*"], "presets": ["next/babel"] }
+{
+  "babelrcRoots": ["packages/*", "example"],
+  "presets": ["@babel/preset-typescript"]
+}

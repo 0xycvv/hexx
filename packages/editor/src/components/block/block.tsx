@@ -1,3 +1,4 @@
+import { styled } from '@elliot/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
@@ -11,37 +12,35 @@ import {
   useState,
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import {
+  blockMapAtom,
+  blockSelectAtom,
+  editorIdAtom,
+  hoverBlockAtom,
+  isEditorSelectAllAtom,
+} from '../../constants/atom';
+import { BackspaceKey, commandKey } from '../../constants/key';
+import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
-import { styled } from '@elliot/theme';
+import {
+  findBlockByIndex,
+  findContentEditable,
+  focusContentEditable,
+  focusLastBlock,
+  lastCursor,
+} from '../../utils/find-blocks';
 import {
   extractFragmentFromPosition,
   getSelectionRange,
   removeRanges,
 } from '../../utils/ranges';
-import {
-  blockMapAtom,
-  blockSelectAtom,
-  editorIdAtom,
-  isEditorSelectAllAtom,
-  hoverBlockAtom,
-} from '../../constants/atom';
+import { isEditableSelectAll } from '../editable';
 import { BlockType } from '../editor';
 import DragIndicator from '../icons/drag-indicator';
 import PlusSvg from '../icons/plus';
 import { useReactPopper } from '../virtual-popper/use-virtual-popper';
 import { PortalPopper } from '../virtual-popper/virtual-popper';
-import {
-  findBlockByIndex,
-  findContentEditable,
-  focusBlockByIndex,
-  focusLastBlock,
-  lastCursor,
-  focusContentEditable,
-} from '../../utils/find-blocks';
 import { TextBlock } from './text';
-import { BackspaceKey, commandKey } from '../../constants/key';
-import { isEditableSelectAll } from '../editable';
-import composeRefs from '../../hooks/use-compose-ref';
 
 const Menu = styled('div', {
   opacity: 0,
@@ -99,7 +98,7 @@ const SelectOverlay = styled('div', {
   left: 0,
   right: 0,
   bottom: 0,
-  background: '#2BC3A8',
+  backgroundColor: '$success',
   zIndex: 81,
   opacity: 0.2,
 });

@@ -3,6 +3,16 @@
   "version": "0.1.0",
   "main": "dist/elliot-theme.cjs.js",
   "types": "dist/elliot-theme.cjs.d.ts",
+  "peerDependencies": {
+    "react-dom": "^16 || ^17",
+    "react": "^16 || ^17"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.8",
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7"
+  },
   "dependencies": {
     "@stitches/react": "^0.0.3-canary.4"
   }

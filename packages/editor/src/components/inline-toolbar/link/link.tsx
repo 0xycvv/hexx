@@ -9,7 +9,6 @@ import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
 import { PortalPopper } from '../../virtual-popper/virtual-popper';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
-import { useBlock, useEditor } from 'src/hooks/use-editor';
 
 const LinkWrapper = styled('div', {
   boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.06)`,
@@ -59,7 +58,6 @@ export function InlineLink() {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
-  const iconRef = useRef<HTMLDivElement>(null);
   const [hasChanged, setHasChanged] = useState(false);
   const popper = useReactPopper({
     onClose: () => {
@@ -75,7 +73,7 @@ export function InlineLink() {
       {
         name: 'offset',
         options: {
-          offset: [0, 8],
+          offset: [0, 24],
         },
       },
     ],
@@ -84,7 +82,10 @@ export function InlineLink() {
   const { getProps, setIsActive } = useInlineTool({
     type: 'link',
     onClick: () => {
-      const editable = activeBlock.editable;
+      const editable = activeBlock?.editable;
+      if (!editable) {
+        return;
+      }
       editableSnap.current = editable;
       snapHTML.current = editable?.innerHTML;
       const selRange = saveSelection();
