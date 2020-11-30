@@ -1,0 +1,21 @@
+{
+  "name": "@elliot/editor",
+  "version": "0.1.0",
+  "main": "dist/elliot-editor.cjs.js",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts",
+      "components/index.ts"
+    ]
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.5.4",
+    "@stitches/react": "^0.0.2",
+    "clsx": "^1.1.1",
+    "jotai": "^0.11.2",
+    "react-beautiful-dnd": "^13.0.0",
+    "react-contenteditable": "^3.3.5",
+    "react-popper": "^2.2.4",
+    "uuid": "^8.3.1"
+  }
+}

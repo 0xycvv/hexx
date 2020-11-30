@@ -1,8 +1,8 @@
 import * as React from 'react';
-import composeRefs from 'src/hooks/use-compose-ref';
-import { useBlock } from 'src/hooks/use-editor';
-import { css } from 'src/stitches.config';
-import { lastCursor } from 'src/utils/find-blocks';
+import composeRefs from '../..//hooks/use-compose-ref';
+import { useBlock } from '../..//hooks/use-editor';
+import { css } from '../..//stitches.config';
+import { lastCursor } from '../..//utils/find-blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
 import { BlockProps } from './block';

@@ -9,7 +9,7 @@ import { surround } from '../../utils/find-blocks';
 import { Children, ReactNode, useEffect, useState } from 'react';
 import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';
 import { InlineLink } from './link/link';
-import { styled } from 'src/stitches.config';
+import { styled } from '../../stitches.config';
 
 const Wrapper = styled('div', {
   display: 'grid',

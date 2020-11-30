@@ -1,5 +1,5 @@
 import { MouseEvent, ReactNode } from 'react';
-import { styled } from 'src/stitches.config';
+import { styled } from '../../stitches.config';
 import ClientOnlyPortal from '../client-only-portal';
 import { useReactPopper } from './use-virtual-popper';
 import type { Property } from 'csstype';

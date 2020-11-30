@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { css } from 'src/stitches.config';
+import { css } from '../../stitches.config';
 import {
   ContentEditableProps,
   ContentEditable,

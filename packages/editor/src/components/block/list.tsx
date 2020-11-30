@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { BackspaceKey } from 'src/constants/key';
-import { useBlock } from 'src/hooks/use-editor';
-import { css, styled } from 'src/stitches.config';
+import { BackspaceKey } from '../../constants/key';
+import { useBlock } from '../../hooks/use-editor';
+import { css, styled } from '../../stitches.config';
 import {
   findContentEditable,
   lastCursor,
-} from 'src/utils/find-blocks';
-import { extractFragmentFromPosition } from 'src/utils/ranges';
+} from '../../utils/find-blocks';
+import { extractFragmentFromPosition } from '../../utils/ranges';
 import { Editable } from '../editable';
 import { list as ListSvg } from '../icons';
 import { BlockProps } from './block';

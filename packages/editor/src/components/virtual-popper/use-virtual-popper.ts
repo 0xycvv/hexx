@@ -5,7 +5,7 @@ import type {
 } from '@popperjs/core';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
-import { useEventListener } from 'src/hooks/use-event-listener';
+import { useEventListener } from '../../hooks/use-event-listener';
 
 export function useReactPopper(props: {
   defaultActive?: boolean;

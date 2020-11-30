@@ -5,9 +5,9 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import composeRefs from 'src/hooks/use-compose-ref';
-import { useEditor } from 'src/hooks/use-editor';
-import { styled } from 'src/stitches.config';
+import composeRefs from '../../hooks/use-compose-ref';
+import { useEditor } from '../../hooks/use-editor';
+import { styled } from '../../stitches.config';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,

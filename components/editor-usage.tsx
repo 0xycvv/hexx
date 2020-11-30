@@ -1,10 +1,15 @@
-import { Editor, EditorProps } from 'src/index';
-import { useReactPopper } from 'src/components/virtual-popper/use-virtual-popper';
-import { useEventListener } from 'src/hooks/use-event-listener';
-import { generateGetBoundingClientRect } from 'src/utils/virtual-element';
-import { PortalPopper } from 'src/components/virtual-popper/virtual-popper';
-import { InlineToolBar } from 'src/components/inline-toolbar';
-import { BlockMap } from 'src/components/default-block-map';
+import {
+  Editor,
+  EditorProps,
+  useEventListener,
+  generateGetBoundingClientRect,
+} from '@elliot/editor';
+import {
+  useReactPopper,
+  PortalPopper,
+  InlineToolBar,
+  BlockMap,
+} from '@elliot/editor/components';
 
 const EditorUsage = (props: EditorProps) => {
   const popper = useReactPopper({

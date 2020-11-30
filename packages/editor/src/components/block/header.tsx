@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { useBlock, useEditor } from 'src/hooks/use-editor';
-import { lastCursor } from 'src/utils/find-blocks';
+import { useBlock, useEditor } from '../../hooks/use-editor';
+import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
 import { BlockProps } from './block';
-import { header as HeaderSvg } from 'src/components/icons';
-import { css } from 'src/stitches.config';
-import composeRefs from 'src/hooks/use-compose-ref';
+import { header as HeaderSvg } from '../icons';
+import { css } from '../../stitches.config';
+import composeRefs from '../../hooks/use-compose-ref';
 
 const styles = css({
   padding: '3px 2px',

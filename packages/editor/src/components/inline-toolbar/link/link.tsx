@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import { styled } from 'src/stitches.config';
+import { styled } from '../../../stitches.config';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import {
   surround

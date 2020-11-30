@@ -1,9 +1,8 @@
 import { KeyboardEvent, useEffect, useRef } from 'react';
-import composeRefs from 'src/hooks/use-compose-ref';
-import { useBlock, useEditor } from 'src/hooks/use-editor';
-import { css } from 'src/stitches.config';
-import { lastCursor } from 'src/utils/find-blocks';
-import { extractFragmentFromPosition } from 'src/utils/ranges';
+import composeRefs from '../../hooks/use-compose-ref';
+import { useBlock, useEditor } from '../../hooks/use-editor';
+import { css } from '../../stitches.config';
+import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
 import { text as TextIcon } from '../icons';
 import { BlockProps } from './block';

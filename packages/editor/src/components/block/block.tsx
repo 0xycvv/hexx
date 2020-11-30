@@ -10,13 +10,13 @@ import {
   useState,
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { useEditor } from 'src/hooks/use-editor';
-import { styled } from 'src/stitches.config';
+import { useEditor } from '../../hooks/use-editor';
+import { styled } from '../../stitches.config';
 import {
   extractFragmentFromPosition,
   getSelectionRange,
   removeRanges,
-} from 'src/utils/ranges';
+} from '../../utils/ranges';
 import {
   blockMapAtom,
   blockSelectAtom,
@@ -37,9 +37,9 @@ import {
   focusContentEditable,
 } from '../../utils/find-blocks';
 import { TextBlock } from './text';
-import { BackspaceKey, commandKey } from 'src/constants/key';
+import { BackspaceKey, commandKey } from '../../constants/key';
 import { isEditableSelectAll } from '../editable';
-import composeRefs from 'src/hooks/use-compose-ref';
+import composeRefs from '../../hooks/use-compose-ref';
 
 const Menu = styled('div', {
   opacity: 0,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useUpdateAtom } from 'jotai/utils.cjs';
-import { blockIdListAtom, blocksIdMapAtom } from 'src/constants/atom';
-import { insert } from 'src/utils/insert';
+import { blockIdListAtom, blocksIdMapAtom } from '../constants/atom';
+import { insert } from '../utils/insert';
 import { v4 } from 'uuid';
 
 export const EditableMap = new WeakMap<

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { divider as DividerSvg } from '../icons';
-import { css } from 'src/stitches.config';
+import { css } from '../../stitches.config';
 
 const styles = css({
   lineHeight: '1.6em',

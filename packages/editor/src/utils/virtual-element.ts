@@ -18,8 +18,7 @@ export function getRectFromTextNode() {
   if (!selection || !selection.rangeCount) {
     return;
   }
-  let selectedRange = window.getSelection().getRangeAt(0);
-  console.log(selectedRange);
+  let selectedRange = selection.getRangeAt(0);
   if (
     Math.abs(selectedRange.startOffset - selectedRange.endOffset) > 0
   ) {

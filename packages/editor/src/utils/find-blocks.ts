@@ -1,4 +1,4 @@
-import { EditableMap } from 'src/hooks/use-editor';
+import { EditableMap } from '../hooks/use-editor';
 
 function isBrowser() {
   return typeof window !== 'undefined';
@@ -167,14 +167,14 @@ function focusWithLastCursor(
 }
 
 export function lastCursor() {
-  // if (isBrowser) {
-  //   const selection = window.getSelection();
-  //   if (!selection || !selection.rangeCount) {
-  //     return;
-  //   }
-  //   document.execCommand('selectAll', false);
-  //   document.getSelection()?.collapseToEnd();
-  // }
+  if (isBrowser) {
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) {
+      return;
+    }
+    document.execCommand('selectAll', false);
+    document.getSelection()?.collapseToEnd();
+  }
 }
 
 export function focusWithCursor(el: Node, cursorIndex: number) {
