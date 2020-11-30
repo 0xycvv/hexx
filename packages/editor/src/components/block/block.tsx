@@ -5,6 +5,7 @@ import {
   Fragment,
   KeyboardEvent,
   MouseEvent,
+  ReactNode,
   useEffect,
   useRef,
   useState,
@@ -22,6 +23,7 @@ import {
   blockSelectAtom,
   editorIdAtom,
   isEditorSelectAllAtom,
+  hoverBlockAtom,
 } from '../../constants/atom';
 import { BlockType } from '../editor';
 import DragIndicator from '../icons/drag-indicator';
@@ -91,7 +93,8 @@ const Drag = styled('div', {
 
 const SelectOverlay = styled('div', {
   position: 'absolute',
-  pointerEvents: 'none',
+  // pointerEvents: 'none',
+  borderRadius: 4,
   top: 0,
   left: 0,
   right: 0,
@@ -111,6 +114,7 @@ function useBlockWrapper({
   const { insertBlock, removeBlockWithId, splitBlock } = useEditor();
   const [blocksMap] = useAtom(blockMapAtom);
   const [editorId] = useAtom(editorIdAtom);
+  const [hoverBlockId, setHoverBlockId] = useAtom(hoverBlockAtom);
   const [isEditorSelectAll, setIsEditorSelectAll] = useAtom(
     isEditorSelectAllAtom,
   );
@@ -118,19 +122,25 @@ function useBlockWrapper({
   const ref = useRef<HTMLDivElement>(null);
   const selectInputRef = useRef<HTMLInputElement>(null);
 
+  const isHovering = hoverBlockId?.id === block.id;
   const currentBlock = blocksMap[block.type];
   const isBlockSelect = blockSelect === index;
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowUp') {
       const range = getSelectionRange();
+      if (!range) {
+        return;
+      }
       if (range.startOffset === 0) {
         focusContentEditable('up');
-        // focusBlockByIndex(index - 1);
       }
     }
     if (e.key === 'ArrowDown') {
       const range = getSelectionRange();
+      if (!range) {
+        return;
+      }
       if (
         !(range.commonAncestorContainer as Text)?.length ||
         ((range.commonAncestorContainer as Text)?.length ===
@@ -138,7 +148,6 @@ function useBlockWrapper({
           range.collapsed)
       ) {
         focusContentEditable('down');
-        // focusBlockByIndex(index + 1, true);
       }
     }
     if (!e.shiftKey && e.key === 'Enter') {
@@ -208,23 +217,36 @@ function useBlockWrapper({
     ref,
     selectInputRef,
     editorId,
+    isHovering,
     blockComponent: currentBlock,
     getBlockProps: () => ({
       'data-block-id': block.id,
       className: 'e-block',
       onKeyDown,
+      onMouseOver: () => {
+        setHoverBlockId({
+          id: block.id,
+          el: ref.current,
+        });
+      },
+      onMouseOut: () => {
+        setHoverBlockId(null);
+      },
       onClick: (e) => {
         const editable = findContentEditable(ref.current);
         if (!editable) {
           setBlockSelect(index);
           e.stopPropagation();
         }
+        setHoverBlockId({
+          id: block.id,
+          el: ref.current,
+        });
       },
     }),
     isBlockSelect,
     isEditorSelectAll,
     setIsBlockSelect: (value: boolean) => {
-      console.log(value);
       setBlockSelect(value ? index : -1);
     },
   };
@@ -234,8 +256,9 @@ export interface BlockProps<T = any> {
   block: BlockType;
   index: number;
   config?: T;
+  children?: ReactNode;
 }
-export function Block({ block, index }: BlockProps) {
+export function Block({ block, index, children }: BlockProps) {
   const {
     selectInputRef,
     getBlockProps,
@@ -244,12 +267,13 @@ export function Block({ block, index }: BlockProps) {
     isEditorSelectAll,
     blockComponent,
     ref,
+    isHovering,
   } = useBlockWrapper({
     block,
     index,
   });
 
-  const [fontSize, setFontSize] = useState<number>(null);
+  const [fontSize, setFontSize] = useState<number | null>(null);
 
   useEffect(() => {
     let wrapper = ref.current;
@@ -272,32 +296,19 @@ export function Block({ block, index }: BlockProps) {
         <Wrapper
           ref={composeRefs(provided.innerRef, ref) as any}
           {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            cursor: !isBlockSelect ? 'auto' : 'grab',
+          }}
           {...getBlockProps()}
         >
-          <Menu
-            style={{
-              top: fontSize
-                ? fontSize - 24 > 0
-                  ? fontSize - 24
-                  : 0
-                : 0,
-            }}
-          >
-            <DragButton
-              {...provided.dragHandleProps}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsBlockSelect(true);
-              }}
-            />
-            <PlusButton index={index} />
-          </Menu>
           {createElement(blockComponent, {
             block,
             index,
             config: blockComponent.block.config,
           })}
+          {children}
           {(isBlockSelect || isEditorSelectAll) && (
             <SelectOverlay>
               <input

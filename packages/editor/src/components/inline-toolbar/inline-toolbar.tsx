@@ -18,9 +18,10 @@ const Wrapper = styled('div', {
   gap: 16,
   background: '$bg-1',
   borderRadius: 8,
-  padding: '0px 4px',
-  px: '$6',
-  py: '14px',
+  paddingLeft: 18,
+  paddingRight: 18,
+  paddingTop: '14px',
+  paddingBottom: '14px',
   border: '1px solid #D3D6D8',
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
 });
@@ -31,10 +32,11 @@ export const IconWrapper = styled('div', {
   alignItems: 'center',
   fontSize: 24,
   color: '$text-1',
+  paddingLeft: 6,
+  paddingRight: 6,
   cursor: 'pointer',
-  padding: '8px 4px',
   ':hover': {
-    color: '$success',
+    color: '$gay500',
   },
   '&.active': {
     color: '$success',

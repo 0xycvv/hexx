@@ -116,7 +116,7 @@ export function InlineLink() {
               '0.05em solid';
             selectionWrapper.current.style.borderColor =
               'rgba(55,53,47,0.4)';
-            selectionWrapper.current.style.opacity = '0.7';
+            // selectionWrapper.current.style.opacity = '0.7';
             selectionWrapper.current.style.background = '';
             selectionWrapper.current.style.boxShadow = '';
             selectionWrapper.current.style.borderRadius = '';

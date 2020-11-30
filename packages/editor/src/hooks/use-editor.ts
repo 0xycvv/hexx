@@ -1,8 +1,15 @@
 import * as React from 'react';
 import { useUpdateAtom } from 'jotai/utils.cjs';
-import { blockIdListAtom, blocksIdMapAtom } from '../constants/atom';
+import {
+  blockIdListAtom,
+  blockMapAtom,
+  blockSelectAtom,
+  blocksIdMapAtom,
+  hoverBlockAtom,
+} from '../constants/atom';
 import { insert } from '../utils/insert';
 import { v4 } from 'uuid';
+import { useAtom } from 'jotai';
 
 export const EditableMap = new WeakMap<
   HTMLDivElement,
@@ -45,8 +52,41 @@ export function useBlock(id: string, blockIndex: number) {
 }
 
 export function useEditor() {
-  const updateIdList = useUpdateAtom(blockIdListAtom);
+  const [hoverBlock] = useAtom(hoverBlockAtom);
+  const [blockMap] = useAtom(blockMapAtom);
+  const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
+  const [idList, setIdList] = useAtom(blockIdListAtom);
   const updateIdMap = useUpdateAtom(blocksIdMapAtom);
+
+  const findBlockIndexById = (id: string) => {
+    return idList.findIndex((d) => d === id);
+  };
+
+  const selectBlock = (id: string) => {
+    const index = findBlockIndexById(id);
+    setBlockSelect(index);
+  };
+
+  const insertBlockAfter = ({
+    id,
+    block,
+  }: {
+    id: string;
+    block: any;
+  }) => {
+    let newBlock = {
+      ...block,
+      id: v4(),
+    };
+    const currentBockIndex = findBlockIndexById(id);
+    if (currentBockIndex > -1) {
+      setIdList(insert(idList, currentBockIndex + 1, newBlock.id));
+      updateIdMap((s) => ({
+        ...s,
+        [newBlock.id]: newBlock,
+      }));
+    }
+  };
 
   const insertBlock = ({
     index,
@@ -60,7 +100,7 @@ export function useEditor() {
       id: v4(),
     };
     if (typeof index === 'undefined') {
-      updateIdList((s) => [...s, newBlock.id]);
+      setIdList((s) => [...s, newBlock.id]);
       updateIdMap((s) => ({
         ...s,
         [newBlock.id]: newBlock,
@@ -70,7 +110,7 @@ export function useEditor() {
         ...s,
         [newBlock.id]: newBlock,
       }));
-      updateIdList((s) => insert(s, index, newBlock.id));
+      setIdList((s) => insert(s, index, newBlock.id));
     }
   };
 
@@ -91,7 +131,7 @@ export function useEditor() {
   };
 
   const removeBlockWithId = ({ id }: { id: string }) => {
-    updateIdList((s) => s.filter((s) => s !== id));
+    setIdList((s) => s.filter((s) => s !== id));
   };
 
   const splitBlock = ({
@@ -116,15 +156,21 @@ export function useEditor() {
       data: '',
       id: v4(),
     };
-    updateIdList(() => [value.id]);
+    setIdList(() => [value.id]);
     updateIdMap(() => ({ [value.id]: value }));
   };
 
   return {
+    hoverBlock,
+    blockSelect,
+    findBlockIndexById,
+    blockMap,
     splitBlock,
     insertBlock,
     updateBlockDataWithId,
     removeBlockWithId,
     clear,
+    insertBlockAfter,
+    selectBlock,
   };
 }

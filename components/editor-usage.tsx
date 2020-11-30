@@ -1,15 +1,17 @@
 import {
   Editor,
   EditorProps,
-  useEventListener,
   generateGetBoundingClientRect,
+  useEventListener,
 } from '@elliot/editor';
 import {
-  useReactPopper,
-  PortalPopper,
-  InlineToolBar,
   BlockMap,
+  InlineToolBar,
+  PortalPopper,
+  useReactPopper,
 } from '@elliot/editor/components';
+import { PlusButton } from './plus-button';
+import { TuneButton } from './tune-button';
 
 const EditorUsage = (props: EditorProps) => {
   const popper = useReactPopper({
@@ -47,7 +49,12 @@ const EditorUsage = (props: EditorProps) => {
   });
 
   return (
-    <Editor {...props} blockMap={BlockMap}>
+    <Editor
+      plusButton={<PlusButton />}
+      dragButton={<TuneButton />}
+      {...props}
+      blockMap={BlockMap}
+    >
       <PortalPopper popper={popper}>
         <InlineToolBar
           css={{

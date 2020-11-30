@@ -102,6 +102,7 @@ export function ListBlock({ index, block, config }: BlockProps) {
 
   React.useEffect(() => {
     requestAnimationFrame(() => {
+      // @ts-ignore
       findContentEditable(ref.current)?.focus();
       lastCursor();
     });
@@ -110,7 +111,7 @@ export function ListBlock({ index, block, config }: BlockProps) {
   return (
     <Ul
       onKeyDown={handleKeyDown}
-      ref={ref}
+      ref={ref as any}
       as={block.data.style === 'unordered' ? Ul : Ol}
     >
       {listItems}

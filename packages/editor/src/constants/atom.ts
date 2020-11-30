@@ -23,3 +23,8 @@ export const blocksIdMapAtom = atom<Record<string, any>>({});
 export const blockAtomFamily = atomFamily((id) => (get) =>
   get(blocksIdMapAtom),
 );
+
+export const hoverBlockAtom = atom<{
+  id: string;
+  el: HTMLElement;
+} | null>();

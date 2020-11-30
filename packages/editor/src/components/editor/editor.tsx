@@ -2,6 +2,7 @@ import { Provider, useAtom } from 'jotai';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   DragDropContext,
+  Draggable,
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
@@ -26,11 +27,6 @@ import {
 } from '../../utils/find-blocks';
 import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
-import { Divider } from '../block/divider';
-import { HeaderBlock } from '../block/header';
-import { ListBlock } from '../block/list';
-import { QuoteBlock } from '../block/quote';
-import { TextBlock } from '../block/text';
 
 export type BlockType<T = any> = {
   id: string;
@@ -38,10 +34,16 @@ export type BlockType<T = any> = {
   data: T;
 };
 
-export interface EditorProps {
+export interface EditorProps extends ElliotProps {
   data?: BlockType[];
-  children?: ReactNode;
   blockMap: Record<string, any>;
+}
+
+interface ElliotProps {
+  children?: ReactNode;
+  plusButton?: ReactNode;
+  dragButton?: ReactNode;
+  defaultBlock?: any;
 }
 
 const Wrapper = styled('div', {
@@ -60,6 +62,7 @@ const Wrapper = styled('div', {
   paddingBottom: '30vh',
   position: 'relative',
   a: {
+    color: '$link',
     textDecoration: 'none',
   },
   'a:-webkit-any-link': {
@@ -67,7 +70,7 @@ const Wrapper = styled('div', {
   },
 });
 
-function Elliot(props: { children?: ReactNode }) {
+function Elliot(props: ElliotProps) {
   const [id] = useAtom(editorIdAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
@@ -137,7 +140,7 @@ function Elliot(props: { children?: ReactNode }) {
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
-      <Droppable droppableId={id}>
+      <Droppable droppableId={id} isDropDisabled={!props.dragButton}>
         {(provided) => (
           <Wrapper
             ref={composeRefs(ref, provided.innerRef) as any}
@@ -157,8 +160,11 @@ function Elliot(props: { children?: ReactNode }) {
           >
             {props.children}
             {blockIdList.map((bId, i) => (
-              <Block index={i} key={bId} block={blockIdMap[bId]} />
+              <Block key={bId} index={i} block={blockIdMap[bId]} />
             ))}
+            {props.dragButton}
+            {props.plusButton}
+            {provided.placeholder}
           </Wrapper>
         )}
       </Droppable>
@@ -178,7 +184,13 @@ export const Editor = (props: EditorProps) => {
         [blockMapAtom, props.blockMap],
       ]}
     >
-      <Elliot>{props.children}</Elliot>
+      <Elliot
+        defaultBlock={props.defaultBlock}
+        dragButton={props.dragButton}
+        plusButton={props.plusButton}
+      >
+        {props.children}
+      </Elliot>
     </Provider>
   );
 };
