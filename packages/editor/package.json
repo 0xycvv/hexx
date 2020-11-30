@@ -8,7 +8,16 @@
       "components/index.ts"
     ]
   },
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "react-dom": "^16 | ^17",
+    "react": "^16 | ^17"
+  },
   "dependencies": {
+    "@elliot/theme": "^0.1.0",
+    "@elliot/renderer": "^0.1.0",
     "@popperjs/core": "^2.5.4",
     "@stitches/react": "^0.0.2",
     "clsx": "^1.1.1",

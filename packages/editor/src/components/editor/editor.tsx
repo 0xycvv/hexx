@@ -7,7 +7,7 @@ import {
 } from 'react-beautiful-dnd';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
-import { styled } from '../../stitches.config';
+import { styled } from '@elliot/theme';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,

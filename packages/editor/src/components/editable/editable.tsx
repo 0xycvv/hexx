@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { css } from '../../stitches.config';
+import { css } from '@elliot/theme';
 import {
   ContentEditableProps,
   ContentEditable,

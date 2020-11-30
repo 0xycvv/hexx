@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { divider as DividerSvg } from '../icons';
-import { css } from '../../stitches.config';
+import { css } from '@elliot/theme';
 
 const styles = css({
   lineHeight: '1.6em',

@@ -1,22 +1,19 @@
-import type {
-  VirtualElement,
-  Placement,
-  Modifier,
-} from '@popperjs/core';
-import { useState } from 'react';
+import { VirtualElement, Placement, Modifier } from '@popperjs/core';
+import { useEffect, useState } from 'react';
 import { usePopper } from 'react-popper';
 import { useEventListener } from '../../hooks/use-event-listener';
 
 export function useReactPopper(props: {
   defaultActive?: boolean;
+  onClose?: () => void;
   placement: Placement;
   modifiers?: readonly Partial<Modifier<unknown, object>>[];
 }) {
   const [active, setActive] = useState(props.defaultActive);
-  const [popperElement, setPopperElement] = useState(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement>();
   const [referenceElement, setReferenceElement] = useState<
-    VirtualElement | Element
-  >(null);
+    VirtualElement | Element | HTMLElement
+  >();
 
   const popper = usePopper(referenceElement, popperElement, {
     placement: props.placement,
@@ -25,11 +22,17 @@ export function useReactPopper(props: {
   });
 
   useEventListener('mousedown', (e) => {
-    if (popperElement?.contains(e.target)) {
+    if (e.target && popperElement?.contains(e.target)) {
       return;
     }
     setActive(false);
   });
+
+  useEffect(() => {
+    if (!active) {
+      props.onClose?.();
+    }
+  }, [active]);
 
   return {
     popperElement,

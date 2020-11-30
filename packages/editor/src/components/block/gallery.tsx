@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { img as ImgSvg, AddImage } from '../icons';
-import { styled } from 'src/stitches.config';
+import { styled } from '@elliot/theme';
 
 const ImagePlaceholder = styled('div', {
   backgroundColor: '#E6E8E9',

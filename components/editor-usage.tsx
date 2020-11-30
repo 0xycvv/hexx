@@ -13,7 +13,7 @@ import {
 
 const EditorUsage = (props: EditorProps) => {
   const popper = useReactPopper({
-    placement: 'top',
+    placement: 'bottom-start',
     modifiers: [
       {
         name: 'offset',
@@ -49,7 +49,11 @@ const EditorUsage = (props: EditorProps) => {
   return (
     <Editor {...props} blockMap={BlockMap}>
       <PortalPopper popper={popper}>
-        <InlineToolBar />
+        <InlineToolBar
+          css={{
+            borderRadius: '0px 26px 26px 26px',
+          }}
+        />
       </PortalPopper>
     </Editor>
   );

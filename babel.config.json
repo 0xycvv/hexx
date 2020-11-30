@@ -1,0 +1,1 @@
+{ "babelrcRoots": [".", "packages/*"], "presets": ["next/babel"] }

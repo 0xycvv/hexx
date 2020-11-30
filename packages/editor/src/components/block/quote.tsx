@@ -1,7 +1,7 @@
 import * as React from 'react';
 import composeRefs from '../..//hooks/use-compose-ref';
 import { useBlock } from '../..//hooks/use-editor';
-import { css } from '../..//stitches.config';
+import { css } from '@elliot/theme';
 import { lastCursor } from '../..//utils/find-blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';

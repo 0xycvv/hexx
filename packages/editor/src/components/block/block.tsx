@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { useEditor } from '../../hooks/use-editor';
-import { styled } from '../../stitches.config';
+import { styled } from '@elliot/theme';
 import {
   extractFragmentFromPosition,
   getSelectionRange,

@@ -4,7 +4,7 @@ import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
 import { BlockProps } from './block';
 import { header as HeaderSvg } from '../icons';
-import { css } from '../../stitches.config';
+import { css } from '@elliot/theme';
 import composeRefs from '../../hooks/use-compose-ref';
 
 const styles = css({

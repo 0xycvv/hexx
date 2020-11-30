@@ -11,7 +11,7 @@ export interface UseInlineToolConfig {
 export function useInlineTool(props?: UseInlineToolConfig) {
   const [isActive, setIsActive] = useState(false);
   const onClick = useCallback(() => {
-    props.onClick?.();
+    props?.onClick?.();
   }, []);
 
   const onMouseDown = useCallback((e) => {

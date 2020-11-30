@@ -1,27 +1,23 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import { styled } from '../../../stitches.config';
+import { styled } from '@elliot/theme';
 import { activeBlockIdAtom } from '../../../constants/atom';
-import {
-  surround
-} from '../../../utils/find-blocks';
+import { surround } from '../../../utils/find-blocks';
 import { saveSelection } from '../../../utils/ranges';
-import {
-  generateGetBoundingClientRect,
-  getRectFromTextNode
-} from '../../../utils/virtual-element';
 import Link from '../../icons/link';
 import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
 import { PortalPopper } from '../../virtual-popper/virtual-popper';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
+import { useBlock, useEditor } from 'src/hooks/use-editor';
 
 const LinkWrapper = styled('div', {
-  boxShadow: `rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
-  rgba(15, 15, 15, 0.1) 0px 3px 6px,
-  rgba(15, 15, 15, 0.2) 0px 9px 24px`,
+  boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.06)`,
   overflow: 'hidden',
   backgroundColor: 'white',
+  border: '1px solid #E6E8E9',
+  borderRadius: 4,
+  p: 6,
 });
 
 const InputWrapper = styled('div', {
@@ -31,6 +27,21 @@ const InputWrapper = styled('div', {
   marginBottom: 8,
   marginLeft: 14,
   marginRight: 14,
+  fontWeight: 500,
+  fontSize: 14,
+  lineHeight: '19px',
+  letterSpacing: 0.1,
+});
+
+const Input = styled('input', {
+  minWidth: '187px',
+  border: 'none',
+  '&::placeholder': {
+    color: '#D3D6D8',
+  },
+  '&:focus': {
+    outline: 'none',
+  },
 });
 
 function highlight(r: Range | null) {
@@ -48,22 +59,37 @@ export function InlineLink() {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
+  const iconRef = useRef<HTMLDivElement>(null);
   const [hasChanged, setHasChanged] = useState(false);
-  const popper = useReactPopper({ placement: 'bottom' });
+  const popper = useReactPopper({
+    onClose: () => {
+      if (!hasChanged && snapHTML.current && editableSnap.current) {
+        requestAnimationFrame(() => {
+          editableSnap.current.innerHTML = snapHTML.current;
+          document.execCommand('formatBlock', false, 'p');
+        });
+      }
+    },
+    placement: 'bottom',
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 8],
+        },
+      },
+    ],
+  });
   const selectionWrapper = useRef<HTMLSpanElement>();
   const { getProps, setIsActive } = useInlineTool({
     type: 'link',
     onClick: () => {
       const editable = activeBlock.editable;
       editableSnap.current = editable;
-      snapHTML.current = editable.innerHTML;
+      snapHTML.current = editable?.innerHTML;
       const selRange = saveSelection();
       selectionWrapper.current = highlight(selRange);
       popper.setActive((s) => !s);
-      const rect = getRectFromTextNode();
-      popper.setReferenceElement({
-        getBoundingClientRect: generateGetBoundingClientRect(rect),
-      });
     },
   });
 
@@ -71,22 +97,17 @@ export function InlineLink() {
 
   return (
     <>
-      <IconWrapper {...getProps()}>
+      <IconWrapper ref={popper.setReferenceElement} {...getProps()}>
         <Link />
       </IconWrapper>
-      <PortalPopper
-        onClose={() => {
-          if (!hasChanged) {
-            editableSnap.current.innerHTML = snapHTML.current;
-          }
-        }}
-        popper={popper}
-        pointerEvent="auto"
-      >
+      <PortalPopper popper={popper} pointerEvent="auto">
         <LinkInput
           onClose={(value) => {
             const selection = window.getSelection();
             const r = document.createRange();
+            if (!selectionWrapper.current || !selection) {
+              return;
+            }
             r.selectNodeContents(selectionWrapper.current);
             selection.removeAllRanges();
             selection.addRange(r);
@@ -102,16 +123,18 @@ export function InlineLink() {
             setHasChanged(true);
             surround('createLink', undefined, value);
             setTimeout(() => {
-              selection.anchorNode.parentElement.setAttribute(
-                'target',
-                '_blank',
-              );
-              selection.anchorNode.parentElement.setAttribute(
-                'rel',
-                'noopener noreferrer',
-              );
-              popper.setActive(false);
-              setIsActive(false);
+              if (selection.anchorNode?.parentElement) {
+                selection.anchorNode.parentElement.setAttribute(
+                  'target',
+                  '_blank',
+                );
+                selection.anchorNode.parentElement.setAttribute(
+                  'rel',
+                  'noopener noreferrer',
+                );
+                popper.setActive(false);
+                setIsActive(false);
+              }
             }, 0);
           }}
         />
@@ -120,18 +143,17 @@ export function InlineLink() {
   );
 }
 
-function LinkInput(props: { onClose: (value: string) => void }) {
-  const ref = useRef<HTMLInputElement>();
+function LinkInput(props: { onClose: (value?: string) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
   return (
     <>
       <LinkWrapper>
         <InputWrapper>
-          <input
-            onFocus={() => {}}
+          <Input
             autoFocus
             ref={ref}
             type="url"
-            placeholder="enter your url"
+            placeholder="Paste link or type to search"
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
@@ -140,7 +162,7 @@ function LinkInput(props: { onClose: (value: string) => void }) {
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                props.onClose(ref.current.value);
+                props.onClose(ref.current?.value);
 
                 e.preventDefault();
                 e.stopPropagation();

@@ -9,16 +9,20 @@ import { surround } from '../../utils/find-blocks';
 import { Children, ReactNode, useEffect, useState } from 'react';
 import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';
 import { InlineLink } from './link/link';
-import { styled } from '../../stitches.config';
+import { styled, StitchesProps } from '@elliot/theme';
 
 const Wrapper = styled('div', {
   display: 'grid',
   gridAutoFlow: 'column',
   gridTemplateRows: 'repeat(auto-fill)',
   gap: 16,
-  background: '#242526',
+  background: '$bg-1',
   borderRadius: 8,
   padding: '0px 4px',
+  px: '$6',
+  py: '14px',
+  border: '1px solid #D3D6D8',
+  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
 });
 
 export const IconWrapper = styled('div', {
@@ -26,14 +30,14 @@ export const IconWrapper = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   fontSize: 24,
-  color: '#f3f3f4',
+  color: '$text-1',
   cursor: 'pointer',
   padding: '8px 4px',
   ':hover': {
-    backgroundColor: '#9b9fa4',
+    color: '$success',
   },
-  "&[data-active='true']": {
-    backgroundColor: 'aqua',
+  '&.active': {
+    color: '$success',
   },
 });
 
@@ -72,9 +76,12 @@ function DefaultInlineTool(
   return <IconWrapper {...getProps()}>{props.children}</IconWrapper>;
 }
 
-export function InlineToolBar() {
+export function InlineToolBar({
+  children,
+  ...props
+}: { children?: ReactNode } & StitchesProps<typeof Wrapper>) {
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       {Children.toArray(
         inlineTools.map((tool) => {
           if (tool.component) {
@@ -91,6 +98,7 @@ export function InlineToolBar() {
           );
         }),
       )}
+      {children}
     </Wrapper>
   );
 }

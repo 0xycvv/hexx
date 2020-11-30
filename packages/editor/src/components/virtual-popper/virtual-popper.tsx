@@ -1,8 +1,8 @@
-import { MouseEvent, ReactNode } from 'react';
-import { styled } from '../../stitches.config';
+import { Property } from 'csstype';
+import { ReactNode } from 'react';
+import { styled } from '@elliot/theme';
 import ClientOnlyPortal from '../client-only-portal';
 import { useReactPopper } from './use-virtual-popper';
-import type { Property } from 'csstype';
 
 type Props = ReturnType<typeof useReactPopper>;
 

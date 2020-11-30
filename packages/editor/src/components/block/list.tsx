@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
-import { css, styled } from '../../stitches.config';
+import { css, styled } from '@elliot/theme';
 import {
   findContentEditable,
   lastCursor,
