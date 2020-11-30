@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { useEditor } from 'src/hooks/use-editor';
+import composeRefs from 'src/hooks/use-compose-ref';
+import { useBlock } from 'src/hooks/use-editor';
 import { css } from 'src/stitches.config';
+import { lastCursor } from 'src/utils/find-blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
 import { BlockProps } from './block';
-import { lastCursor } from 'src/utils/find-blocks';
 
 const styles = {
   wrapper: {
@@ -34,8 +35,8 @@ const styles = {
   },
 };
 
-export function QuoteBlock({ block, config }: BlockProps) {
-  const { updateBlockDataWithId } = useEditor();
+export function QuoteBlock({ block, config, index }: BlockProps) {
+  const { update, register } = useBlock(block.id, index);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     ref.current?.focus();
@@ -48,15 +49,12 @@ export function QuoteBlock({ block, config }: BlockProps) {
         placeholder={config.placeholder}
         className={css(styles.text)}
         onChange={(evt) => {
-          updateBlockDataWithId({
-            id: block.id,
-            data: {
-              ...block.data,
-              text: evt.target.value,
-            },
+          update({
+            ...block.data,
+            text: evt.target.value,
           });
         }}
-        ref={ref}
+        ref={composeRefs(ref, register)}
         html={block.data.text}
       />
     </blockquote>

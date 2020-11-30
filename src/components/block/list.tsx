@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BackspaceKey } from 'src/constants/key';
-import { useEditor } from 'src/hooks/use-editor';
+import { useBlock } from 'src/hooks/use-editor';
 import { css, styled } from 'src/stitches.config';
 import {
   findContentEditable,
@@ -42,11 +42,14 @@ export function ListBlock({ index, block, config }: BlockProps) {
     setActiveListItemIndex,
   ] = React.useState<number>(0);
 
-  const { updateBlockDataWithId } = useEditor();
+  const { update } = useBlock(block.id, index);
 
   let listItems = React.Children.toArray(
     block.data.items.map((item, i) => (
       <ListItem
+        index={i}
+        blockId={block.id}
+        blockIndex={index}
         placeholder={config.placeholder}
         onFocus={() => setActiveListItemIndex(i)}
         onChange={(value) => {
@@ -56,12 +59,9 @@ export function ListBlock({ index, block, config }: BlockProps) {
           } else {
             items = replaceItemAtIndex(block.data.items, i, value);
           }
-          updateBlockDataWithId({
-            id: block.id,
-            data: {
-              ...block.data,
-              items,
-            },
+          update({
+            ...block.data,
+            items,
           });
         }}
         data={item}
@@ -72,35 +72,29 @@ export function ListBlock({ index, block, config }: BlockProps) {
     if (!e.shiftKey && e.key === 'Enter') {
       if (!!block.data.items[activeListItemIndex]) {
         const { current, next } = extractFragmentFromPosition();
-        updateBlockDataWithId({
-          id: block.id,
-          data: {
-            ...block.data,
-            items: replaceItemAtIndex(
-              replaceItemAtIndex(
-                block.data.items,
-                activeListItemIndex,
-                current,
-              ),
-              activeListItemIndex + 1,
-              next,
+        update({
+          ...block.data,
+          items: replaceItemAtIndex(
+            replaceItemAtIndex(
+              block.data.items,
+              activeListItemIndex,
+              current,
             ),
-          },
+            activeListItemIndex + 1,
+            next,
+          ),
         });
         e.stopPropagation();
         e.preventDefault();
       }
     } else if (e.key === BackspaceKey) {
       if (!block.data.items[activeListItemIndex]) {
-        updateBlockDataWithId({
-          id: block.id,
-          data: {
-            ...block.data,
-            items: removeItemAtIndex(
-              block.data.items,
-              activeListItemIndex,
-            ),
-          },
+        update({
+          ...block.data,
+          items: removeItemAtIndex(
+            block.data.items,
+            activeListItemIndex,
+          ),
         });
       }
     }
@@ -129,10 +123,18 @@ function ListItem(props: {
   onChange: (value: string) => void;
   onFocus: () => void;
   placeholder?: string;
+  index: number;
+  blockId: string;
+  blockIndex: number;
 }) {
+  const { registerWithIndex } = useBlock(
+    props.blockId,
+    props.blockIndex,
+  );
   return (
     <li className={css(styles.item)}>
       <Editable
+        ref={registerWithIndex(props.index)}
         placeholder={props.placeholder}
         onFocus={props.onFocus}
         onChange={(e) => {

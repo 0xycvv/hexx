@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { useEditor } from 'src/hooks/use-editor';
+import { useBlock, useEditor } from 'src/hooks/use-editor';
 import { lastCursor } from 'src/utils/find-blocks';
 import { Editable } from '../editable';
 import { BlockProps } from './block';
 import { header as HeaderSvg } from 'src/components/icons';
 import { css } from 'src/stitches.config';
+import composeRefs from 'src/hooks/use-compose-ref';
 
 const styles = css({
   padding: '3px 2px',
@@ -23,11 +24,7 @@ const styles = css({
 });
 
 export function HeaderBlock({ block, index, config }: BlockProps) {
-  const {
-    insertBlock,
-    removeBlockWithId,
-    updateBlockDataWithId,
-  } = useEditor();
+  const { register, update } = useBlock(block.id, index);
 
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -39,14 +36,11 @@ export function HeaderBlock({ block, index, config }: BlockProps) {
     <Editable
       placeholder={config.placeholder}
       className={`e-h${block.data.level} ${styles}`}
-      ref={ref}
+      ref={composeRefs(ref, register)}
       onChange={(evt) =>
-        updateBlockDataWithId({
-          id: block.id,
-          data: {
-            ...block.data,
-            text: evt.target.value,
-          },
+        update({
+          ...block.data,
+          text: evt.target.value,
         })
       }
       html={block.data.text}

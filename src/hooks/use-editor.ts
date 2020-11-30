@@ -1,7 +1,48 @@
+import * as React from 'react';
 import { useUpdateAtom } from 'jotai/utils.cjs';
 import { blockIdListAtom, blocksIdMapAtom } from 'src/constants/atom';
 import { insert } from 'src/utils/insert';
 import { v4 } from 'uuid';
+
+export const EditableMap = new WeakMap<
+  HTMLDivElement,
+  {
+    blockIndex: number;
+    index: number;
+    id: string;
+  }
+>();
+
+export function useBlock(id: string, blockIndex: number) {
+  const { removeBlockWithId, updateBlockDataWithId } = useEditor();
+  const remove = () => {
+    removeBlockWithId({ id });
+  };
+
+  const update = (block) => {
+    updateBlockDataWithId({ id, data: block });
+  };
+  const register = React.useCallback((ref, index: number = 0) => {
+    if (ref) {
+      EditableMap.set(ref, { index, id, blockIndex });
+    }
+  }, []);
+
+  const registerWithIndex = React.useCallback(
+    (index: number) =>
+      React.useCallback((ref) => {
+        register(ref, index);
+      }, []),
+    [register],
+  );
+
+  return {
+    remove,
+    update,
+    registerWithIndex,
+    register,
+  };
+}
 
 export function useEditor() {
   const updateIdList = useUpdateAtom(blockIdListAtom);

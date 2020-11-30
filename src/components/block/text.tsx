@@ -1,5 +1,6 @@
 import { KeyboardEvent, useEffect, useRef } from 'react';
-import { useEditor } from 'src/hooks/use-editor';
+import composeRefs from 'src/hooks/use-compose-ref';
+import { useBlock, useEditor } from 'src/hooks/use-editor';
 import { css } from 'src/stitches.config';
 import { lastCursor } from 'src/utils/find-blocks';
 import { extractFragmentFromPosition } from 'src/utils/ranges';
@@ -9,11 +10,7 @@ import { BlockProps } from './block';
 
 export function TextBlock({ index, block }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const {
-    updateBlockDataWithId,
-    splitBlock,
-    insertBlock,
-  } = useEditor();
+  const { update, register } = useBlock(block.id, index);
 
   useEffect(() => {
     ref.current?.focus();
@@ -23,15 +20,12 @@ export function TextBlock({ index, block }: BlockProps) {
   }, [block.data.text]);
 
   const props = {
-    ref,
+    ref: composeRefs(ref, register),
     html: block.data.text || '',
     onChange: (evt) => {
-      updateBlockDataWithId({
-        id: block.id,
-        data: {
-          ...block.data,
-          text: evt.target.value,
-        },
+      update({
+        ...block.data,
+        text: evt.target.value,
       });
     },
   };

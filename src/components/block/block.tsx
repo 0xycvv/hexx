@@ -34,6 +34,7 @@ import {
   focusBlockByIndex,
   focusLastBlock,
   lastCursor,
+  focusContentEditable,
 } from '../../utils/find-blocks';
 import { TextBlock } from './text';
 import { BackspaceKey, commandKey } from 'src/constants/key';
@@ -100,7 +101,7 @@ const SelectOverlay = styled('div', {
   opacity: 0.2,
 });
 
-function useBlock({
+function useBlockWrapper({
   block,
   index,
 }: {
@@ -124,7 +125,8 @@ function useBlock({
     if (e.key === 'ArrowUp') {
       const range = getSelectionRange();
       if (range.startOffset === 0) {
-        focusBlockByIndex(index - 1);
+        focusContentEditable('up');
+        // focusBlockByIndex(index - 1);
       }
     }
     if (e.key === 'ArrowDown') {
@@ -135,7 +137,8 @@ function useBlock({
           range.endOffset &&
           range.collapsed)
       ) {
-        focusBlockByIndex(index + 1, true);
+        focusContentEditable('down');
+        // focusBlockByIndex(index + 1, true);
       }
     }
     if (!e.shiftKey && e.key === 'Enter') {
@@ -241,7 +244,7 @@ export function Block({ block, index }: BlockProps) {
     isEditorSelectAll,
     blockComponent,
     ref,
-  } = useBlock({
+  } = useBlockWrapper({
     block,
     index,
   });

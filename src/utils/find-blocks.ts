@@ -1,9 +1,95 @@
+import { EditableMap } from 'src/hooks/use-editor';
+
 function isBrowser() {
   return typeof window !== 'undefined';
 }
 
-function findClosetBlock() {
-  return;
+function focusContentEditableWithOffset(
+  currentEl: HTMLDivElement | HTMLElement | Element,
+  offset: number,
+) {
+  if (!currentEl) {
+    return;
+  }
+  // @ts-ignore
+  const blockInfo = EditableMap.get(currentEl);
+  if (blockInfo && blockInfo.blockIndex + offset >= 0) {
+    if (blockInfo.index === 0) {
+      const offsetBlock = findBlockByIndex(
+        blockInfo.blockIndex + offset,
+      );
+      if (offsetBlock?.editable) {
+        focusWithLastCursor(offsetBlock.editable, offset > 0);
+      } else {
+        focusContentEditableWithOffset(
+          findPreviousContentEditable(blockInfo.blockIndex, offset),
+          0,
+        );
+      }
+    } else {
+      const currentBlockDiv = findBlockById(blockInfo.id);
+      const nodeList = currentBlockDiv.querySelectorAll(
+        '[contenteditable]',
+      );
+      if (nodeList.length > 0 && nodeList[blockInfo.index + offset]) {
+        focusWithLastCursor(
+          nodeList[blockInfo.index + offset] as HTMLDivElement,
+          offset > 0,
+        );
+      } else {
+        focusContentEditableWithOffset(
+          currentBlockDiv,
+          offset + offset,
+        );
+      }
+    }
+  }
+}
+
+function findPreviousContentEditable(
+  blockIndex: number,
+  offset?: number,
+) {
+  const result = findBlockByIndex(blockIndex + offset);
+  if (!result) {
+    return;
+  }
+  if (result.editable) {
+    return result.editable;
+  } else {
+    return findPreviousContentEditable(blockIndex + offset, offset);
+  }
+}
+
+export function focusContentEditable(
+  query: 'up' | 'down' | 'current',
+) {
+  const isActiveElementEditable =
+    document.activeElement.getAttribute('contenteditable') === 'true';
+  switch (query) {
+    case 'current':
+      if (isActiveElementEditable) {
+        focusWithLastCursor(document.activeElement as HTMLDivElement);
+      } else {
+        focusWithLastCursor(
+          document.activeElement.closest('[contenteditable]'),
+        );
+      }
+      break;
+    case 'up':
+      focusContentEditableWithOffset(document.activeElement, -1);
+      break;
+    case 'down':
+      focusContentEditableWithOffset(document.activeElement, 1);
+      break;
+    default:
+      break;
+  }
+}
+
+function findBlockById(id: string) {
+  const el = document.querySelector(`[data-block-id="${id}"]`);
+  return el;
 }
 
 export function findBlockByIndex(i: number, first?: boolean) {
@@ -37,7 +123,7 @@ export function findContentEditable(
     return;
   }
   if (first) {
-    const editable = el.querySelector('[contenteditable');
+    const editable = el.querySelector('[contenteditable]');
     return editable as HTMLDivElement;
   }
   const editableNodeList = el.querySelectorAll('[contenteditable]');
@@ -68,15 +154,27 @@ export function focusLastBlock() {
   }
 }
 
-export function lastCursor() {
-  if (isBrowser) {
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) {
-      return;
-    }
-    document.execCommand('selectAll', false); // select all the content in the element
-    document.getSelection()?.collapseToEnd(); // collapse selection to the end
+function focusWithLastCursor(
+  el: HTMLElement,
+  shouldFocusLast: boolean = true,
+) {
+  el?.focus();
+  if (shouldFocusLast) {
+    requestAnimationFrame(() => {
+      lastCursor();
+    });
   }
+}
+
+export function lastCursor() {
+  // if (isBrowser) {
+  //   const selection = window.getSelection();
+  //   if (!selection || !selection.rangeCount) {
+  //     return;
+  //   }
+  //   document.execCommand('selectAll', false);
+  //   document.getSelection()?.collapseToEnd();
+  // }
 }
 
 export function focusWithCursor(el: Node, cursorIndex: number) {
