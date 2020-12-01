@@ -22,6 +22,12 @@ const config = {
       $5: '20px',
       $6: '24px',
     },
+    breakpoints: {
+      bp1: (rule) => `@media (min-width: 640px) { ${rule} }`,
+      bp2: (rule) => `@media (min-width: 768px) { ${rule} }`,
+      bp3: (rule) => `@media (min-width: 1024px) { ${rule} }`,
+      bp4: (rule) => `@media (min-width: 1280px) { ${rule} }`,
+    },
   },
 } as const;
 

@@ -6,8 +6,8 @@ import { TextBlock } from './block/text';
 
 export const BlockMap = {
   paragraph: TextBlock,
-  list: ListBlock,
-  delimiter: Divider,
   header: HeaderBlock,
+  list: ListBlock,
   quote: QuoteBlock,
+  delimiter: Divider,
 };

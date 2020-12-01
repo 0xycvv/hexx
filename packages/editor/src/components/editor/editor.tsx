@@ -58,8 +58,10 @@ const Wrapper = styled('div', {
   fontSize: 16,
   lineHeight: 1.5,
   color: 'rgb(55, 53, 47)',
-  paddingLeft: 'calc(96px + env(safe-area-inset-left))',
-  paddingRight: 'calc(96px + env(safe-area-inset-right))',
+  paddingLeft:
+    'min(calc(100% * 0.1 + env(safe-area-inset-left)), 100px)',
+  paddingRight:
+    'min(calc(100% * 0.1 + env(safe-area-inset-right)), 100px)',
   paddingBottom: '30vh',
   position: 'relative',
   a: {
