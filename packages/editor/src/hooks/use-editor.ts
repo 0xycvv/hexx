@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useUpdateAtom } from 'jotai/utils.cjs';
 import {
   blockIdListAtom,
   blockMapAtom,
@@ -56,7 +55,7 @@ export function useEditor() {
   const [blockMap] = useAtom(blockMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [idList, setIdList] = useAtom(blockIdListAtom);
-  const updateIdMap = useUpdateAtom(blocksIdMapAtom);
+  const [IdMap, setIdMap] = useAtom(blocksIdMapAtom);
 
   const findBlockIndexById = (id: string) => {
     return idList.findIndex((d) => d === id);
@@ -81,7 +80,7 @@ export function useEditor() {
     const currentBockIndex = findBlockIndexById(id);
     if (currentBockIndex > -1) {
       setIdList(insert(idList, currentBockIndex + 1, newBlock.id));
-      updateIdMap((s) => ({
+      setIdMap((s) => ({
         ...s,
         [newBlock.id]: newBlock,
       }));
@@ -101,12 +100,12 @@ export function useEditor() {
     };
     if (typeof index === 'undefined') {
       setIdList((s) => [...s, newBlock.id]);
-      updateIdMap((s) => ({
+      setIdMap((s) => ({
         ...s,
         [newBlock.id]: newBlock,
       }));
     } else {
-      updateIdMap((s) => ({
+      setIdMap((s) => ({
         ...s,
         [newBlock.id]: newBlock,
       }));
@@ -121,7 +120,7 @@ export function useEditor() {
     id: string;
     data: any;
   }) => {
-    updateIdMap((s) => ({
+    setIdMap((s) => ({
       ...s,
       [id]: {
         ...s[id],
@@ -157,20 +156,23 @@ export function useEditor() {
       id: v4(),
     };
     setIdList(() => [value.id]);
-    updateIdMap(() => ({ [value.id]: value }));
+    setIdMap(() => ({ [value.id]: value }));
   };
 
   return {
-    hoverBlock,
-    blockSelect,
+    // method
     findBlockIndexById,
-    blockMap,
-    splitBlock,
     insertBlock,
+    insertBlockAfter,
+    splitBlock,
     updateBlockDataWithId,
     removeBlockWithId,
     clear,
-    insertBlockAfter,
+    // data
+    blockSelect,
+    blockMap,
+    hoverBlock,
     selectBlock,
+    IdMap,
   };
 }

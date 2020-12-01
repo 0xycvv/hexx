@@ -21,6 +21,29 @@ const Tune = styled('div', {
   color: 'black',
 });
 
+const Icon = styled('svg', {
+  cursor: 'pointer',
+  paddingLeft: 6,
+  paddingRight: 6,
+  boxSizing: 'content-box',
+  ':hover': {
+    color: '$gay500',
+  },
+  variants: {
+    color: {
+      active: {
+        color: '$success',
+        ':hover': {
+          color: '$success',
+        },
+      },
+      inactive: {
+        color: '$text-1',
+      },
+    },
+  },
+});
+
 export const TuneButton = forwardRef((props: any, ref) => {
   const popper = useReactPopper({
     defaultActive: false,
@@ -38,25 +61,37 @@ export const TuneButton = forwardRef((props: any, ref) => {
   const {
     hoverBlock,
     blockMap,
-    insertBlockAfter,
+    updateBlockDataWithId,
     selectBlock,
     blockSelect,
     findBlockIndexById,
     removeBlockWithId,
+    IdMap,
   } = useEditor();
   const previousHoverBlockId = usePrevious(hoverBlock?.id);
   const hoverId = usePreviousExistValue(hoverBlock?.id);
 
   useEffect(() => {
+    const body = document.querySelector('#title');
     if (previousHoverBlockId !== hoverBlock?.id) {
-      popper.setReferenceElement(hoverBlock?.el);
+      if (hoverBlock?.el) {
+        popper.setReferenceElement(
+          // body,
+          hoverBlock?.el,
+        );
+      }
       if (hoverBlock) {
         popper.setActive(true);
       }
     }
   }, [hoverBlock, previousHoverBlockId]);
+  const blockIndex = findBlockIndexById(hoverId);
+  const isSelecting = blockSelect === blockIndex;
+  const currentBlockData = hoverId && IdMap[hoverId];
 
-  const isSelecting = blockSelect === findBlockIndexById(hoverId);
+  const tunes =
+    currentBlockData?.type &&
+    blockMap[currentBlockData.type]?.block?.tune;
 
   return (
     <PortalPopper popper={popper}>
@@ -64,31 +99,50 @@ export const TuneButton = forwardRef((props: any, ref) => {
         ref={ref as any}
         {...props}
         onClick={(e) => {
-          if (isSelecting) {
-            removeBlockWithId({ id: hoverId });
-            selectBlock(null);
-            popper.setActive(false);
-          } else {
+          if (!isSelecting) {
             selectBlock(hoverId);
           }
-
-          e.preventDefault();
-          e.stopPropagation();
         }}
       >
         {isSelecting ? (
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M17 6H22V8H20V21C20 21.2652 19.8946 21.5196 19.7071 21.7071C19.5196 21.8946 19.2652 22 19 22H5C4.73478 22 4.48043 21.8946 4.29289 21.7071C4.10536 21.5196 4 21.2652 4 21V8H2V6H7V3C7 2.73478 7.10536 2.48043 7.29289 2.29289C7.48043 2.10536 7.73478 2 8 2H16C16.2652 2 16.5196 2.10536 16.7071 2.29289C16.8946 2.48043 17 2.73478 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"
-              fill="#191919"
-            />
-          </svg>
+          <>
+            {tunes?.map((tune) => {
+              return (
+                <Icon
+                  as={tune.icon.svg}
+                  color={
+                    tune.icon.isActive(currentBlockData.data)
+                      ? 'active'
+                      : 'inactive'
+                  }
+                  onClick={(e) => {
+                    updateBlockDataWithId({
+                      id: hoverId,
+                      data: tune.updater(currentBlockData.data),
+                    });
+                    e.stopPropagation();
+                  }}
+                />
+              );
+            })}
+            <svg
+              onClick={() => {
+                removeBlockWithId({ id: hoverId });
+                selectBlock(null);
+                popper.setActive(false);
+              }}
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17 6H22V8H20V21C20 21.2652 19.8946 21.5196 19.7071 21.7071C19.5196 21.8946 19.2652 22 19 22H5C4.73478 22 4.48043 21.8946 4.29289 21.7071C4.10536 21.5196 4 21.2652 4 21V8H2V6H7V3C7 2.73478 7.10536 2.48043 7.29289 2.29289C7.48043 2.10536 7.73478 2 8 2H16C16.2652 2 16.5196 2.10536 16.7071 2.29289C16.8946 2.48043 17 2.73478 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"
+                fill="#191919"
+              />
+            </svg>
+          </>
         ) : (
           <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
             <path

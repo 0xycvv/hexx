@@ -56,16 +56,18 @@ function highlight(r: Range | null) {
 
 export function InlineLink() {
   const [activeBlock] = useAtom(activeBlockIdAtom);
+  const [initialValue, setInitialValue] = useState('');
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
   const popper = useReactPopper({
     onClose: () => {
       if (!hasChanged && snapHTML.current && editableSnap.current) {
-        requestAnimationFrame(() => {
-          editableSnap.current.innerHTML = snapHTML.current;
-          document.execCommand('formatBlock', false, 'p');
-        });
+        console.log(editableSnap.current.innerHTML);
+        console.log(snapHTML.current);
+        editableSnap.current.innerHTML = snapHTML.current;
+        editableSnap.current.focus();
+        document.execCommand('formatBlock', false, 'p');
       }
     },
     placement: 'bottom',
@@ -94,7 +96,10 @@ export function InlineLink() {
     },
   });
 
-  useEventChangeSelection(setIsActive);
+  useEventChangeSelection(([isLink, url]) => {
+    setIsActive(isLink);
+    setInitialValue(url || '');
+  });
 
   return (
     <>
@@ -103,6 +108,7 @@ export function InlineLink() {
       </IconWrapper>
       <PortalPopper popper={popper} pointerEvent="auto">
         <LinkInput
+          defaultValue={initialValue}
           onClose={(value) => {
             const selection = window.getSelection();
             const r = document.createRange();
@@ -117,26 +123,25 @@ export function InlineLink() {
               '0.05em solid';
             selectionWrapper.current.style.borderColor =
               'rgba(55,53,47,0.4)';
-            // selectionWrapper.current.style.opacity = '0.7';
             selectionWrapper.current.style.background = '';
             selectionWrapper.current.style.boxShadow = '';
             selectionWrapper.current.style.borderRadius = '';
             setHasChanged(true);
             surround('createLink', undefined, value);
-            setTimeout(() => {
-              if (selection.anchorNode?.parentElement) {
-                selection.anchorNode.parentElement.setAttribute(
-                  'target',
-                  '_blank',
-                );
-                selection.anchorNode.parentElement.setAttribute(
-                  'rel',
-                  'noopener noreferrer',
-                );
-                popper.setActive(false);
-                setIsActive(false);
-              }
-            }, 0);
+            if (selection.anchorNode?.parentElement) {
+              selection.anchorNode.parentElement.setAttribute(
+                'target',
+                '_blank',
+              );
+              selection.anchorNode.parentElement.setAttribute(
+                'rel',
+                'noopener noreferrer',
+              );
+              editableSnap.current?.focus();
+              document.execCommand('formatBlock', false, 'p');
+              popper.setActive(false);
+              setIsActive(false);
+            }
           }}
         />
       </PortalPopper>
@@ -144,16 +149,21 @@ export function InlineLink() {
   );
 }
 
-function LinkInput(props: { onClose: (value?: string) => void }) {
+function LinkInput(props: {
+  onClose: (value?: string) => void;
+  defaultValue?: string;
+}) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <>
       <LinkWrapper>
         <InputWrapper>
           <Input
+            defaultValue={props.defaultValue}
             autoFocus
             ref={ref}
             type="url"
+            pattern="https?://.+"
             placeholder="Paste link or type to search"
             onMouseDown={(e) => {
               e.stopPropagation();
@@ -164,7 +174,6 @@ function LinkInput(props: { onClose: (value?: string) => void }) {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 props.onClose(ref.current?.value);
-
                 e.preventDefault();
                 e.stopPropagation();
               }

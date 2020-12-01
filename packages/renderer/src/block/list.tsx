@@ -1,7 +1,7 @@
 import * as React from 'react';
 // @ts-ignore
 import ReactHtmlParser from 'react-html-parser';
-import { css } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@elliot/theme';
 export type List = {
   type: 'list';
   data: {
@@ -17,7 +17,7 @@ const commonListStyle = {
   left: 18,
 } as const;
 
-const styles = {
+export const listStyle: StitchesStyleObject = {
   ul: {
     listStyle: 'disc',
     ...commonListStyle,
@@ -35,14 +35,14 @@ const styles = {
 export const ListRenderer = ({ data }: { data: List['data'] }) => {
   let listItems = React.Children.toArray(
     data.items.map((item) => (
-      <li className={css(styles.item)}>{ReactHtmlParser(item)}</li>
+      <li className={css(listStyle.item)}>{ReactHtmlParser(item)}</li>
     )),
   );
   if (data.style === 'ordered') {
-    return <ol className={css(styles.ol)}>{listItems}</ol>;
+    return <ol className={css(listStyle.ol)}>{listItems}</ol>;
   }
   if (data.style === 'unordered') {
-    return <ul className={css(styles.ul)}>{listItems}</ul>;
+    return <ul className={css(listStyle.ul)}>{listItems}</ul>;
   }
   return null;
 };

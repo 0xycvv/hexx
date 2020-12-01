@@ -4,7 +4,7 @@ import {
   StitchesProps,
 } from '@stitches/react';
 
-export const { css, styled } = createStyled({
+const config = {
   prefix: 'elliot',
   tokens: {
     colors: {
@@ -23,11 +23,14 @@ export const { css, styled } = createStyled({
       $6: '24px',
     },
   },
-});
+} as const;
+
+export const { css, styled } = createStyled(config);
 
 export type { StitchesProps };
 
+// export type StitchesCssProp = TCssProp<typeof config>;
 export type StitchesStyleObject = Record<
   string,
-  TCssProp<{ prefix: string }>
+  TCssProp<typeof config>
 >;

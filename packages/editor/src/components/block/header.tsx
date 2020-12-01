@@ -1,27 +1,14 @@
+import { headerStyle } from '@elliot/renderer';
+import { styled } from '@elliot/theme';
 import * as React from 'react';
-import { useBlock, useEditor } from '../../hooks/use-editor';
+import composeRefs from '../../hooks/use-compose-ref';
+import { useBlock } from '../../hooks/use-editor';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
-import { BlockProps } from './block';
 import { header as HeaderSvg } from '../icons';
-import { css } from '@elliot/theme';
-import composeRefs from '../../hooks/use-compose-ref';
+import { BlockProps } from './block';
 
-const styles = css({
-  padding: '3px 2px',
-  '&.e-h1': {
-    fontSize: '2.5rem',
-    fontWeight: 700,
-  },
-  '&.e-h2': {
-    fontSize: '2rem',
-    fontWeight: 700,
-  },
-  '&.e-h3': {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-  },
-});
+const Heading = styled(Editable, headerStyle);
 
 export function HeaderBlock({ block, index, config }: BlockProps) {
   const { register, update } = useBlock(block.id, index);
@@ -33,9 +20,10 @@ export function HeaderBlock({ block, index, config }: BlockProps) {
   }, []);
 
   return (
-    <Editable
+    <Heading
+      // @ts-ignore
+      h={block.data.level || 3}
       placeholder={config.placeholder}
-      className={`e-h${block.data.level} ${styles}`}
       ref={composeRefs(ref, register)}
       onChange={(evt) =>
         update({
@@ -59,7 +47,7 @@ HeaderBlock.block = {
   },
   defaultValue: {
     text: '',
-    level: 2,
+    level: 3,
   },
   isEmpty: (d) => !d.text.trim(),
 };

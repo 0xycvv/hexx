@@ -15,7 +15,6 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className={styles.main}>
         <EditorUsage
           data={[
@@ -49,6 +48,15 @@ export default function Home() {
             },
           ]}
         />
+                <div
+          id="title"
+          style={{
+            width: '100vw',
+            height: '50px'
+          }}
+        >
+          Elliot Editor
+        </div>
       </main>
     </div>
   );

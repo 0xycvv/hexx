@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { css } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@elliot/theme';
 
 export type Quote = {
   type: 'quote';
@@ -10,10 +10,12 @@ export type Quote = {
   };
 };
 
-const styles = {
+export const quoteStyle: StitchesStyleObject = {
   wrapper: {
     paddingLeft: '24px',
     paddingRight: '24px',
+    paddingTop: 3,
+    paddingBottom: 3,
   },
   text: {
     borderTop: 'none',
@@ -23,21 +25,24 @@ const styles = {
     borderLeft: '2px solid rgb(36, 37, 38)',
     boxShadow: 'none',
     borderRadius: 0,
-    marginBottom: 10,
-    padding: '10px 12px',
+    marginTop: 8,
+    marginBottom: 8,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 16,
+    paddingRight: 12,
     fontSize: '1rem',
     lineHeight: '20px',
     fontStyle: 'italic',
     color: 'rgb(36, 37, 38)',
-    paddingLeft: 16,
     minHeight: 'unset !important',
   },
 };
 
 export const QuoteRenderer = ({ data }: { data: Quote['data'] }) => {
   return (
-    <blockquote className={css(styles.wrapper)}>
-      <div className={css(styles.text)}>{data.text}</div>
+    <blockquote className={css(quoteStyle.wrapper)}>
+      <div className={css(quoteStyle.text)}>{data.text}</div>
     </blockquote>
   );
 };

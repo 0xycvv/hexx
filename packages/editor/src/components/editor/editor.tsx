@@ -1,4 +1,5 @@
 import { Provider, useAtom } from 'jotai';
+import { paragraphStyle } from '@elliot/renderer';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
   DragDropContext,
@@ -8,7 +9,7 @@ import {
 } from 'react-beautiful-dnd';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
-import { styled } from '@elliot/theme';
+import { css, styled } from '@elliot/theme';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,
@@ -144,7 +145,7 @@ function Elliot(props: ElliotProps) {
         {(provided) => (
           <Wrapper
             ref={composeRefs(ref, provided.innerRef) as any}
-            className="elliot"
+            className={`elliot ${css(paragraphStyle)}`}
             onClick={handleClick}
             onKeyDown={(e) => {
               if (e.key === BackspaceKey && isSelectAll) {

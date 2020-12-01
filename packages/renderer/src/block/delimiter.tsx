@@ -1,4 +1,4 @@
-import { css } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@elliot/theme';
 import * as React from 'react';
 
 export type Delimiter = {
@@ -6,20 +6,20 @@ export type Delimiter = {
   data: {};
 };
 
-const styles = css({
+export const dividerStyles: StitchesStyleObject = {
   lineHeight: '1.6em',
   width: '100%',
   textAlign: 'center',
   '::before': {
     display: 'inline-block',
-    content: `'***'`,
+    color: '#C4C4C4',
+    content: `'・・・'`,
     fontSize: '30px',
-    lineHeight: '65px',
-    height: '30px',
+    lineHeight: '38px',
     letterSpacing: '0.2em',
   },
-});
+};
 
 export const DelimiterRenderer = () => {
-  return <div role="separator" className={styles} />;
+  return <div role="separator" className={css(dividerStyles)} />;
 };

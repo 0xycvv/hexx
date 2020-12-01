@@ -17,8 +17,8 @@ export function useReactPopper(props: {
 
   const popper = usePopper(referenceElement, popperElement, {
     placement: props.placement,
-    modifiers: props.modifiers,
-    strategy: 'absolute',
+    modifiers: [...(props.modifiers || [])],
+    strategy: 'fixed',
   });
 
   useEventListener('mousedown', (e) => {
@@ -31,6 +31,8 @@ export function useReactPopper(props: {
   });
 
   useEffect(() => {
+    popper.forceUpdate?.();
+    popper.update?.();
     if (!active) {
       props.onClose?.();
     }
@@ -41,6 +43,7 @@ export function useReactPopper(props: {
     active,
     setActive,
     setReferenceElement,
+    popperJs: popper,
     getPopperProps: () => ({
       ref: setPopperElement,
       style: popper.styles.popper,

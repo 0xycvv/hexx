@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import clsx from 'clsx';
+import { getSelectionRange } from '../../utils/ranges';
 import { useEventListener } from '../../hooks/use-event-listener';
 import { useLatestRef } from '../../hooks/use-latest-ref';
 
@@ -21,10 +21,8 @@ export function useInlineTool(props?: UseInlineToolConfig) {
   const bindProps = {
     onClick,
     onMouseDown,
-    className: clsx('icon', {
-      active: isActive,
-    }),
-  };
+    color: isActive ? 'active' : 'inactive',
+  } as const;
   return {
     isActive,
     setIsActive,
@@ -50,7 +48,7 @@ export function useDefaultInlineTool(props?: UseInlineToolConfig) {
 }
 
 export function useEventChangeSelection(
-  cb?: (value: boolean) => void,
+  cb?: (value: [isLink: boolean, url: string | null]) => void,
 ) {
   const savedRef = useLatestRef(cb);
 
@@ -62,20 +60,24 @@ export function useEventChangeSelection(
   });
 }
 
-const isLink = () => {
-  const selection = getSelection();
-  if (selection) {
+const isLink = (): [boolean, string | null] => {
+  const range = getSelectionRange();
+  if (range) {
     if (
       // @ts-ignore
-      selection.startContainer?.parentNode.tagName === 'A' ||
+      range.startContainer?.parentNode instanceof HTMLAnchorElement ||
       // @ts-ignore
-      selection.endContainer?.parentNode.tagName === 'A'
+      range.endContainer?.parentNode instanceof HTMLAnchorElement
     ) {
-      return true;
+      const url =
+        (range.startContainer?.parentNode as HTMLAnchorElement)
+          .href ||
+        (range.endContainer?.parentNode as HTMLAnchorElement).href;
+      return [true, url];
     } else {
-      return false;
+      return [false, null];
     }
   } else {
-    return false;
+    return [false, null];
   }
 };

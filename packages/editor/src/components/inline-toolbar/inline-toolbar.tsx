@@ -24,6 +24,7 @@ const Wrapper = styled('div', {
   paddingBottom: '14px',
   border: '1px solid #D3D6D8',
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
+  zIndex: 999
 });
 
 export const IconWrapper = styled('div', {
@@ -35,11 +36,21 @@ export const IconWrapper = styled('div', {
   paddingLeft: 6,
   paddingRight: 6,
   cursor: 'pointer',
+  variants: {
+    color: {
+      active: {
+        color: '$success',
+        ':hover': {
+          color: '$success',
+        },
+      },
+      inactive: {
+        color: '$text-1',
+      },
+    },
+  },
   ':hover': {
     color: '$gay500',
-  },
-  '&.active': {
-    color: '$success',
   },
 });
 

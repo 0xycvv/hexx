@@ -1,7 +1,7 @@
 import * as React from 'react';
 // @ts-ignore
 import ReactHtmlParser from 'react-html-parser';
-import { css } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@elliot/theme';
 export type Paragraph = {
   type: 'paragraph';
   data: {
@@ -10,8 +10,8 @@ export type Paragraph = {
   };
 };
 
-const styles = {
-  p: css({
+export const paragraphStyle: StitchesStyleObject = {
+  p: {
     lineHeight: '1.6em',
     outline: 'none',
     code: {
@@ -26,7 +26,7 @@ const styles = {
       letterSpacing: 0.3,
     },
     mark: {
-      background: 'rgba(245,235,111,0.29)',
+      background: 'rgba(1, 72, 209, 0.2)',
       padding: '3px 0',
     },
     a: {
@@ -34,12 +34,19 @@ const styles = {
       textDecoration: 'underline',
       color: 'inherit',
     },
-  }),
+  },
 };
 
-export const ParagraphRenderer = ({ data }: { data: Paragraph['data'] }) => {
+export const ParagraphRenderer = ({
+  data,
+}: {
+  data: Paragraph['data'];
+}) => {
   return (
-    <p className={styles.p} style={{ textAlign: data.alignment || 'left' }}>
+    <p
+      className={css(paragraphStyle)}
+      style={{ textAlign: data.alignment || 'left' }}
+    >
       {ReactHtmlParser(data.text)}
     </p>
   );
