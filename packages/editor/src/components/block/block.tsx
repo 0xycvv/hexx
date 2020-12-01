@@ -58,36 +58,14 @@ const Wrapper = styled('div', {
   },
 });
 
-const Plus = styled('div', {
-  userSelect: 'none',
-  cursor: 'pointer',
-  fontSize: 24,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: 'rgba(55, 53, 47, 0.3)',
+const RightIndicator = styled('div', {
+  height: '100%',
+  width: 0,
   position: 'absolute',
-  top: 3,
-  left: '-24px',
-  width: 24,
-  height: 24,
-  borderRadius: 3,
-  pointerEvents: 'auto',
-});
-
-const Drag = styled('div', {
-  userSelect: 'none',
-  position: 'absolute',
-  top: 3,
-  right: '-24px',
-  pointerEvents: 'auto',
-  cursor: '-webkit-grab',
-  borderRadius: 3,
-  fontSize: 24,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: 'rgba(55, 53, 47, 0.3)',
+  right: 0,
+  bottom: 0,
+  top: 0,
+  zIndex: 9,
 });
 
 const SelectOverlay = styled('div', {
@@ -99,7 +77,7 @@ const SelectOverlay = styled('div', {
   right: 0,
   bottom: 0,
   backgroundColor: '$success',
-  zIndex: 81,
+  zIndex: 1,
   opacity: 0.2,
 });
 
@@ -317,78 +295,9 @@ export function Block({ block, index, children }: BlockProps) {
               />
             </SelectOverlay>
           )}
+          <RightIndicator className="elliot-right-indicator" />
         </Wrapper>
       )}
     </Draggable>
-  );
-}
-
-const DragButton = forwardRef((props: any, ref) => {
-  return (
-    <Drag ref={ref as any} {...props}>
-      <DragIndicator />
-    </Drag>
-  );
-});
-
-const AddMenu = styled('div', {
-  background: 'black',
-  borderRadius: 4,
-  display: 'flex',
-  fontSize: '18px',
-  padding: 6,
-  color: 'white',
-  svg: {
-    cursor: 'pointer',
-  },
-});
-
-function PlusButton({
-  onClick,
-  index,
-}: {
-  onClick?: () => void;
-  index: number;
-}) {
-  const [blocksMap] = useAtom(blockMapAtom);
-  const popper = useReactPopper({
-    placement: 'right',
-  });
-  const { insertBlock } = useEditor();
-
-  return (
-    <>
-      <Plus
-        ref={popper.setReferenceElement}
-        onClick={(e) => {
-          popper.setActive(true);
-          onClick?.();
-          e.stopPropagation();
-        }}
-      >
-        <PlusSvg />
-      </Plus>
-      <PortalPopper popper={popper}>
-        <AddMenu>
-          {Object.entries(blocksMap).map(([key, blockType]) => (
-            <Fragment key={key}>
-              {createElement(blockType.block.icon.svg, {
-                onClick: (e: MouseEvent) => {
-                  insertBlock({
-                    block: {
-                      type: blockType.block.type,
-                      data: blockType.block.defaultValue,
-                    },
-                    index: index + 1,
-                  });
-                  popper.setActive(false);
-                  e.stopPropagation();
-                },
-              })}
-            </Fragment>
-          ))}
-        </AddMenu>
-      </PortalPopper>
-    </>
   );
 }

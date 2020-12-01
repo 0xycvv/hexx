@@ -36,7 +36,9 @@ export function PortalPopper({
           e.stopPropagation();
         }}
       />
-      <div {...popper.getPopperProps()}>{props.children}</div>
+      <PopperLayer {...popper.getPopperProps()}>
+        {props.children}
+      </PopperLayer>
     </ClientOnlyPortal>
   );
 }
@@ -47,4 +49,7 @@ const Overlay = styled('div', {
   left: 0,
   width: '100vw',
   height: '100vh',
+});
+const PopperLayer = styled('div', {
+  zIndex: 1,
 });

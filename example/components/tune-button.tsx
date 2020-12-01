@@ -19,6 +19,7 @@ const Tune = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   color: 'black',
+  backgroundColor: '$bg-1',
 });
 
 const Icon = styled('svg', {
@@ -72,13 +73,12 @@ export const TuneButton = forwardRef((props: any, ref) => {
   const hoverId = usePreviousExistValue(hoverBlock?.id);
 
   useEffect(() => {
-    const body = document.querySelector('#title');
     if (previousHoverBlockId !== hoverBlock?.id) {
       if (hoverBlock?.el) {
-        popper.setReferenceElement(
-          // body,
-          hoverBlock?.el,
+        const target = hoverBlock.el.querySelector(
+          '.elliot-right-indicator',
         );
+        popper.setReferenceElement(target);
       }
       if (hoverBlock) {
         popper.setActive(true);
@@ -101,6 +101,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
         onClick={(e) => {
           if (!isSelecting) {
             selectBlock(hoverId);
+            popper.popperJs.update?.();
           }
         }}
       >
