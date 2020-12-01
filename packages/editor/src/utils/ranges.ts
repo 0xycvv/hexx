@@ -12,11 +12,17 @@ export function removeRanges() {
 
 export function saveSelection() {
   const selection = window.getSelection();
-  return selection.rangeCount === 0 ? null : selection.getRangeAt(0);
+  if (!selection) {
+    return;
+  }
+  return selection.rangeCount === 0 ? undefined : selection.getRangeAt(0);
 }
 
 export function restoreSelection(range?: Range) {
   const selection = window.getSelection();
+  if (!selection || !range) {
+    return;
+  }
   selection.removeAllRanges();
   selection.addRange(range);
 }
@@ -31,6 +37,9 @@ export function getSelectionRange() {
 
 export function extractFragmentFromPosition() {
   const selectRange = getSelectionRange();
+  if (!selectRange || !document.activeElement) {
+    return;
+  }
   selectRange.deleteContents();
   const range = selectRange.cloneRange();
   range.selectNodeContents(document.activeElement);
@@ -45,4 +54,14 @@ export function extractFragmentFromPosition() {
     // @ts-ignore
     current: range.commonAncestorContainer.innerHTML,
   };
+}
+
+export function expandToTag(node: Node) {
+  const selection = window.getSelection();
+  if (!selection) return;
+  selection.removeAllRanges();
+  const range = document.createRange();
+
+  range.selectNodeContents(node);
+  selection.addRange(range);
 }

@@ -12,21 +12,19 @@ export type Paragraph = {
 
 export const paragraphStyle: StitchesStyleObject = {
   p: {
-    lineHeight: '1.6em',
+    lineHeight: '24px',
+    fontSize: '16px',
     outline: 'none',
     code: {
-      background: 'rgba(250, 239, 240, 0.78)',
-      color: '#b44437',
-      padding: '3px 4px',
-      borderRadius: 5,
+      background: 'rgba(1, 72, 209, 0.1)',
+      color: '#0148D1',
+      padding: '1px 6px',
+      borderRadius: 6,
       margin: '0 1px',
       fontFamily: 'inherit',
-      fontSize: '0.86em',
-      fontWeight: 500,
-      letterSpacing: 0.3,
     },
     mark: {
-      background: 'rgba(1, 72, 209, 0.2)',
+      background: 'rgba(228, 178, 2, 0.18)',
       padding: '3px 0',
     },
     a: {

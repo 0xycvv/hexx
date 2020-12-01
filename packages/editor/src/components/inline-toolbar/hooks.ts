@@ -4,22 +4,19 @@ import { useEventListener } from '../../hooks/use-event-listener';
 import { useLatestRef } from '../../hooks/use-latest-ref';
 
 export interface UseInlineToolConfig {
-  type: string;
+  type?: string;
   onClick?: () => void;
 }
 
-export function useInlineTool(props?: UseInlineToolConfig) {
+export function useInlineTool(props: UseInlineToolConfig) {
   const [isActive, setIsActive] = useState(false);
-  const onClick = useCallback(() => {
-    props?.onClick?.();
-  }, []);
 
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
   }, []);
 
   const bindProps = {
-    onClick,
+    onClick: props.onClick,
     onMouseDown,
     color: isActive ? 'active' : 'inactive',
   } as const;
@@ -33,34 +30,36 @@ export function useInlineTool(props?: UseInlineToolConfig) {
   };
 }
 
-export function useDefaultInlineTool(props?: UseInlineToolConfig) {
+export function useDefaultInlineTool(props: UseInlineToolConfig) {
   const inlineTool = useInlineTool(props);
   useEventListener('selectionchange', () => {
-    const commandState = document.queryCommandState(props.type);
-    inlineTool.setIsActive(commandState);
+    if (props.type) {
+      const commandState = document.queryCommandState(props.type);
+      inlineTool.setIsActive(commandState);
+    }
   });
   useEventListener('dblclick', () => {
-    const commandState = document.queryCommandState(props.type);
-    inlineTool.setIsActive(commandState);
+    if (props.type) {
+      const commandState = document.queryCommandState(props.type);
+      inlineTool.setIsActive(commandState);
+    }
   });
 
   return inlineTool;
 }
 
-export function useEventChangeSelection(
-  cb?: (value: [isLink: boolean, url: string | null]) => void,
-) {
+export function useEventChangeSelection(cb?: () => void) {
   const savedRef = useLatestRef(cb);
 
   useEventListener('selectionchange', () => {
-    savedRef.current?.(isLink());
+    savedRef.current?.();
   });
   useEventListener('dblclick', () => {
-    savedRef.current?.(isLink());
+    savedRef.current?.();
   });
 }
 
-const isLink = (): [boolean, string | null] => {
+export const isAnchorElement = (): [boolean, string | null] => {
   const range = getSelectionRange();
   if (range) {
     if (

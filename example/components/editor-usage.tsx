@@ -6,8 +6,10 @@ import {
 } from '@elliot/editor';
 import {
   BlockMap,
-  InlineToolBar,
+  InlineToolBarPreset,
   PortalPopper,
+  InlineCode,
+  Unstable_InlineMarker,
   useReactPopper,
 } from '@elliot/editor/components';
 import { PlusButton } from './plus-button';
@@ -56,11 +58,14 @@ const EditorUsage = (props: EditorProps) => {
       blockMap={BlockMap}
     >
       <PortalPopper popper={popper}>
-        <InlineToolBar
+        <InlineToolBarPreset
           css={{
             borderRadius: '0px 26px 26px 26px',
           }}
-        />
+        >
+          <Unstable_InlineMarker />
+          <InlineCode />
+        </InlineToolBarPreset>
       </PortalPopper>
     </Editor>
   );

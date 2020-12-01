@@ -1,4 +1,5 @@
 import { EditableMap } from '../hooks/use-editor';
+import { getSelectionRange } from './ranges';
 
 function isBrowser() {
   return typeof window !== 'undefined';
@@ -167,7 +168,7 @@ function focusWithLastCursor(
 }
 
 export function lastCursor() {
-  if (isBrowser) {
+  if (isBrowser()) {
     const selection = window.getSelection();
     if (!selection || !selection.rangeCount) {
       return;
@@ -188,10 +189,17 @@ export function focusWithCursor(el: Node, cursorIndex: number) {
   sel.addRange(range);
 }
 
-export function surround(
-  commandName: string,
-  selection?: Selection,
-  value?: string,
-) {
-  document.execCommand(commandName, false, value);
+export function surround(nodeName: string) {
+  let range = getSelectionRange();
+  let newNode = document.createElement(nodeName);
+  if (!range) {
+    return;
+  }
+  try {
+    console.log(newNode);
+    range.surroundContents(newNode);
+    document.execCommand('formatBlock', false, 'p');
+  } catch (e) {
+    console.log(e);
+  }
 }

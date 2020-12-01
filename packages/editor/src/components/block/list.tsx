@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { List, listStyle } from '@elliot/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
 import { css, styled } from '@elliot/theme';
@@ -11,29 +12,8 @@ import { Editable } from '../editable';
 import { list as ListSvg } from '../icons';
 import { BlockProps } from './block';
 
-const commonListStyle = {
-  paddingLeft: 40,
-  outline: 'none',
-  position: 'relative',
-} as const;
-
-const styles = {
-  ul: {
-    listStyle: 'disc',
-    ...commonListStyle,
-  },
-  ol: {
-    listStyle: 'decimal',
-    ...commonListStyle,
-  },
-  item: {
-    padding: '5.5px 0 5.5px 3px',
-    lineHeight: '1.6em',
-  },
-};
-
-const Ul = styled('ul', styles.ul);
-const Ol = styled('ol', styles.ol);
+const Ul = styled('ul', listStyle.ul);
+const Ol = styled('ol', listStyle.ol);
 
 export function ListBlock({ index, block, config }: BlockProps) {
   const ref = React.useRef<HTMLElement>(null);
@@ -108,10 +88,17 @@ export function ListBlock({ index, block, config }: BlockProps) {
     });
   }, [block.data.items.length]);
 
+  console.log(block.data.style);
+
+  console.log(listStyle.ol);
   return (
     <Ul
       onKeyDown={handleKeyDown}
       ref={ref as any}
+      css={{
+        listStyle:
+          block.data.style === 'unordered' ? 'disc' : 'decimal',
+      }}
       as={block.data.style === 'unordered' ? Ul : Ol}
     >
       {listItems}
@@ -133,7 +120,7 @@ function ListItem(props: {
     props.blockIndex,
   );
   return (
-    <li className={css(styles.item)}>
+    <li className={css(listStyle.item)}>
       <Editable
         ref={registerWithIndex(props.index)}
         placeholder={props.placeholder}
@@ -160,8 +147,27 @@ ListBlock.block = {
     items: [''],
     style: 'unordered',
   },
+  tune: [
+    {
+      icon: {
+        text: 'Bullet',
+        svg: ListSvg,
+        isActive: (data) => data.style === 'unordered',
+      },
+      updater: (data) => ({ ...data, style: 'unordered' }),
+    },
+    {
+      icon: {
+        text: 'Number',
+        svg: ListSvg,
+        isActive: (data) => data.style === 'ordered',
+      },
+      updater: (data) => ({ ...data, style: 'ordered' }),
+    },
+  ],
   isEmpty: (data) => data.items.length === 0,
 };
+
 function replaceItemAtIndex(arr, index, newValue) {
   return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)];
 }

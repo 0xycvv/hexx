@@ -2,12 +2,15 @@ import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
 import { styled } from '@elliot/theme';
 import { activeBlockIdAtom } from '../../../constants/atom';
-import { surround } from '../../../utils/find-blocks';
 import { saveSelection } from '../../../utils/ranges';
 import Link from '../../icons/link';
 import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
 import { PortalPopper } from '../../virtual-popper/virtual-popper';
-import { useEventChangeSelection, useInlineTool } from '../hooks';
+import {
+  useEventChangeSelection,
+  useInlineTool,
+  isAnchorElement,
+} from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 
 const LinkWrapper = styled('div', {
@@ -63,8 +66,6 @@ export function InlineLink() {
   const popper = useReactPopper({
     onClose: () => {
       if (!hasChanged && snapHTML.current && editableSnap.current) {
-        console.log(editableSnap.current.innerHTML);
-        console.log(snapHTML.current);
         editableSnap.current.innerHTML = snapHTML.current;
         editableSnap.current.focus();
         document.execCommand('formatBlock', false, 'p');
@@ -96,8 +97,9 @@ export function InlineLink() {
     },
   });
 
-  useEventChangeSelection(([isLink, url]) => {
-    setIsActive(isLink);
+  useEventChangeSelection(() => {
+    const [isAnchor, url] = isAnchorElement();
+    setIsActive(isAnchor);
     setInitialValue(url || '');
   });
 
@@ -127,7 +129,7 @@ export function InlineLink() {
             selectionWrapper.current.style.boxShadow = '';
             selectionWrapper.current.style.borderRadius = '';
             setHasChanged(true);
-            surround('createLink', undefined, value);
+            document.execCommand('createLink', false, value);
             if (selection.anchorNode?.parentElement) {
               selection.anchorNode.parentElement.setAttribute(
                 'target',
@@ -138,7 +140,7 @@ export function InlineLink() {
                 'noopener noreferrer',
               );
               editableSnap.current?.focus();
-              document.execCommand('formatBlock', false, 'p');
+              document.execCommand('removeFormat');
               popper.setActive(false);
               setIsActive(false);
             }
@@ -159,17 +161,27 @@ function LinkInput(props: {
       <LinkWrapper>
         <InputWrapper>
           <Input
+            onFocus={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
             defaultValue={props.defaultValue}
             autoFocus
             ref={ref}
             type="url"
             pattern="https?://.+"
             placeholder="Paste link or type to search"
+            onMouseUp={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
             onMouseDown={(e) => {
               e.stopPropagation();
+              e.preventDefault();
             }}
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {

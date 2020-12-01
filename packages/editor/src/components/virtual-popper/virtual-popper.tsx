@@ -1,5 +1,5 @@
 import { Property } from 'csstype';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { styled } from '@elliot/theme';
 import ClientOnlyPortal from '../client-only-portal';
 import { useReactPopper } from './use-virtual-popper';
@@ -18,6 +18,11 @@ export function PortalPopper({
   if (!popper.active) {
     return null;
   }
+  useEffect(() => {
+    return () => {
+      props.onClose?.();
+    };
+  }, []);
   return (
     <ClientOnlyPortal selector={props.selector || 'body'}>
       <Overlay

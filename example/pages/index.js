@@ -36,7 +36,9 @@ export default function Home() {
       </Head>
       <Header>
         {SVG}
-        <span style={{ marginLeft: '6px' }}>Elliot</span>
+        <span style={{ marginLeft: '6px', fontSize: 20 }}>
+          Elliot
+        </span>
       </Header>
       <main className={styles.main}>
         <EditorUsage
