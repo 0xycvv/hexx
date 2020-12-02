@@ -13,7 +13,7 @@
     "build": "yarn build:pkg && yarn workspace example build",
     "build:pkg": "yarn preconstruct build",
     "changeset": "changeset",
-    "release": "yarn build:pkg && changeset publish",
+    "release": "yarn build:pkg && changeset publish --access public",
     "start": "yarn workspace example start"
   },
   "devDependencies": {
