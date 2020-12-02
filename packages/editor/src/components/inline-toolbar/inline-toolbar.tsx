@@ -1,5 +1,5 @@
 import { StitchesProps, styled } from '@elliot/theme';
-import { Children, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import Bold from '../icons/bold';
 import Italic from '../icons/italic';
 import Underlined from '../icons/underlined';
@@ -49,11 +49,18 @@ export const IconWrapper = styled('div', {
   },
 });
 
-function DefaultInlineTool(
-  props: UseInlineToolConfig & { children: ReactNode },
-) {
-  const { getProps } = useDefaultInlineTool(props);
-  return <IconWrapper {...getProps()}>{props.children}</IconWrapper>;
+function DefaultInlineTool({
+  type,
+  ...props
+}: UseInlineToolConfig & {
+  children: ReactNode;
+} & StitchesProps<typeof IconWrapper>) {
+  const { getProps } = useDefaultInlineTool({ type });
+  return (
+    <IconWrapper {...props} {...getProps}>
+      {props.children}
+    </IconWrapper>
+  );
 }
 
 export function InlineToolBar({
@@ -63,36 +70,43 @@ export function InlineToolBar({
   return <Wrapper {...props}>{children}</Wrapper>;
 }
 
-export function InlineBold() {
+export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
   return (
     <DefaultInlineTool
       type="bold"
       onClick={() => {
         document.execCommand('bold', false);
       }}
+      {...props}
     >
       <Bold />
     </DefaultInlineTool>
   );
 }
 
-export function InlineItalic() {
+export function InlineItalic(
+  props: StitchesProps<typeof IconWrapper>,
+) {
   return (
     <DefaultInlineTool
       type="italic"
       onClick={() => {
         document.execCommand('italic', false);
       }}
+      {...props}
     >
       <Italic />
     </DefaultInlineTool>
   );
 }
 
-export function InlineUnderline() {
+export function InlineUnderline(
+  props: StitchesProps<typeof IconWrapper>,
+) {
   return (
     <DefaultInlineTool
       type="underline"
+      {...props}
       onClick={() => {
         document.execCommand('underline', false);
       }}
@@ -113,7 +127,7 @@ export function InlineToolBarPreset({
       <InlineBold />
       <InlineItalic />
       <InlineUnderline />
-      <InlineLink />
+      {/* <InlineLink /> */}
       {children}
     </Wrapper>
   );

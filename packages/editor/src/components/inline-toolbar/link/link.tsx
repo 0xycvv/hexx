@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import { styled } from '@elliot/theme';
+import { StitchesProps, styled } from '@elliot/theme';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import { saveSelection } from '../../../utils/ranges';
 import Link from '../../icons/link';
@@ -57,7 +57,7 @@ function highlight(r: Range | null) {
   return el;
 }
 
-export function InlineLink() {
+export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const [initialValue, setInitialValue] = useState('');
   const snapHTML = useRef<string>();
@@ -82,20 +82,7 @@ export function InlineLink() {
     ],
   });
   const selectionWrapper = useRef<HTMLSpanElement>();
-  const { getProps, setIsActive } = useInlineTool({
-    type: 'link',
-    onClick: () => {
-      const editable = activeBlock?.editable;
-      if (!editable) {
-        return;
-      }
-      editableSnap.current = editable;
-      snapHTML.current = editable?.innerHTML;
-      const selRange = saveSelection();
-      selectionWrapper.current = highlight(selRange);
-      popper.setActive((s) => !s);
-    },
-  });
+  const { getProps, setIsActive } = useInlineTool();
 
   useEventChangeSelection(() => {
     const [isAnchor, url] = isAnchorElement();
@@ -105,7 +92,23 @@ export function InlineLink() {
 
   return (
     <>
-      <IconWrapper ref={popper.setReferenceElement} {...getProps()}>
+      <IconWrapper
+        ref={popper.setReferenceElement}
+        onClick={() => {
+          const editable = activeBlock?.editable;
+          if (!editable) {
+            return;
+          }
+          editableSnap.current = editable;
+          snapHTML.current = editable?.innerHTML;
+          const selRange = saveSelection();
+          if (!selRange) return;
+          selectionWrapper.current = highlight(selRange);
+          popper.setActive((s) => !s);
+        }}
+        {...getProps}
+        {...props}
+      >
         <Link />
       </IconWrapper>
       <PortalPopper popper={popper} pointerEvent="auto">

@@ -3,18 +3,9 @@ import SvgCode from '../../icons/code';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { surround } from '../../../utils/find-blocks';
 import { getSelectionRange } from '../../../utils/ranges';
-export function InlineCode() {
-  const { getProps, setIsActive, isActive } = useInlineTool({
-    onClick: () => {
-      if (isActive) {
-        document.execCommand('removeFormat');
-        setIsActive(false);
-      } else {
-        surround('code');
-        setIsActive(true);
-      }
-    },
-  });
+import { StitchesProps } from '@elliot/theme';
+export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
+  const { getProps, setIsActive, isActive } = useInlineTool();
 
   useEventChangeSelection(() => {
     const r = getSelectionRange();
@@ -31,7 +22,19 @@ export function InlineCode() {
   });
 
   return (
-    <IconWrapper {...getProps()}>
+    <IconWrapper
+      {...getProps}
+      onClick={() => {
+        if (isActive) {
+          document.execCommand('removeFormat');
+          setIsActive(false);
+        } else {
+          surround('code');
+          setIsActive(true);
+        }
+      }}
+      {...props}
+    >
       <SvgCode />
     </IconWrapper>
   );

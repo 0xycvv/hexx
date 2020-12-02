@@ -1,15 +1,12 @@
-import { Provider, useAtom } from 'jotai';
 import { paragraphStyle } from '@elliot/renderer';
-import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import { css, styled, StitchesCssProp } from '@elliot/theme';
+import { Provider, useAtom } from 'jotai';
+import { MouseEvent, ReactNode, useRef } from 'react';
 import {
   DragDropContext,
-  Draggable,
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import composeRefs from '../../hooks/use-compose-ref';
-import { useEditor } from '../../hooks/use-editor';
-import { css, styled } from '@elliot/theme';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,
@@ -21,6 +18,8 @@ import {
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useActiveBlockId } from '../../hooks/use-active-element';
+import composeRefs from '../../hooks/use-compose-ref';
+import { useEditor } from '../../hooks/use-editor';
 import {
   findLastBlock,
   focusLastBlock,
@@ -28,6 +27,7 @@ import {
 } from '../../utils/find-blocks';
 import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
+import { TextBlock } from '../block/text';
 
 export type BlockType<T = any> = {
   id: string;
@@ -43,8 +43,10 @@ export interface EditorProps extends ElliotProps {
 interface ElliotProps {
   children?: ReactNode;
   plusButton?: ReactNode;
-  dragButton?: ReactNode;
-  defaultBlock?: any;
+  tuneButton?: ReactNode;
+  defaultBlock?: Omit<BlockType, 'id'>;
+  css?: StitchesCssProp;
+  blockCss?: StitchesCssProp;
 }
 
 const Wrapper = styled('div', {
@@ -74,6 +76,10 @@ const Wrapper = styled('div', {
 });
 
 function Elliot(props: ElliotProps) {
+  const defaultBlock = props.defaultBlock || {
+    type: TextBlock.block.type,
+    data: TextBlock.block.defaultValue,
+  };
   const [id] = useAtom(editorIdAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
@@ -97,14 +103,9 @@ function Elliot(props: ElliotProps) {
       const lastBlock = findLastBlock();
       if (lastBlock) {
         if (lastBlock.editable) {
-          if (lastBlock.editable?.textContent?.length > 0) {
+          if ((lastBlock?.editable?.textContent?.length ?? 0) > 0) {
             insertBlock({
-              block: {
-                type: 'paragraph',
-                data: {
-                  text: '',
-                },
-              },
+              block: defaultBlock,
             });
             lastBlock.editable?.focus();
           } else {
@@ -112,12 +113,7 @@ function Elliot(props: ElliotProps) {
           }
         } else {
           insertBlock({
-            block: {
-              type: 'paragraph',
-              data: {
-                text: '',
-              },
-            },
+            block: defaultBlock,
           });
         }
       }
@@ -143,9 +139,10 @@ function Elliot(props: ElliotProps) {
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
-      <Droppable droppableId={id} isDropDisabled={!props.dragButton}>
+      <Droppable droppableId={id}>
         {(provided) => (
           <Wrapper
+            css={props.css}
             ref={composeRefs(ref, provided.innerRef) as any}
             className={`elliot ${css(paragraphStyle)}`}
             onClick={handleClick}
@@ -163,9 +160,14 @@ function Elliot(props: ElliotProps) {
           >
             {props.children}
             {blockIdList.map((bId, i) => (
-              <Block key={bId} index={i} block={blockIdMap[bId]} />
+              <Block
+                css={props.blockCss}
+                key={bId}
+                index={i}
+                block={blockIdMap[bId]}
+              />
             ))}
-            {props.dragButton}
+            {props.tuneButton}
             {props.plusButton}
             {provided.placeholder}
           </Wrapper>
@@ -176,7 +178,7 @@ function Elliot(props: ElliotProps) {
 }
 
 export const Editor = (props: EditorProps) => {
-  const { byId, ids } = normalize(props.data || [], 'id');
+  const { byId, ids } = normalize(props.data, 'id');
   return (
     <Provider
       // @ts-ignore
@@ -189,7 +191,7 @@ export const Editor = (props: EditorProps) => {
     >
       <Elliot
         defaultBlock={props.defaultBlock}
-        dragButton={props.dragButton}
+        tuneButton={props.tuneButton}
         plusButton={props.plusButton}
       >
         {props.children}

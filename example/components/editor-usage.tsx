@@ -53,7 +53,7 @@ const EditorUsage = (props: EditorProps) => {
   return (
     <Editor
       plusButton={<PlusButton />}
-      dragButton={<TuneButton />}
+      tuneButton={<TuneButton />}
       {...props}
       blockMap={BlockMap}
     >

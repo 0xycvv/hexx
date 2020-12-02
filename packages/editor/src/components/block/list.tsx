@@ -32,13 +32,16 @@ export function ListBlock({ index, block, config }: BlockProps) {
         blockIndex={index}
         placeholder={config.placeholder}
         onFocus={() => setActiveListItemIndex(i)}
+        onEmpty={() => {
+          const items = removeItemAtIndex(block.data.items, i);
+          update({
+            ...block.data,
+            items,
+          });
+        }}
         onChange={(value) => {
           let items = block.data.items;
-          if (value === '') {
-            items = removeItemAtIndex(block.data.items, i);
-          } else {
-            items = replaceItemAtIndex(block.data.items, i, value);
-          }
+          items = replaceItemAtIndex(block.data.items, i, value);
           update({
             ...block.data,
             items,
@@ -51,18 +54,23 @@ export function ListBlock({ index, block, config }: BlockProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!e.shiftKey && e.key === 'Enter') {
       if (!!block.data.items[activeListItemIndex]) {
-        const { current, next } = extractFragmentFromPosition();
+        const fragments = extractFragmentFromPosition();
+        if (!fragments) return;
+        const { current, next } = fragments;
+        let items = block.data.items;
+        items = replaceItemAtIndex(
+          items,
+          activeListItemIndex,
+          current,
+        );
+        items = insertItemAtIndex(
+          items,
+          activeListItemIndex + 1,
+          next,
+        );
         update({
           ...block.data,
-          items: replaceItemAtIndex(
-            replaceItemAtIndex(
-              block.data.items,
-              activeListItemIndex,
-              current,
-            ),
-            activeListItemIndex + 1,
-            next,
-          ),
+          items,
         });
         e.stopPropagation();
         e.preventDefault();
@@ -88,9 +96,6 @@ export function ListBlock({ index, block, config }: BlockProps) {
     });
   }, [block.data.items.length]);
 
-  console.log(block.data.style);
-
-  console.log(listStyle.ol);
   return (
     <Ul
       onKeyDown={handleKeyDown}
@@ -109,6 +114,7 @@ export function ListBlock({ index, block, config }: BlockProps) {
 function ListItem(props: {
   data: string;
   onChange: (value: string) => void;
+  onEmpty: () => void;
   onFocus: () => void;
   placeholder?: string;
   index: number;
@@ -127,6 +133,11 @@ function ListItem(props: {
         onFocus={props.onFocus}
         onChange={(e) => {
           props.onChange(e.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === BackspaceKey && props.data === '') {
+            props.onEmpty();
+          }
         }}
         html={props.data}
       />
@@ -167,6 +178,10 @@ ListBlock.block = {
   ],
   isEmpty: (data) => data.items.length === 0,
 };
+
+function insertItemAtIndex(arr, index, newValue) {
+  return [...arr.slice(0, index), newValue, ...arr.slice(index)];
+}
 
 function replaceItemAtIndex(arr, index, newValue) {
   return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)];

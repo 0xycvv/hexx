@@ -2,6 +2,7 @@ import {
   createStyled,
   TCssProp,
   StitchesProps,
+  TCssWithBreakpoints,
 } from '@stitches/react';
 
 const config = {
@@ -13,7 +14,7 @@ const config = {
       $gay500: '#9B9FA4',
       $link: '#0278E4',
       $success: '#2BC3A8',
-      $highlight: '#E4B202'
+      $highlight: '#E4B202',
     },
     space: {
       $1: '4px',
@@ -41,3 +42,5 @@ export type StitchesStyleObject = Record<
   string,
   TCssProp<typeof config>
 >;
+
+export type StitchesCssProp = TCssWithBreakpoints<typeof config>;

@@ -5,16 +5,7 @@ import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 
 export function Unstable_InlineMarker() {
-  const { getProps, isActive, setIsActive } = useInlineTool({
-    onClick: () => {
-      if (isActive) {
-        // TODO: remove mark or add mark
-      } else {
-        surround('mark');
-        setIsActive(true);
-      }
-    },
-  });
+  const { getProps, isActive, setIsActive } = useInlineTool();
 
   useEventChangeSelection(() => {
     const r = getSelectionRange();
@@ -31,7 +22,17 @@ export function Unstable_InlineMarker() {
   });
 
   return (
-    <IconWrapper {...getProps()}>
+    <IconWrapper
+      {...getProps}
+      onClick={() => {
+        if (isActive) {
+          // TODO: remove mark or add mark
+        } else {
+          surround('mark');
+          setIsActive(true);
+        }
+      }}
+    >
       <SvgMarker />
     </IconWrapper>
   );

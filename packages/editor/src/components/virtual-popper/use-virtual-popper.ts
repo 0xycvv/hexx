@@ -12,7 +12,7 @@ export function useReactPopper(props: {
   const [active, setActive] = useState(props.defaultActive);
   const [popperElement, setPopperElement] = useState<HTMLElement>();
   const [referenceElement, setReferenceElement] = useState<
-    VirtualElement | Element | HTMLElement
+    VirtualElement | Element | HTMLElement | any
   >();
 
   const popper = usePopper(referenceElement, popperElement, {

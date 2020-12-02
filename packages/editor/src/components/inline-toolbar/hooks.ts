@@ -5,33 +5,27 @@ import { useLatestRef } from '../../hooks/use-latest-ref';
 
 export interface UseInlineToolConfig {
   type?: string;
-  onClick?: () => void;
 }
 
-export function useInlineTool(props: UseInlineToolConfig) {
+export function useInlineTool() {
   const [isActive, setIsActive] = useState(false);
 
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
   }, []);
 
-  const bindProps = {
-    onClick: props.onClick,
-    onMouseDown,
-    color: isActive ? 'active' : 'inactive',
-  } as const;
   return {
     isActive,
     setIsActive,
-    getProps: (p: Partial<typeof bindProps> = {}) => ({
-      ...p,
-      ...bindProps,
-    }),
+    getProps: {
+      onMouseDown,
+      color: isActive ? ('active' as const) : ('inactive' as const),
+    },
   };
 }
 
 export function useDefaultInlineTool(props: UseInlineToolConfig) {
-  const inlineTool = useInlineTool(props);
+  const inlineTool = useInlineTool();
   useEventListener('selectionchange', () => {
     if (props.type) {
       const commandState = document.queryCommandState(props.type);

@@ -1,15 +1,11 @@
-import { styled } from '@elliot/theme';
+import { StitchesCssProp, styled } from '@elliot/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
-  forwardRef,
-  Fragment,
   KeyboardEvent,
-  MouseEvent,
   ReactNode,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import {
@@ -36,26 +32,13 @@ import {
 } from '../../utils/ranges';
 import { isEditableSelectAll } from '../editable';
 import { BlockType } from '../editor';
-import DragIndicator from '../icons/drag-indicator';
-import PlusSvg from '../icons/plus';
-import { useReactPopper } from '../virtual-popper/use-virtual-popper';
-import { PortalPopper } from '../virtual-popper/virtual-popper';
 import { TextBlock } from './text';
-
-const Menu = styled('div', {
-  opacity: 0,
-  position: 'relative',
-});
 
 const Wrapper = styled('div', {
   width: '100%',
   position: 'relative',
   marginTop: '1px',
   marginBottom: '1px',
-  [`:hover ${Menu}`]: {
-    opacity: 1,
-    transition: 'opacity 20ms ease-in 0s',
-  },
 });
 
 const RightIndicator = styled('div', {
@@ -70,7 +53,6 @@ const RightIndicator = styled('div', {
 
 const SelectOverlay = styled('div', {
   position: 'absolute',
-  // pointerEvents: 'none',
   borderRadius: 4,
   top: 0,
   left: 0,
@@ -88,7 +70,7 @@ function useBlockWrapper({
   block: BlockType;
   index: number;
 }) {
-  const { insertBlock, removeBlockWithId, splitBlock } = useEditor();
+  const { removeBlockWithId, splitBlock } = useEditor();
   const [blocksMap] = useAtom(blockMapAtom);
   const [editorId] = useAtom(editorIdAtom);
   const [hoverBlockId, setHoverBlockId] = useAtom(hoverBlockAtom);
@@ -210,6 +192,7 @@ function useBlockWrapper({
         setHoverBlockId(null);
       },
       onClick: (e) => {
+        if (!ref.current) return;
         const editable = findContentEditable(ref.current);
         if (!editable) {
           setBlockSelect(index);
@@ -234,8 +217,9 @@ export interface BlockProps<T = any> {
   index: number;
   config?: T;
   children?: ReactNode;
+  css?: StitchesCssProp;
 }
-export function Block({ block, index, children }: BlockProps) {
+export function Block({ block, index, children, css }: BlockProps) {
   const {
     selectInputRef,
     getBlockProps,
@@ -250,27 +234,11 @@ export function Block({ block, index, children }: BlockProps) {
     index,
   });
 
-  const [fontSize, setFontSize] = useState<number | null>(null);
-
-  useEffect(() => {
-    let wrapper = ref.current;
-    if (wrapper) {
-      const editable = findContentEditable(wrapper, true);
-      if (editable) {
-        const computedFontSize = window.getComputedStyle(editable)[
-          'font-size'
-        ];
-        if (computedFontSize) {
-          setFontSize(parseInt(computedFontSize, 10));
-        }
-      }
-    }
-  }, []);
-
   return (
     <Draggable draggableId={block.id} index={index}>
       {(provided) => (
         <Wrapper
+          css={css}
           ref={composeRefs(provided.innerRef, ref) as any}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
