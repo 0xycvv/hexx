@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/hexx-editor.cjs.js",
   "preconstruct": {
     "entrypoints": [
@@ -23,8 +23,8 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "@hexx/theme": "^0.1.0",
-    "@hexx/renderer": "^0.1.0",
+    "@hexx/theme": "^0.1.1",
+    "@hexx/renderer": "^0.1.1",
     "@popperjs/core": "^2.5.4",
     "jotai": "^0.11.2",
     "react-beautiful-dnd": "^13.0.0",

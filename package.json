@@ -10,7 +10,10 @@
   },
   "scripts": {
     "dev": "yarn preconstruct dev && yarn workspace example dev",
-    "build": "yarn preconstruct build && yarn workspace example build",
+    "build": "yarn build:pkg && yarn workspace example build",
+    "build:pkg": "yarn preconstruct build",
+    "changeset": "changeset",
+    "release": "yarn build:pkg && changeset publish",
     "start": "yarn workspace example start"
   },
   "devDependencies": {
@@ -27,5 +30,8 @@
     "packages": [
       "packages/*"
     ]
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.12.0"
   }
 }
