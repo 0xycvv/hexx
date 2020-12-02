@@ -1,9 +1,9 @@
-import { useEditor } from '@elliot/editor';
+import { useEditor } from '@hexx/editor';
 import {
   PortalPopper,
   useReactPopper,
-} from '@elliot/editor/components';
-import { styled } from '@elliot/theme';
+} from '@hexx/editor/components';
+import { styled } from '@hexx/theme';
 import { forwardRef, useEffect } from 'react';
 import { usePrevious, usePreviousExistValue } from './hooks';
 
@@ -76,7 +76,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
     if (previousHoverBlockId !== hoverBlock?.id) {
       if (hoverBlock?.el) {
         const target = hoverBlock.el.querySelector(
-          '.elliot-right-indicator',
+          '.hexx-right-indicator',
         );
         popper.setReferenceElement(target);
       }

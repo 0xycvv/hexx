@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import dynamic from 'next/dynamic';
-import { styled } from '@elliot/theme';
+import { styled } from '@hexx/theme';
 const EditorUsage = dynamic(
   () => import('../components/editor-usage'),
   {
@@ -37,7 +37,7 @@ export default function Home() {
       <Header>
         {SVG}
         <span style={{ marginLeft: '6px', fontSize: 20 }}>
-          Elliot
+          Hexx
         </span>
       </Header>
       <main className={styles.main}>

@@ -1,8 +1,8 @@
 {
-  "name": "@elliot/theme",
+  "name": "@hexx/theme",
   "version": "0.1.0",
-  "main": "dist/elliot-theme.cjs.js",
-  "types": "dist/elliot-theme.cjs.d.ts",
+  "main": "dist/hexx-theme.cjs.js",
+  "types": "dist/hexx-theme.cjs.d.ts",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
     "react": "^16 || ^17"

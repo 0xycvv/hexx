@@ -1,5 +1,5 @@
-import { headerStyle } from '@elliot/renderer';
-import { styled } from '@elliot/theme';
+import { headerStyle } from '@hexx/renderer';
+import { styled } from '@hexx/theme';
 import * as React from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';

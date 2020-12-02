@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { css, StitchesStyleObject } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@hexx/theme';
 import { BlockData } from './types';
 
 interface EditorRendererProps {

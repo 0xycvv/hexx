@@ -3,7 +3,7 @@ import {
   EditorProps,
   generateGetBoundingClientRect,
   useEventListener,
-} from '@elliot/editor';
+} from '@hexx/editor';
 import {
   BlockMap,
   InlineToolBarPreset,
@@ -11,7 +11,7 @@ import {
   InlineCode,
   Unstable_InlineMarker,
   useReactPopper,
-} from '@elliot/editor/components';
+} from '@hexx/editor/components';
 import { PlusButton } from './plus-button';
 import { TuneButton } from './tune-button';
 

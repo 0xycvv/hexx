@@ -6,7 +6,7 @@ import {
 } from '@stitches/react';
 
 const config = {
-  prefix: 'elliot',
+  prefix: 'hexx',
   tokens: {
     colors: {
       '$text-1': '#000000',

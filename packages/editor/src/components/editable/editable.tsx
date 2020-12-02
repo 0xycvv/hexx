@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { css } from '@elliot/theme';
+import { css } from '@hexx/theme';
 import {
   ContentEditableProps,
   ContentEditable,

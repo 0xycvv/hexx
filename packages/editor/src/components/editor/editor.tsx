@@ -1,5 +1,5 @@
-import { paragraphStyle } from '@elliot/renderer';
-import { css, styled, StitchesCssProp } from '@elliot/theme';
+import { paragraphStyle } from '@hexx/renderer';
+import { css, styled, StitchesCssProp } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
 import { MouseEvent, ReactNode, useRef } from 'react';
 import {
@@ -35,12 +35,12 @@ export type BlockType<T = any> = {
   data: T;
 };
 
-export interface EditorProps extends ElliotProps {
+export interface EditorProps extends HexxProps {
   data?: BlockType[];
   blockMap: Record<string, any>;
 }
 
-interface ElliotProps {
+interface HexxProps {
   children?: ReactNode;
   plusButton?: ReactNode;
   tuneButton?: ReactNode;
@@ -75,7 +75,7 @@ const Wrapper = styled('div', {
   },
 });
 
-function Elliot(props: ElliotProps) {
+function Hexx(props: HexxProps) {
   const defaultBlock = props.defaultBlock || {
     type: TextBlock.block.type,
     data: TextBlock.block.defaultValue,
@@ -144,7 +144,7 @@ function Elliot(props: ElliotProps) {
           <Wrapper
             css={props.css}
             ref={composeRefs(ref, provided.innerRef) as any}
-            className={`elliot ${css(paragraphStyle)}`}
+            className={`hexx ${css(paragraphStyle)}`}
             onClick={handleClick}
             onKeyDown={(e) => {
               if (e.key === BackspaceKey && isSelectAll) {
@@ -189,13 +189,13 @@ export const Editor = (props: EditorProps) => {
         [blockMapAtom, props.blockMap],
       ]}
     >
-      <Elliot
+      <Hexx
         defaultBlock={props.defaultBlock}
         tuneButton={props.tuneButton}
         plusButton={props.plusButton}
       >
         {props.children}
-      </Elliot>
+      </Hexx>
     </Provider>
   );
 };

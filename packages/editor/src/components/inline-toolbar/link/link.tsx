@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import { StitchesProps, styled } from '@elliot/theme';
+import { StitchesProps, styled } from '@hexx/theme';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import { saveSelection } from '../../../utils/ranges';
 import Link from '../../icons/link';

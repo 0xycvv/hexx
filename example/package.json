@@ -7,9 +7,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "@elliot/editor": "^0.1.0",
-    "@elliot/renderer": "^0.1.0",
-    "@elliot/theme": "^0.1.0",
+    "@hexx/editor": "^0.1.0",
+    "@hexx/renderer": "^0.1.0",
+    "@hexx/theme": "^0.1.0",
     "@preconstruct/next": "^2.0.0",
     "next": "10.0.3",
     "react": "17.0.1",

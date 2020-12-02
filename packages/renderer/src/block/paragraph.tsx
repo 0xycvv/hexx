@@ -1,7 +1,7 @@
 import * as React from 'react';
 // @ts-ignore
 import ReactHtmlParser from 'react-html-parser';
-import { css, StitchesStyleObject } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@hexx/theme';
 export type Paragraph = {
   type: 'paragraph';
   data: {

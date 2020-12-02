@@ -1,7 +1,7 @@
 {
-  "name": "@elliot/renderer",
+  "name": "@hexx/renderer",
   "version": "0.1.0",
-  "main": "dist/elliot-renderer.cjs.js",
+  "main": "dist/hexx-renderer.cjs.js",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
     "react": "^16 || ^17"
@@ -14,7 +14,7 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "@elliot/theme": "^0.1.0",
+    "@hexx/theme": "^0.1.0",
     "react-html-parser": "^2.0.2"
   }
 }

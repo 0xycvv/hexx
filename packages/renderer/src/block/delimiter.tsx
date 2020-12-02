@@ -1,4 +1,4 @@
-import { css, StitchesStyleObject } from '@elliot/theme';
+import { css, StitchesStyleObject } from '@hexx/theme';
 import * as React from 'react';
 
 export type Delimiter = {

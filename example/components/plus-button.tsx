@@ -1,9 +1,9 @@
-import { useEditor } from '@elliot/editor';
+import { useEditor } from '@hexx/editor';
 import {
   PortalPopper,
   useReactPopper,
-} from '@elliot/editor/components';
-import { styled } from '@elliot/theme';
+} from '@hexx/editor/components';
+import { styled } from '@hexx/theme';
 import { createElement, Fragment, useEffect } from 'react';
 import { usePrevious, usePreviousExistValue } from './hooks';
 

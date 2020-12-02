@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { dividerStyles } from '@elliot/renderer';
+import { dividerStyles } from '@hexx/renderer';
 import { divider as DividerSvg } from '../icons';
-import { css } from '@elliot/theme';
+import { css } from '@hexx/theme';
 
 const styles = css(dividerStyles);
 

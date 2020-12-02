@@ -1,7 +1,7 @@
 {
-  "name": "@elliot/editor",
+  "name": "@hexx/editor",
   "version": "0.1.0",
-  "main": "dist/elliot-editor.cjs.js",
+  "main": "dist/hexx-editor.cjs.js",
   "preconstruct": {
     "entrypoints": [
       "index.ts",
@@ -23,8 +23,8 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "@elliot/theme": "^0.1.0",
-    "@elliot/renderer": "^0.1.0",
+    "@hexx/theme": "^0.1.0",
+    "@hexx/renderer": "^0.1.0",
     "@popperjs/core": "^2.5.4",
     "jotai": "^0.11.2",
     "react-beautiful-dnd": "^13.0.0",

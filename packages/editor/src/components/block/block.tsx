@@ -1,4 +1,4 @@
-import { StitchesCssProp, styled } from '@elliot/theme';
+import { StitchesCssProp, styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
@@ -263,7 +263,7 @@ export function Block({ block, index, children, css }: BlockProps) {
               />
             </SelectOverlay>
           )}
-          <RightIndicator className="elliot-right-indicator" />
+          <RightIndicator className="hexx-right-indicator" />
         </Wrapper>
       )}
     </Draggable>

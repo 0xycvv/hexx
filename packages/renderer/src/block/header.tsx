@@ -1,6 +1,6 @@
 // @ts-ignore
 import ReactHtmlParser from 'react-html-parser';
-import { css, StitchesStyleObject, styled } from '@elliot/theme';
+import { css, StitchesStyleObject, styled } from '@hexx/theme';
 import * as React from 'react';
 
 export type Header = {

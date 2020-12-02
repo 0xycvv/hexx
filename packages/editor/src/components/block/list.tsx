@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { List, listStyle } from '@elliot/renderer';
+import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
-import { css, styled } from '@elliot/theme';
+import { css, styled } from '@hexx/theme';
 import {
   findContentEditable,
   lastCursor,

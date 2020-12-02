@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { img as ImgSvg, AddImage } from '../icons';
-import { styled } from '@elliot/theme';
+import { styled } from '@hexx/theme';
 
 const ImagePlaceholder = styled('div', {
   backgroundColor: '#E6E8E9',

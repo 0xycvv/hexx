@@ -1,4 +1,4 @@
-import { StitchesProps, styled } from '@elliot/theme';
+import { StitchesProps, styled } from '@hexx/theme';
 import { ReactNode } from 'react';
 import Bold from '../icons/bold';
 import Italic from '../icons/italic';

@@ -1,6 +1,6 @@
 import { Property } from 'csstype';
 import { ReactNode, useEffect } from 'react';
-import { styled } from '@elliot/theme';
+import { styled } from '@hexx/theme';
 import ClientOnlyPortal from '../client-only-portal';
 import { useReactPopper } from './use-virtual-popper';
 
@@ -26,7 +26,7 @@ export function PortalPopper({
   return (
     <ClientOnlyPortal selector={props.selector || 'body'}>
       <Overlay
-        className="elliot-popper-overlay"
+        className="hexx-popper-overlay"
         style={{
           pointerEvents: props.pointerEvent || 'none',
         }}

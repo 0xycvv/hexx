@@ -1,4 +1,4 @@
-import { css } from '@elliot/theme';
+import { css } from '@hexx/theme';
 import { useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';

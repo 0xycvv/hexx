@@ -1,6 +1,6 @@
 // @ts-ignore
 import ReactHtmlParser from 'react-html-parser';
-import { css } from '@elliot/theme';
+import { css } from '@hexx/theme';
 import * as React from 'react';
 
 const iframeCss = css({
