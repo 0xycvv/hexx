@@ -110,7 +110,13 @@ function useBlockWrapper({
       }
     }
     if (!e.shiftKey && e.key === 'Enter') {
-      const { current, next } = extractFragmentFromPosition();
+      const fragment = extractFragmentFromPosition();
+
+      if (!fragment) {
+        return;
+      }
+
+      const { current, next } = fragment;
       splitBlock({
         index,
         block: {
@@ -171,6 +177,10 @@ function useBlockWrapper({
       selectInputRef.current?.focus();
     }
   }, [isBlockSelect]);
+
+  if (!currentBlock) {
+    console.error(`missing block type ${block.type}`);
+  }
 
   return {
     ref,
@@ -233,6 +243,10 @@ export function Block({ block, index, children, css }: BlockProps) {
     block,
     index,
   });
+
+  if (!blockComponent) {
+    return null;
+  }
 
   return (
     <Draggable draggableId={block.id} index={index}>

@@ -1,6 +1,13 @@
 # @hexx/editor
 
+## 0.1.2
+
+### Patch Changes
+
+- pass css props to editor
+
 ## 0.1.1
+
 ### Patch Changes
 
 - publish

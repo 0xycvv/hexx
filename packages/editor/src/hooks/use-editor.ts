@@ -1,4 +1,6 @@
-import * as React from 'react';
+import { useAtom } from 'jotai';
+import { useCallback } from 'react';
+import { v4 } from 'uuid';
 import {
   blockIdListAtom,
   blockMapAtom,
@@ -7,8 +9,6 @@ import {
   hoverBlockAtom,
 } from '../constants/atom';
 import { insert } from '../utils/insert';
-import { v4 } from 'uuid';
-import { useAtom } from 'jotai';
 
 export const EditableMap = new WeakMap<
   HTMLDivElement,
@@ -19,30 +19,48 @@ export const EditableMap = new WeakMap<
   }
 >();
 
-export function useBlock(id: string, blockIndex: number) {
-  const { removeBlockWithId, updateBlockDataWithId } = useEditor();
+export function useBlock(id: string, blockIndex?: number) {
+  const {
+    removeBlockWithId,
+    updateBlockDataWithId,
+    IdMap,
+  } = useEditor();
   const remove = () => {
     removeBlockWithId({ id });
   };
 
   const update = (block) => {
-    updateBlockDataWithId({ id, data: block });
-  };
-  const register = React.useCallback((ref, index: number = 0) => {
-    if (ref) {
-      EditableMap.set(ref, { index, id, blockIndex });
+    if (typeof block === 'function') {
+      updateBlockDataWithId(block);
+    } else {
+      updateBlockDataWithId({ id, data: block });
     }
-  }, []);
+  };
 
-  const registerWithIndex = React.useCallback(
+  const register = useCallback(
+    (ref, index: number = 0) => {
+      if (typeof blockIndex === 'undefined') {
+        throw new Error(
+          'register editable block must provide blockIndex.',
+        );
+      }
+      if (ref) {
+        EditableMap.set(ref, { index, id, blockIndex });
+      }
+    },
+    [blockIndex],
+  );
+
+  const registerWithIndex = useCallback(
     (index: number) =>
-      React.useCallback((ref) => {
+      useCallback((ref) => {
         register(ref, index);
       }, []),
     [register],
   );
 
   return {
+    block: IdMap[id],
     remove,
     update,
     registerWithIndex,
@@ -166,6 +184,7 @@ export function useEditor() {
     insertBlockAfter,
     splitBlock,
     updateBlockDataWithId,
+    setIdMap,
     removeBlockWithId,
     clear,
     // data

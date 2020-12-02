@@ -193,6 +193,8 @@ export const Editor = (props: EditorProps) => {
         defaultBlock={props.defaultBlock}
         tuneButton={props.tuneButton}
         plusButton={props.plusButton}
+        css={props.css}
+        blockCss={props.blockCss}
       >
         {props.children}
       </Hexx>
