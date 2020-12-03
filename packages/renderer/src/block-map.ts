@@ -6,7 +6,6 @@ export const BlockMap: {
 } = {
   paragraph: DefaultBlocks.ParagraphRenderer,
   delimiter: DefaultBlocks.DelimiterRenderer,
-  embedLink: DefaultBlocks.EmbedLinkRenderer,
   header: DefaultBlocks.HeaderRenderer,
   list: DefaultBlocks.ListRenderer,
   quote: DefaultBlocks.QuoteRenderer,

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactHtmlParser from 'react-html-parser';
 import { css, StitchesStyleObject } from '@hexx/theme';
 
 export type Quote = {
@@ -42,7 +43,9 @@ export const quoteStyle: StitchesStyleObject = {
 export const QuoteRenderer = ({ data }: { data: Quote['data'] }) => {
   return (
     <blockquote className={css(quoteStyle.wrapper)}>
-      <div className={css(quoteStyle.text)}>{data.text}</div>
+      <div className={css(quoteStyle.text)}>
+        {ReactHtmlParser(data.text)}
+      </div>
     </blockquote>
   );
 };

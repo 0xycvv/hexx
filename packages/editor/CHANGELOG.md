@@ -1,5 +1,16 @@
 # @hexx/editor
 
+## 0.2.0
+
+### Minor Changes
+
+- Add basic editor get data handler
+
+### Patch Changes
+
+- Updated dependencies [undefined]
+  - @hexx/renderer@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

@@ -1,15 +1,12 @@
-# @hexx/renderer
+# example
 
-## 0.2.0
-
+## 0.1.0
 ### Minor Changes
 
 - Add basic editor get data handler
 
-## 0.1.1
-
 ### Patch Changes
 
-- publish
 - Updated dependencies [undefined]
-  - @hexx/theme@0.1.1
+  - @hexx/editor@0.2.0
+  - @hexx/renderer@0.2.0

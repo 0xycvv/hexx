@@ -1,7 +1,13 @@
 import { paragraphStyle } from '@hexx/renderer';
 import { css, styled, StitchesCssProp } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
-import { MouseEvent, ReactNode, useRef } from 'react';
+import {
+  forwardRef,
+  MouseEvent,
+  ReactNode,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -75,7 +81,11 @@ const Wrapper = styled('div', {
   },
 });
 
-function Hexx(props: HexxProps) {
+interface HexxHandler {
+  getData: () => BlockType[];
+}
+
+const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const defaultBlock = props.defaultBlock || {
     type: TextBlock.block.type,
     data: TextBlock.block.defaultValue,
@@ -83,7 +93,7 @@ function Hexx(props: HexxProps) {
   const [id] = useAtom(editorIdAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
-  const ref = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const active = useActiveBlockId();
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
@@ -137,13 +147,17 @@ function Hexx(props: HexxProps) {
     setBlockIdList(newBlocks);
   };
 
+  useImperativeHandle(ref, () => ({
+    getData: () => blockIdList.map((bId) => blockIdMap[bId]),
+  }));
+
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <Droppable droppableId={id}>
         {(provided) => (
           <Wrapper
             css={props.css}
-            ref={composeRefs(ref, provided.innerRef) as any}
+            ref={composeRefs(wrapperRef, provided.innerRef) as any}
             className={`hexx ${css(paragraphStyle)}`}
             onClick={handleClick}
             onKeyDown={(e) => {
@@ -175,29 +189,32 @@ function Hexx(props: HexxProps) {
       </Droppable>
     </DragDropContext>
   );
-}
+});
 
-export const Editor = (props: EditorProps) => {
-  const { byId, ids } = normalize(props.data, 'id');
-  return (
-    <Provider
-      // @ts-ignore
-      initialValues={[
-        [blockIdListAtom, ids],
-        [blocksIdMapAtom, byId],
-        [editorIdAtom, v4()],
-        [blockMapAtom, props.blockMap],
-      ]}
-    >
-      <Hexx
-        defaultBlock={props.defaultBlock}
-        tuneButton={props.tuneButton}
-        plusButton={props.plusButton}
-        css={props.css}
-        blockCss={props.blockCss}
+export const Editor = forwardRef<HexxHandler, EditorProps>(
+  (props, ref) => {
+    const { byId, ids } = normalize(props.data, 'id');
+    return (
+      <Provider
+        // @ts-ignore
+        initialValues={[
+          [blockIdListAtom, ids],
+          [blocksIdMapAtom, byId],
+          [editorIdAtom, v4()],
+          [blockMapAtom, props.blockMap],
+        ]}
       >
-        {props.children}
-      </Hexx>
-    </Provider>
-  );
-};
+        <Hexx
+          ref={ref}
+          defaultBlock={props.defaultBlock}
+          tuneButton={props.tuneButton}
+          plusButton={props.plusButton}
+          css={props.css}
+          blockCss={props.blockCss}
+        >
+          {props.children}
+        </Hexx>
+      </Provider>
+    );
+  },
+);
