@@ -9,7 +9,7 @@ import {
   InlineToolBarPreset,
   PortalPopper,
   InlineCode,
-  Unstable_InlineMarker,
+  InlineMarker,
   useReactPopper,
 } from '@hexx/editor/components';
 import { css } from '@hexx/theme';
@@ -87,7 +87,7 @@ const EditorUsage = (props: EditorProps) => {
               borderRadius: '0px 26px 26px 26px',
             }}
           >
-            <Unstable_InlineMarker />
+            <InlineMarker />
             <InlineCode />
           </InlineToolBarPreset>
         </PortalPopper>

@@ -4,16 +4,24 @@ import { getSelectionRange } from '../../../utils/ranges';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 
-export function Unstable_InlineMarker() {
+const DEFAULT_HIGHLIGHT = 'rgba(228, 178, 2, 0.18)';
+
+export function InlineMarker({
+  highlightColor = DEFAULT_HIGHLIGHT,
+}: {
+  highlightColor?: string;
+}) {
   const { getProps, isActive, setIsActive } = useInlineTool();
 
   useEventChangeSelection(() => {
     const r = getSelectionRange();
+    const parentStart = r?.startContainer?.parentElement;
+    const parentEnd = r?.endContainer?.parentElement;
     if (
-      // @ts-ignore
-      r?.startContainer?.parentNode?.tagName === 'MARK' ||
-      // @ts-ignore
-      r?.endContainer?.parentNode?.tagName === 'MARK'
+      (parentStart?.tagName === 'SPAN' ||
+        parentEnd?.tagName === 'SPAN') &&
+      (parentEnd?.style.backgroundColor === highlightColor ||
+        parentStart?.style.backgroundColor === highlightColor)
     ) {
       setIsActive(true);
     } else {
@@ -26,9 +34,13 @@ export function Unstable_InlineMarker() {
       {...getProps}
       onClick={() => {
         if (isActive) {
-          // TODO: remove mark or add mark
+          document.execCommand('removeFormat');
         } else {
-          surround('mark');
+          // https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-removeformat-command
+          // `removeFormat` for `mark` should be supported?
+          surround('span', {
+            backgroundColor: 'rgba(228, 178, 2, 0.18)',
+          });
           setIsActive(true);
         }
       }}

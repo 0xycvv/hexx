@@ -189,14 +189,19 @@ export function focusWithCursor(el: Node, cursorIndex: number) {
   sel.addRange(range);
 }
 
-export function surround(nodeName: string) {
+export function surround(
+  nodeName: string,
+  style?: Partial<CSSStyleDeclaration>,
+) {
   let range = getSelectionRange();
   let newNode = document.createElement(nodeName);
+  if (style) {
+    Object.assign(newNode.style, style);
+  }
   if (!range) {
     return;
   }
   try {
-    console.log(newNode);
     range.surroundContents(newNode);
     document.execCommand('formatBlock', false, 'p');
   } catch (e) {

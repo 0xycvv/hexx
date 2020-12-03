@@ -1,6 +1,15 @@
 # example
 
+## 0.1.1
+
+### Patch Changes
+
+- inline marker works now
+- Updated dependencies [undefined]
+  - @hexx/editor@0.2.1
+
 ## 0.1.0
+
 ### Minor Changes
 
 - Add basic editor get data handler
