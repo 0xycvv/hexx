@@ -81,11 +81,13 @@ function useBlockWrapper({
   const ref = useRef<HTMLDivElement>(null);
   const selectInputRef = useRef<HTMLInputElement>(null);
 
-  const isHovering = hoverBlockId?.id === block.id;
-  const currentBlock = blocksMap[block.type];
+  const isHovering =
+    hoverBlockId && block && hoverBlockId.id === block.id;
+  const currentBlock = block && blocksMap[block.type];
   const isBlockSelect = blockSelect === index;
 
   const onKeyDown = (e: KeyboardEvent) => {
+    setHoverBlockId(null);
     if (e.key === 'ArrowUp') {
       const range = getSelectionRange();
       if (!range) {
@@ -192,14 +194,20 @@ function useBlockWrapper({
       'data-block-id': block.id,
       className: 'e-block',
       onKeyDown,
-      onMouseOver: () => {
+      onFocus: () => {
         setHoverBlockId({
           id: block.id,
-          el: ref.current,
+          el: ref.current!,
         });
       },
-      onMouseOut: () => {
+      onBlur: () => {
         setHoverBlockId(null);
+      },
+      onMouseMove: () => {
+        setHoverBlockId({
+          id: block.id,
+          el: ref.current!,
+        });
       },
       onClick: (e) => {
         if (!ref.current) return;
@@ -238,7 +246,6 @@ export function Block({ block, index, children, css }: BlockProps) {
     isEditorSelectAll,
     blockComponent,
     ref,
-    isHovering,
   } = useBlockWrapper({
     block,
     index,

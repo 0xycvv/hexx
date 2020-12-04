@@ -27,12 +27,23 @@ export function useInlineTool() {
 export function useDefaultInlineTool(props: UseInlineToolConfig) {
   const inlineTool = useInlineTool();
   useEventListener('selectionchange', () => {
+    console.log('change');
     if (props.type) {
       const commandState = document.queryCommandState(props.type);
       inlineTool.setIsActive(commandState);
     }
   });
+
+  useEventListener('select', () => {
+    console.log('select');
+  })
+
+  useEventListener('selectstart', () => {
+    console.log('selectstart');
+  })
+
   useEventListener('dblclick', () => {
+    console.log('click');
     if (props.type) {
       const commandState = document.queryCommandState(props.type);
       inlineTool.setIsActive(commandState);

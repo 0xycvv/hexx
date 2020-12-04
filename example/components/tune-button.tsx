@@ -5,7 +5,6 @@ import {
 } from '@hexx/editor/components';
 import { styled } from '@hexx/theme';
 import { forwardRef, useEffect } from 'react';
-import { usePrevious, usePreviousExistValue } from './hooks';
 
 const Tune = styled('div', {
   userSelect: 'none',
@@ -19,7 +18,7 @@ const Tune = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   color: 'black',
-  backgroundColor: '$bg-1',
+  backgroundColor: '$bg',
 });
 
 const Icon = styled('svg', {
@@ -39,7 +38,7 @@ const Icon = styled('svg', {
         },
       },
       inactive: {
-        color: '$text-1',
+        color: '$text',
       },
     },
   },
@@ -61,6 +60,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
 
   const {
     hoverBlock,
+    lastHoverBlock,
     blockMap,
     updateBlockDataWithId,
     selectBlock,
@@ -69,25 +69,24 @@ export const TuneButton = forwardRef((props: any, ref) => {
     removeBlockWithId,
     IdMap,
   } = useEditor();
-  const previousHoverBlockId = usePrevious(hoverBlock?.id);
-  const hoverId = usePreviousExistValue(hoverBlock?.id);
 
   useEffect(() => {
-    if (previousHoverBlockId !== hoverBlock?.id) {
-      if (hoverBlock?.el) {
-        const target = hoverBlock.el.querySelector(
-          '.hexx-right-indicator',
-        );
-        popper.setReferenceElement(target);
-      }
-      if (hoverBlock) {
-        popper.setActive(true);
-      }
+    if (hoverBlock?.el) {
+      const target = hoverBlock.el.querySelector(
+        '.hexx-right-indicator',
+      );
+      popper.setReferenceElement(target);
     }
-  }, [hoverBlock, previousHoverBlockId]);
-  const blockIndex = findBlockIndexById(hoverId);
+    if (hoverBlock) {
+      popper.setActive(true);
+    } else {
+      popper.setActive(false);
+    }
+  }, [hoverBlock]);
+  const blockIndex = findBlockIndexById(lastHoverBlock?.id);
   const isSelecting = blockSelect === blockIndex;
-  const currentBlockData = hoverId && IdMap[hoverId];
+  const currentBlockData =
+    lastHoverBlock?.id && IdMap[lastHoverBlock.id];
 
   const tunes =
     currentBlockData?.type &&
@@ -100,7 +99,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
         {...props}
         onClick={(e) => {
           if (!isSelecting) {
-            selectBlock(hoverId);
+            selectBlock(lastHoverBlock?.id);
             popper.popperJs.update?.();
           }
         }}
@@ -117,8 +116,9 @@ export const TuneButton = forwardRef((props: any, ref) => {
                       : 'inactive'
                   }
                   onClick={(e) => {
+                    if (!lastHoverBlock?.id) return;
                     updateBlockDataWithId({
-                      id: hoverId,
+                      id: lastHoverBlock.id,
                       data: tune.updater(currentBlockData.data),
                     });
                     e.stopPropagation();
@@ -128,7 +128,8 @@ export const TuneButton = forwardRef((props: any, ref) => {
             })}
             <svg
               onClick={() => {
-                removeBlockWithId({ id: hoverId });
+                if (!lastHoverBlock?.id) return;
+                removeBlockWithId({ id: lastHoverBlock.id });
                 selectBlock(null);
                 popper.setActive(false);
               }}

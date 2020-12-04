@@ -32,27 +32,34 @@ const EditorUsage = (props: EditorProps) => {
     ],
   });
 
-  useEventListener('selectionchange', (e) => {
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) {
-      return;
-    }
-    let selectedRange = selection.getRangeAt(0);
-    if (
-      Math.abs(selectedRange.startOffset - selectedRange.endOffset) >
-      0
-    ) {
-      const rect = selectedRange.getBoundingClientRect();
-      if (rect) {
-        if (!popper.active) {
-          popper.setActive(true);
-        }
-        popper.setReferenceElement({
-          getBoundingClientRect: generateGetBoundingClientRect(rect),
-        });
-      }
-    }
-  });
+  // useEventListener(
+  //   'selectionchange',
+  //   (e) => {
+  //     const selection = window.getSelection();
+  //     if (!selection || !selection.rangeCount) {
+  //       return;
+  //     }
+  //     let selectedRange = selection.getRangeAt(0);
+  //     if (
+  //       Math.abs(
+  //         selectedRange.startOffset - selectedRange.endOffset,
+  //       ) > 0
+  //     ) {
+  //       const rect = selectedRange.getBoundingClientRect();
+  //       if (rect) {
+  //         if (!popper.active) {
+  //           popper.setActive(true);
+  //         }
+  //         popper.setReferenceElement({
+  //           getBoundingClientRect: generateGetBoundingClientRect(
+  //             rect,
+  //           ),
+  //         });
+  //       }
+  //     }
+  //   },
+  //   editorWrapper.current,
+  // );
 
   return (
     <>
@@ -75,6 +82,31 @@ const EditorUsage = (props: EditorProps) => {
         </svg>
       </div>
       <Editor
+        onSelectionChange={(e) => {
+          console.log(e);
+          const selection = window.getSelection();
+          if (!selection || !selection.rangeCount) {
+            return;
+          }
+          let selectedRange = selection.getRangeAt(0);
+          if (
+            Math.abs(
+              selectedRange.startOffset - selectedRange.endOffset,
+            ) > 0
+          ) {
+            const rect = selectedRange.getBoundingClientRect();
+            if (rect) {
+              if (!popper.active) {
+                popper.setActive(true);
+              }
+              popper.setReferenceElement({
+                getBoundingClientRect: generateGetBoundingClientRect(
+                  rect,
+                ),
+              });
+            }
+          }
+        }}
         ref={editorRef as any}
         plusButton={<PlusButton />}
         tuneButton={<TuneButton />}
