@@ -28,6 +28,7 @@ import {
   history,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
+import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
@@ -144,6 +145,15 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   useSelectionChange((e) => {
     props.onSelectionChange?.(e);
   }, wrapperRef.current);
+
+  useEventListener(
+    'paste',
+    (e) => {
+      console.log(e.clipboardData?.getData('text/plain'));
+      console.log(e.clipboardData?.getData('text/html'));
+    },
+    wrapperRef.current,
+  );
 
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result;

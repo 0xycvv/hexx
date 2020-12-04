@@ -2,7 +2,7 @@ import { useEventListener } from './use-event-listener';
 
 export function useSelectionChange(
   handler: (event: DocumentEventMap['selectionchange']) => void,
-  ref?: HTMLElement,
+  ref?: HTMLElement | null,
 ) {
   useEventListener(
     'selectstart',

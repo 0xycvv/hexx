@@ -9,7 +9,6 @@ export interface UseInlineToolConfig {
 
 export function useInlineTool() {
   const [isActive, setIsActive] = useState(false);
-
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
   }, []);
@@ -26,29 +25,18 @@ export function useInlineTool() {
 
 export function useDefaultInlineTool(props: UseInlineToolConfig) {
   const inlineTool = useInlineTool();
-  useEventListener('selectionchange', () => {
-    console.log('change');
+  const handler = useCallback(() => {
     if (props.type) {
       const commandState = document.queryCommandState(props.type);
       inlineTool.setIsActive(commandState);
     }
-  });
+  }, [props.type]);
 
-  useEventListener('select', () => {
-    console.log('select');
-  })
+  useEventListener('selectionchange', handler);
 
-  useEventListener('selectstart', () => {
-    console.log('selectstart');
-  })
+  useEventListener('mouseup', handler);
 
-  useEventListener('dblclick', () => {
-    console.log('click');
-    if (props.type) {
-      const commandState = document.queryCommandState(props.type);
-      inlineTool.setIsActive(commandState);
-    }
-  });
+  useEventListener('dblclick', handler);
 
   return inlineTool;
 }
