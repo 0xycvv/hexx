@@ -9,6 +9,7 @@ import {
   hoverBlockAtom,
 } from '../constants/atom';
 import { insert } from '../utils/insert';
+import { usePreviousExistValue } from './use-previous-exist-value';
 
 export const EditableMap = new WeakMap<
   HTMLDivElement,
@@ -74,12 +75,12 @@ export function useEditor() {
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [idList, setIdList] = useAtom(blockIdListAtom);
   const [IdMap, setIdMap] = useAtom(blocksIdMapAtom);
-
-  const findBlockIndexById = (id: string) => {
+  const lastHoverBlock = usePreviousExistValue(hoverBlock);
+  const findBlockIndexById = (id?: string) => {
     return idList.findIndex((d) => d === id);
   };
 
-  const selectBlock = (id: string) => {
+  const selectBlock = (id?: string) => {
     const index = findBlockIndexById(id);
     setBlockSelect(index);
   };
@@ -191,6 +192,7 @@ export function useEditor() {
     blockSelect,
     blockMap,
     hoverBlock,
+    lastHoverBlock,
     selectBlock,
     IdMap,
   };

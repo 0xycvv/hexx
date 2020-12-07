@@ -9,8 +9,8 @@ const config = {
   prefix: 'hexx',
   tokens: {
     colors: {
-      '$text-1': '#000000',
-      '$bg-1': 'white',
+      $text: '#000000',
+      $bg: 'white',
       $gay500: '#9B9FA4',
       $link: '#0278E4',
       $success: '#2BC3A8',
@@ -24,12 +24,6 @@ const config = {
       $5: '20px',
       $6: '24px',
     },
-    breakpoints: {
-      bp1: (rule) => `@media (min-width: 640px) { ${rule} }`,
-      bp2: (rule) => `@media (min-width: 768px) { ${rule} }`,
-      bp3: (rule) => `@media (min-width: 1024px) { ${rule} }`,
-      bp4: (rule) => `@media (min-width: 1280px) { ${rule} }`,
-    },
   },
 } as const;
 
@@ -37,7 +31,6 @@ export const { css, styled } = createStyled(config);
 
 export type { StitchesProps };
 
-// export type StitchesCssProp = TCssProp<typeof config>;
 export type StitchesStyleObject = Record<
   string,
   TCssProp<typeof config>

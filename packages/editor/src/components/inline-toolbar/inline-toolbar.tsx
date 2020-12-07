@@ -11,7 +11,7 @@ const Wrapper = styled('div', {
   gridAutoFlow: 'column',
   gridTemplateRows: 'repeat(auto-fill)',
   gap: 16,
-  background: '$bg-1',
+  background: '$bg',
   borderRadius: 8,
   paddingLeft: 18,
   paddingRight: 18,
@@ -27,7 +27,7 @@ export const IconWrapper = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   fontSize: 24,
-  color: '$text-1',
+  color: '$text',
   paddingLeft: 6,
   paddingRight: 6,
   cursor: 'pointer',
@@ -40,7 +40,7 @@ export const IconWrapper = styled('div', {
         },
       },
       inactive: {
-        color: '$text-1',
+        color: '$text',
       },
     },
   },
@@ -79,7 +79,7 @@ export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
       }}
       {...props}
     >
-      <Bold />
+      <Bold title="bold" />
     </DefaultInlineTool>
   );
 }
@@ -95,7 +95,7 @@ export function InlineItalic(
       }}
       {...props}
     >
-      <Italic />
+      <Italic title="italic" />
     </DefaultInlineTool>
   );
 }
@@ -111,7 +111,7 @@ export function InlineUnderline(
         document.execCommand('underline', false);
       }}
     >
-      <Underlined />
+      <Underlined title="underlined" />
     </DefaultInlineTool>
   );
 }
@@ -127,7 +127,6 @@ export function InlineToolBarPreset({
       <InlineBold />
       <InlineItalic />
       <InlineUnderline />
-      {/* <InlineLink /> */}
       {children}
     </Wrapper>
   );

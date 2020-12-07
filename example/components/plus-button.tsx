@@ -5,7 +5,6 @@ import {
 } from '@hexx/editor/components';
 import { styled } from '@hexx/theme';
 import { createElement, Fragment, useEffect } from 'react';
-import { usePrevious, usePreviousExistValue } from './hooks';
 
 const Plus = styled('div', {
   userSelect: 'none',
@@ -19,13 +18,14 @@ const Plus = styled('div', {
   border: '1px solid #D3D6D8',
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
   borderRadius: '26px 26px 0 26px',
+  svg: { pointerEvents: 'none' },
   variants: {
     color: {
       active: {
         color: '$success',
       },
       inactive: {
-        color: '$text-1',
+        color: '$text',
       },
     },
   },
@@ -59,9 +59,12 @@ const AddMenu = styled('div', {
 });
 
 export function PlusButton() {
-  const { hoverBlock, blockMap, insertBlockAfter } = useEditor();
-  const previousHoverBlockId = usePrevious(hoverBlock?.id);
-  const hoverId = usePreviousExistValue(hoverBlock?.id);
+  const {
+    hoverBlock,
+    blockMap,
+    insertBlockAfter,
+    lastHoverBlock,
+  } = useEditor();
   const popper = useReactPopper({
     defaultActive: false,
     placement: 'left-start',
@@ -87,57 +90,59 @@ export function PlusButton() {
   });
 
   useEffect(() => {
-    if (previousHoverBlockId !== hoverBlock?.id) {
-      popper.setReferenceElement(hoverBlock?.el);
-      if (hoverBlock) {
-        popper.setActive(true);
-      }
+    popper.setReferenceElement(hoverBlock?.el);
+    if (hoverBlock) {
+      popper.setActive(true);
+    } else {
+      popper.setActive(false);
     }
-  }, [hoverBlock, previousHoverBlockId]);
+  }, [hoverBlock]);
 
   return (
-    <PortalPopper popper={popper}>
-      <Plus
-        color={menuPopper.active ? 'active' : 'inactive'}
-        ref={menuPopper.setReferenceElement}
-        onClick={(e) => {
-          menuPopper.setActive(true);
-          e.stopPropagation();
-        }}
-      >
-        <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-          <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-            fill="currentColor"
-          />
-        </svg>
-        <PortalPopper popper={menuPopper}>
-          <AddMenu
-            onMouseDown={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {Object.entries(blockMap).map(([key, blockType]) => (
-              <Fragment key={key}>
-                {createElement(blockType.block.icon.svg, {
-                  onClick: (e: MouseEvent) => {
-                    insertBlockAfter({
-                      block: {
-                        type: blockType.block.type,
-                        data: blockType.block.defaultValue,
-                      },
-                      id: hoverId,
-                    });
-                    menuPopper.setActive(false);
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
-                })}
-              </Fragment>
-            ))}
-          </AddMenu>
-        </PortalPopper>
-      </Plus>
-    </PortalPopper>
+    <>
+      <PortalPopper popper={popper}>
+        <Plus
+          color={menuPopper.active ? 'active' : 'inactive'}
+          ref={menuPopper.setReferenceElement}
+          onClick={(e) => {
+            menuPopper.setActive(true);
+            e.stopPropagation();
+          }}
+        >
+          <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+            <path
+              d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+              fill="currentColor"
+            />
+          </svg>
+        </Plus>
+      </PortalPopper>
+      <PortalPopper popper={menuPopper}>
+        <AddMenu
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {Object.entries(blockMap).map(([key, blockType]) => (
+            <Fragment key={key}>
+              {createElement(blockType.block.icon.svg, {
+                onClick: (e: MouseEvent) => {
+                  insertBlockAfter({
+                    block: {
+                      type: blockType.block.type,
+                      data: blockType.block.defaultValue,
+                    },
+                    id: lastHoverBlock.id,
+                  });
+                  menuPopper.setActive(false);
+                  e.preventDefault();
+                  e.stopPropagation();
+                },
+              })}
+            </Fragment>
+          ))}
+        </AddMenu>
+      </PortalPopper>
+    </>
   );
 }

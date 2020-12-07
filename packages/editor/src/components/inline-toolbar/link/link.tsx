@@ -4,8 +4,8 @@ import { StitchesProps, styled } from '@hexx/theme';
 import { activeBlockIdAtom } from '../../../constants/atom';
 import { saveSelection } from '../../../utils/ranges';
 import Link from '../../icons/link';
-import { useReactPopper } from '../../virtual-popper/use-virtual-popper';
-import { PortalPopper } from '../../virtual-popper/virtual-popper';
+import { useReactPopper } from '../../popper/use-react-popper';
+import { PortalPopper } from '../../popper/portal-popper';
 import {
   useEventChangeSelection,
   useInlineTool,
@@ -109,7 +109,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
         {...getProps}
         {...props}
       >
-        <Link />
+        <Link title="link" />
       </IconWrapper>
       <PortalPopper popper={popper} pointerEvent="auto">
         <LinkInput

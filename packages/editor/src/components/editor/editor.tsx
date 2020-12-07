@@ -4,6 +4,7 @@ import { Provider, useAtom } from 'jotai';
 import {
   forwardRef,
   MouseEvent,
+  MutableRefObject,
   ReactNode,
   useImperativeHandle,
   useRef,
@@ -21,11 +22,18 @@ import {
   blocksIdMapAtom,
   editorIdAtom,
   isEditorSelectAllAtom,
+  _blockIdListAtom,
+  _blocksIdMapAtom,
+  _hexxScope,
+  history,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
+import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
+import { useSelectionChange } from '../../hooks/use-selection-change';
+import { processor } from '../../parser/html';
 import {
   findLastBlock,
   focusLastBlock,
@@ -47,12 +55,16 @@ export interface EditorProps extends HexxProps {
 }
 
 interface HexxProps {
+  wrapperRef?: MutableRefObject<HTMLDivElement>;
   children?: ReactNode;
   plusButton?: ReactNode;
   tuneButton?: ReactNode;
   defaultBlock?: Omit<BlockType, 'id'>;
   css?: StitchesCssProp;
   blockCss?: StitchesCssProp;
+  onSelectionChange?: (
+    e: DocumentEventMap['selectionchange'],
+  ) => void;
 }
 
 const Wrapper = styled('div', {
@@ -83,17 +95,16 @@ const Wrapper = styled('div', {
 
 interface HexxHandler {
   getData: () => BlockType[];
+  focus: () => void;
+  watch: (cb: Function) => void;
+  history: () => void;
 }
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
-  const defaultBlock = props.defaultBlock || {
-    type: TextBlock.block.type,
-    data: TextBlock.block.defaultValue,
-  };
+  const wrapperRef = useRef<HTMLDivElement>();
   const [id] = useAtom(editorIdAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const active = useActiveBlockId();
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
@@ -115,7 +126,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         if (lastBlock.editable) {
           if ((lastBlock?.editable?.textContent?.length ?? 0) > 0) {
             insertBlock({
-              block: defaultBlock,
+              block: props.defaultBlock,
             });
             lastBlock.editable?.focus();
           } else {
@@ -123,7 +134,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           }
         } else {
           insertBlock({
-            block: defaultBlock,
+            block: props.defaultBlock,
           });
         }
       }
@@ -131,6 +142,21 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       active?.editable?.focus();
     }
   };
+
+  useSelectionChange((e) => {
+    props.onSelectionChange?.(e);
+  }, wrapperRef.current);
+
+  useEventListener(
+    'paste',
+    (e) => {
+      const html = e.clipboardData?.getData('text/html');
+      if (!html) return;
+      const htmlAST = processor.parse(html);
+      console.log(htmlAST);
+    },
+    wrapperRef.current,
+  );
 
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result;
@@ -149,6 +175,17 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     getData: () => blockIdList.map((bId) => blockIdMap[bId]),
+    focus: () => findLastBlock()?.editable?.focus(),
+    watch: (cb) => {
+      typeof cb === 'function' && cb();
+    },
+    history: () => {
+      const last = history.pop();
+      if (last) {
+        console.log(last);
+        last.undo();
+      }
+    },
   }));
 
   return (
@@ -157,7 +194,13 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         {(provided) => (
           <Wrapper
             css={props.css}
-            ref={composeRefs(wrapperRef, provided.innerRef) as any}
+            ref={
+              composeRefs(
+                props.wrapperRef,
+                provided.innerRef,
+                wrapperRef,
+              ) as any
+            }
             className={`hexx ${css(paragraphStyle)}`}
             onClick={handleClick}
             onKeyDown={(e) => {
@@ -173,14 +216,18 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             {...provided.droppableProps}
           >
             {props.children}
-            {blockIdList.map((bId, i) => (
-              <Block
-                css={props.blockCss}
-                key={bId}
-                index={i}
-                block={blockIdMap[bId]}
-              />
-            ))}
+            {blockIdList.map(
+              (bId, i) =>
+                bId &&
+                blockIdMap[bId] && (
+                  <Block
+                    css={props.blockCss}
+                    key={bId}
+                    index={i}
+                    block={blockIdMap[bId]}
+                  />
+                ),
+            )}
             {props.tuneButton}
             {props.plusButton}
             {provided.placeholder}
@@ -193,20 +240,30 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
 
 export const Editor = forwardRef<HexxHandler, EditorProps>(
   (props, ref) => {
-    const { byId, ids } = normalize(props.data, 'id');
+    const defaultBlock = props.defaultBlock || {
+      type: TextBlock.block.type,
+      data: TextBlock.block.defaultValue,
+    };
+    const { byId, ids } = normalize(
+      props.data || [{ ...defaultBlock, id: v4() }],
+      'id',
+    );
     return (
       <Provider
+        scope={_hexxScope}
         // @ts-ignore
         initialValues={[
-          [blockIdListAtom, ids],
-          [blocksIdMapAtom, byId],
+          [_blockIdListAtom, ids],
+          [_blocksIdMapAtom, byId],
           [editorIdAtom, v4()],
           [blockMapAtom, props.blockMap],
         ]}
       >
         <Hexx
           ref={ref}
-          defaultBlock={props.defaultBlock}
+          onSelectionChange={props.onSelectionChange}
+          wrapperRef={props.wrapperRef}
+          defaultBlock={defaultBlock}
           tuneButton={props.tuneButton}
           plusButton={props.plusButton}
           css={props.css}

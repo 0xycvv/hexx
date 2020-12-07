@@ -45,7 +45,7 @@ export function InlineMarker({
         }
       }}
     >
-      <SvgMarker />
+      <SvgMarker title="marker" />
     </IconWrapper>
   );
 }

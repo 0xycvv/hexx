@@ -35,7 +35,7 @@ export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
       }}
       {...props}
     >
-      <SvgCode />
+      <SvgCode title="code" />
     </IconWrapper>
   );
 }

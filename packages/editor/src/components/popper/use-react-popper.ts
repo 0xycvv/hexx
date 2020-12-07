@@ -22,7 +22,11 @@ export function useReactPopper(props: {
   });
 
   useEventListener('mousedown', (e) => {
-    if (e.target && popperElement?.contains(e.target)) {
+    if (
+      e.target &&
+      e.target instanceof HTMLElement &&
+      popperElement?.contains(e.target)
+    ) {
       e.preventDefault();
       e.stopPropagation();
       return;

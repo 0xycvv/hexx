@@ -1,5 +1,5 @@
-export * from './virtual-popper/use-virtual-popper';
-export * from './virtual-popper/virtual-popper';
+export * from './popper/use-react-popper';
+export * from './popper/portal-popper';
 export * from './inline-toolbar';
 export * from './inline-toolbar/code';
 export * from './inline-toolbar/marker';
