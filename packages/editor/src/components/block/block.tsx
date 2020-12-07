@@ -7,7 +7,6 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
 import {
   blockMapAtom,
   blockSelectAtom,
@@ -16,7 +15,7 @@ import {
   isEditorSelectAllAtom,
 } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
-import composeRefs from '../../hooks/use-compose-ref';
+import { SortableHandle } from 'react-sortable-hoc';
 import { useEditor } from '../../hooks/use-editor';
 import {
   findBlockByIndex,
@@ -61,6 +60,7 @@ const SelectOverlay = styled('div', {
   backgroundColor: '$success',
   zIndex: 1,
   opacity: 0.2,
+  cursor: 'grab'
 });
 
 function useBlockWrapper({
@@ -242,7 +242,6 @@ export function Block({ block, index, children, css }: BlockProps) {
     selectInputRef,
     getBlockProps,
     isBlockSelect,
-    setIsBlockSelect,
     isEditorSelectAll,
     blockComponent,
     ref,
@@ -256,37 +255,30 @@ export function Block({ block, index, children, css }: BlockProps) {
   }
 
   return (
-    <Draggable draggableId={block.id} index={index}>
-      {(provided) => (
-        <Wrapper
-          css={css}
-          ref={composeRefs(provided.innerRef, ref) as any}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={{
-            ...provided.draggableProps.style,
-            cursor: !isBlockSelect ? 'auto' : 'grab',
-          }}
-          {...getBlockProps()}
-        >
-          {createElement(blockComponent, {
-            block,
-            index,
-            config: blockComponent.block.config,
-          })}
-          {children}
-          {(isBlockSelect || isEditorSelectAll) && (
-            <SelectOverlay>
-              <input
-                ref={selectInputRef}
-                autoFocus
-                style={{ opacity: 0 }}
-              />
-            </SelectOverlay>
-          )}
-          <RightIndicator className="hexx-right-indicator" />
-        </Wrapper>
+    <Wrapper
+      css={css}
+      ref={ref}
+      // style={{
+      //   cursor: !isBlockSelect ? 'auto' : 'grab',
+      // }}
+      {...getBlockProps()}
+    >
+      {createElement(blockComponent, {
+        block,
+        index,
+        config: blockComponent.block.config,
+      })}
+      {children}
+      {(isBlockSelect || isEditorSelectAll) && (
+        <SortableOverlay selectInputRef={selectInputRef} />
       )}
-    </Draggable>
+      <RightIndicator className="hexx-right-indicator" />
+    </Wrapper>
   );
 }
+
+const SortableOverlay = SortableHandle(({ selectInputRef }) => (
+  <SelectOverlay>
+    <input ref={selectInputRef} autoFocus style={{ opacity: 0 }} />
+  </SelectOverlay>
+));
