@@ -1,5 +1,13 @@
 # @hexx/renderer
 
+## 0.2.1
+
+### Patch Changes
+
+- 694a998: inline tool selection and button improve
+- Updated dependencies [694a998]
+  - @hexx/theme@0.1.2
+
 ## 0.2.0
 
 ### Minor Changes
