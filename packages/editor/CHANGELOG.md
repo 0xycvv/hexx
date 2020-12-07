@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.3.0
+
+### Minor Changes
+
+- Add past html and plugin system
+
 ## 0.2.3
 
 ### Patch Changes

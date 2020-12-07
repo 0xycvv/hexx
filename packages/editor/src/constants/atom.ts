@@ -7,6 +7,9 @@ export const _hexxScope = Symbol();
 export const editorIdAtom = atom('');
 editorIdAtom.scope = _hexxScope;
 
+export const editorWrapperAtom = atom<HTMLElement | null>(null);
+editorWrapperAtom.scope = _hexxScope;
+
 type ActiveBlock = {
   id: string;
   editable?: HTMLDivElement;

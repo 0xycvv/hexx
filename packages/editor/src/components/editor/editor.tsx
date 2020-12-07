@@ -26,6 +26,7 @@ import {
   _blocksIdMapAtom,
   _hexxScope,
   history,
+  editorWrapperAtom,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
@@ -33,7 +34,7 @@ import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
 import { useSelectionChange } from '../../hooks/use-selection-change';
-import { processor } from '../../parser/html';
+import { processor } from '../../parser/html/html';
 import {
   findLastBlock,
   focusLastBlock,
@@ -42,6 +43,8 @@ import {
 import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
 import { TextBlock } from '../block/text';
+import toDOM from 'hast-util-to-dom';
+import { PastHtmlPlugin } from '../../plugins/paste';
 
 export type BlockType<T = any> = {
   id: string;
@@ -101,7 +104,6 @@ interface HexxHandler {
 }
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
-  const wrapperRef = useRef<HTMLDivElement>();
   const [id] = useAtom(editorIdAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
@@ -110,6 +112,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [isSelectAll, setIsSelectAll] = useAtom(
     isEditorSelectAllAtom,
   );
+  const [, setWrapperRef] = useAtom(editorWrapperAtom);
   const { insertBlock, clear } = useEditor();
 
   const handleClick = (e: MouseEvent) => {
@@ -142,21 +145,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       active?.editable?.focus();
     }
   };
-
-  useSelectionChange((e) => {
-    props.onSelectionChange?.(e);
-  }, wrapperRef.current);
-
-  useEventListener(
-    'paste',
-    (e) => {
-      const html = e.clipboardData?.getData('text/html');
-      if (!html) return;
-      const htmlAST = processor.parse(html);
-      console.log(htmlAST);
-    },
-    wrapperRef.current,
-  );
 
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result;
@@ -195,10 +183,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           <Wrapper
             css={props.css}
             ref={
-              composeRefs(
-                props.wrapperRef,
-                provided.innerRef,
-                wrapperRef,
+              composeRefs(props.wrapperRef, provided.innerRef, (s) =>
+                setWrapperRef(s),
               ) as any
             }
             className={`hexx ${css(paragraphStyle)}`}
@@ -215,6 +201,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             }}
             {...provided.droppableProps}
           >
+            <PastHtmlPlugin />
             {props.children}
             {blockIdList.map(
               (bId, i) =>

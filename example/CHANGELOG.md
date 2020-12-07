@@ -1,5 +1,16 @@
 # example
 
+## 0.2.0
+
+### Minor Changes
+
+- Add past html and plugin system
+
+### Patch Changes
+
+- Updated dependencies [undefined]
+  - @hexx/editor@0.3.0
+
 ## 0.1.2
 
 ### Patch Changes

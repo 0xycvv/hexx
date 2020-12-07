@@ -1,11 +1,12 @@
 {
   "name": "@hexx/editor",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "main": "dist/hexx-editor.cjs.js",
   "preconstruct": {
     "entrypoints": [
       "index.ts",
-      "components/index.ts"
+      "components/index.ts",
+      "plugins/index.ts"
     ]
   },
   "scripts": {
@@ -26,6 +27,7 @@
     "@hexx/renderer": "^0.2.1",
     "@hexx/theme": "^0.1.2",
     "@popperjs/core": "^2.5.4",
+    "hast-util-to-dom": "^2.0.6",
     "jotai": "^0.11.2",
     "react-beautiful-dnd": "^13.0.0",
     "react-contenteditable": "^3.3.5",

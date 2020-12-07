@@ -11,6 +11,7 @@ import {
   InlineMarker,
   useReactPopper,
 } from '@hexx/editor/components';
+import { SelectionChangePlugin } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
 import { PlusButton } from './plus-button';
@@ -52,18 +53,15 @@ const EditorUsage = (props: EditorProps) => {
         </svg>
       </div>
       <Editor
-        onSelectionChange={(e) => {
-          const selection = window.getSelection();
-          if (!selection || !selection.rangeCount) {
-            return;
-          }
-          let selectedRange = selection.getRangeAt(0);
-          if (
-            Math.abs(
-              selectedRange.startOffset - selectedRange.endOffset,
-            ) > 0
-          ) {
-            const rect = selectedRange.getBoundingClientRect();
+        ref={editorRef as any}
+        plusButton={<PlusButton />}
+        tuneButton={<TuneButton />}
+        {...props}
+        blockMap={BlockMap}
+      >
+        <SelectionChangePlugin
+          onSelectionChange={(range) => {
+            const rect = range.getBoundingClientRect();
             if (rect) {
               if (!popper.active) {
                 popper.setActive(true);
@@ -74,14 +72,8 @@ const EditorUsage = (props: EditorProps) => {
                 ),
               });
             }
-          }
-        }}
-        ref={editorRef as any}
-        plusButton={<PlusButton />}
-        tuneButton={<TuneButton />}
-        {...props}
-        blockMap={BlockMap}
-      >
+          }}
+        />
         <PortalPopper popper={popper}>
           <InlineToolBarPreset
             css={{

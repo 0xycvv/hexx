@@ -194,6 +194,7 @@ export function useEditor() {
     hoverBlock,
     lastHoverBlock,
     selectBlock,
+    idList,
     IdMap,
   };
 }

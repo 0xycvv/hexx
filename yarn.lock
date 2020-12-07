@@ -3929,7 +3929,7 @@ hast-util-parse-selector@^2.0.0:
   resolved "https://registry.yarnpkg.com/hast-util-parse-selector/-/hast-util-parse-selector-2.2.5.tgz#d57c23f4da16ae3c63b3b6ca4616683313499c3a"
   integrity sha512-7j6mrk/qqkSehsM92wQjdIgWM2/BW61u/53G6xmC8i1OmEdKLHbk419QKQUjz6LglWsfqoiHmyMRkP1BGjecNQ==
 
-hast-util-to-dom@^2.0.1:
+hast-util-to-dom@^2.0.1, hast-util-to-dom@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/hast-util-to-dom/-/hast-util-to-dom-2.0.6.tgz#b3f8b040529921d5dda098828dd3b2d80e456a81"
   integrity sha512-rQ5Bu71whciB9imQUO6V6O25VR3I1H0Ah5ztwicWCQ6JBn7RjytcfIouEgUShXLxmjxkhErNHBwMAHSoScwqlg==
