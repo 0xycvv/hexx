@@ -2,6 +2,7 @@
   "name": "@hexx/renderer",
   "version": "0.2.1",
   "main": "dist/hexx-renderer.cjs.js",
+  "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
     "react": "^16 || ^17"

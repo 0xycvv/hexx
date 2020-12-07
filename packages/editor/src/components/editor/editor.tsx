@@ -9,10 +9,10 @@ import {
   useImperativeHandle,
 } from 'react';
 import {
-  DragDropContext,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
+  SortableContainer,
+  SortableElement,
+  SortEndHandler,
+} from 'react-sortable-hoc';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,
@@ -140,18 +140,14 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }
   };
 
-  const onDragEndHandler = (result: DropResult) => {
-    const { destination, source } = result;
-
-    if (!destination || destination.index === source.index) {
-      setBlockSelect(-1);
-      return;
-    }
-    setBlockSelect(destination.index);
-
+  const onDragEndHandler: SortEndHandler = ({
+    newIndex,
+    oldIndex,
+  }) => {
+    setBlockSelect(newIndex);
     const newBlocks = [...blockIdList];
-    const dragBlock = newBlocks.splice(source.index, 1);
-    newBlocks.splice(destination.index, 0, dragBlock[0]);
+    const dragBlock = newBlocks.splice(oldIndex, 1);
+    newBlocks.splice(newIndex, 0, dragBlock[0]);
     setBlockIdList(newBlocks);
   };
 
@@ -166,53 +162,66 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   }));
 
   return (
-    <DragDropContext onDragEnd={onDragEndHandler}>
-      <Droppable droppableId={id}>
-        {(provided) => (
-          <Wrapper
-            css={props.css}
-            ref={
-              composeRefs(props.wrapperRef, provided.innerRef, (s) =>
-                setWrapperRef(s),
-              ) as any
-            }
-            className={`hexx ${css(paragraphStyle)}`}
-            onClick={handleClick}
-            onKeyDown={(e) => {
-              if (e.key === BackspaceKey && isSelectAll) {
-                clear();
-                setIsSelectAll(false);
-                requestAnimationFrame(() => {
-                  focusLastBlock();
-                  lastCursor();
-                });
-              }
-            }}
-            {...provided.droppableProps}
-          >
-            <PastHtmlPlugin />
-            {props.children}
-            {blockIdList.map(
-              (bId, i) =>
-                bId &&
-                blockIdMap[bId] && (
-                  <Block
-                    css={props.blockCss}
-                    key={bId}
-                    index={i}
-                    block={blockIdMap[bId]}
-                  />
-                ),
-            )}
-            {props.tuneButton}
-            {props.plusButton}
-            {provided.placeholder}
-          </Wrapper>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <Wrapper
+      css={props.css}
+      ref={
+        composeRefs(props.wrapperRef, (s) => setWrapperRef(s)) as any
+      }
+      className={`hexx ${css(paragraphStyle)}`}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === BackspaceKey && isSelectAll) {
+          clear();
+          setIsSelectAll(false);
+          requestAnimationFrame(() => {
+            focusLastBlock();
+            lastCursor();
+          });
+        }
+      }}
+    >
+      <PastHtmlPlugin />
+      {props.children}
+      <SortableBlockList
+        lockAxis="y"
+        onSortEnd={onDragEndHandler}
+        blockCss={props.blockCss}
+        blockIdList={blockIdList}
+        blockIdMap={blockIdMap}
+      />
+      {props.tuneButton}
+      {props.plusButton}
+    </Wrapper>
   );
 });
+
+const SortableBlock = SortableElement(({ blockCss, block, i }) => (
+  <Block css={blockCss} index={i} block={block} />
+));
+
+const SortableBlockList = SortableContainer(
+  ({ blockCss, blockIdList, blockIdMap }) => (
+    <div
+      className={css({
+        width: '100%',
+      })}
+    >
+      {blockIdList.map(
+        (bId, i) =>
+          bId &&
+          blockIdMap[bId] && (
+            <SortableBlock
+              blockCss={blockCss}
+              key={bId}
+              index={i}
+              i={i}
+              block={blockIdMap[bId]}
+            />
+          ),
+      )}
+    </div>
+  ),
+);
 
 export const Editor = forwardRef<HexxHandler, EditorProps>(
   (props, ref) => {

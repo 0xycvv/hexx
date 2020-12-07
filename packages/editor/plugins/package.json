@@ -1,3 +1,4 @@
 {
-  "main": "dist/hexx-editor-plugins.cjs.js"
+  "main": "dist/hexx-editor-plugins.cjs.js",
+  "module": "dist/hexx-editor-plugins.esm.js"
 }

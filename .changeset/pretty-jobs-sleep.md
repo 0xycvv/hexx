@@ -1,0 +1,5 @@
+---
+"@hexx/editor": patch
+---
+
+sortable
