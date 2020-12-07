@@ -2,6 +2,7 @@
   "name": "@hexx/editor",
   "version": "0.4.1-next.0",
   "main": "dist/hexx-editor.cjs.js",
+  "module": "dist/hexx-editor.esm.js",
   "preconstruct": {
     "entrypoints": [
       "index.ts",
@@ -10,6 +11,7 @@
     ]
   },
   "scripts": {
+    "size": "size-limit",
     "icons": "svgr --template ./icon-template.js --ext tsx --icon --filename-case 'kebab' --title-prop --ref -d ./src/components/icons ./src/components/icons"
   },
   "peerDependencies": {
@@ -21,7 +23,9 @@
     "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.12.7",
     "@babel/preset-react": "^7.12.7",
-    "@babel/preset-typescript": "^7.12.7"
+    "@babel/preset-typescript": "^7.12.7",
+    "@size-limit/preset-big-lib": "^4.9.1",
+    "size-limit": "^4.9.1"
   },
   "dependencies": {
     "@hexx/renderer": "^0.2.1",
@@ -37,5 +41,10 @@
     "unified": "^9.2.0",
     "unist-util-visit": "^2.0.3",
     "uuid": "^8.3.1"
-  }
+  },
+  "size-limit": [
+    {
+      "path": "dist/hexx-editor.cjs.production-*.js"
+    }
+  ]
 }
