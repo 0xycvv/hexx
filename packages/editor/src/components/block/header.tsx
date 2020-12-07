@@ -44,6 +44,39 @@ HeaderBlock.block = {
   config: {
     placeholder: 'Heading',
   },
+  paste: {
+    onPaste: (ast, toDOM) => {
+      let level = 3;
+      switch (ast.tagName) {
+        case 'h1':
+          level = 1;
+          break;
+        case 'h2':
+          level = 2;
+          break;
+        case 'h3':
+          level = 3;
+          break;
+        case 'h4':
+          level = 4;
+          break;
+        case 'h5':
+          level = 5;
+          break;
+        case 'h6':
+          level = 6;
+          break;
+        default:
+          break;
+      }
+      return {
+        level,
+        text: toDOM(ast).innerHTML,
+      };
+    },
+    tags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    html: ['text'],
+  },
   icon: {
     text: 'Header',
     svg: HeaderSvg,

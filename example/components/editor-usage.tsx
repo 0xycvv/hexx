@@ -11,7 +11,10 @@ import {
   InlineMarker,
   useReactPopper,
 } from '@hexx/editor/components';
-import { SelectionChangePlugin } from '@hexx/editor/plugins';
+import {
+  SelectionChangePlugin,
+  Unstable_UndoPlugin,
+} from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
 import { PlusButton } from './plus-button';
@@ -59,6 +62,7 @@ const EditorUsage = (props: EditorProps) => {
         {...props}
         blockMap={BlockMap}
       >
+        <Unstable_UndoPlugin />
         <SelectionChangePlugin
           onSelectionChange={(range) => {
             const rect = range.getBoundingClientRect();

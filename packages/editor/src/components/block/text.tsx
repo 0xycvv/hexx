@@ -56,6 +56,12 @@ TextBlock.block = {
   defaultValue: {
     text: '',
   },
+  paste: {
+    tags: ['p', 'div'],
+    onPaste: (ast, toDOM) => ({
+      text: toDOM(ast).outerHTML,
+    }),
+  },
   tune: [
     {
       icon: {

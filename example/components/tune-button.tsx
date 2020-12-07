@@ -106,9 +106,10 @@ export const TuneButton = forwardRef((props: any, ref) => {
       >
         {isSelecting ? (
           <>
-            {tunes?.map((tune) => {
+            {tunes?.map((tune, i) => {
               return (
                 <Icon
+                  key={i}
                   as={tune.icon.svg}
                   color={
                     tune.icon.isActive(currentBlockData.data)

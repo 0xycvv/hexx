@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { SetStateAction } from 'react';
+import { BlockType } from '../components/editor';
 
 export const _hexxScope = Symbol();
 
@@ -9,6 +10,16 @@ editorIdAtom.scope = _hexxScope;
 
 export const editorWrapperAtom = atom<HTMLElement | null>(null);
 editorWrapperAtom.scope = _hexxScope;
+
+export const editorDefaultBlockAtom = atom<
+  Pick<BlockType<any>, 'type' | 'data'>
+>({
+  type: 'paragraph',
+  data: {
+    text: '',
+  },
+});
+editorDefaultBlockAtom.scope = _hexxScope;
 
 type ActiveBlock = {
   id: string;
@@ -41,10 +52,29 @@ export const hoverBlockAtom = atom<{
 hoverBlockAtom.scope = _hexxScope;
 
 // history
-export const history: Array<{
+type EditorHistory = Array<{
   label: string;
   undo: () => void;
-}> = [];
+  redo: () => void;
+}>;
+export const history: EditorHistory = [];
+
+export const undoHistory: EditorHistory = [];
+
+export const undo = () => {
+  const last = history.pop();
+  if (last) {
+    last.undo();
+    undoHistory.push(last);
+  }
+};
+
+export const redo = () => {
+  const last = undoHistory.pop();
+  if (last) {
+    last.redo();
+  }
+};
 
 function debounce(func, wait, immediate): any {
   var timeout;
@@ -84,14 +114,16 @@ export const blocksIdMapAtom = atom(
     set(_blocksIdMapAtom, arg);
     const newValue = get(_blocksIdMapAtom);
     const old = { ...firstOldValue };
-    if (!firstOldValue) return;
+    if (!firstOldValue) {
+      return;
+    }
     debounceUpdateHistory({
       label: `${JSON.stringify(old)} -> ${JSON.stringify(newValue)}`,
-      diff: { old, newValue },
       undo: () => {
-        if (!old) return;
-        console.log(old);
         set(_blocksIdMapAtom, old);
+      },
+      redo: () => {
+        set(_blocksIdMapAtom, newValue);
       },
     });
   },
@@ -110,6 +142,9 @@ export const blockIdListAtom = atom(
       )}`,
       undo: () => {
         set(_blockIdListAtom, oldValue);
+      },
+      redo: () => {
+        set(_blockIdListAtom, newValue);
       },
     });
   },

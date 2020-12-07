@@ -28,9 +28,10 @@ const styles = css({
   },
 });
 export const Editable = forwardRef<any, ContentEditableProps>(
-  (props, ref) => (
+  ({ html = '', ...props }, ref) => (
     <ContentEditable
       {...props}
+      html={html}
       placeholder={props.placeholder || 'Type something...'}
       className={`e-editable ${props.className || ''} ${styles}`}
       ref={ref as any}

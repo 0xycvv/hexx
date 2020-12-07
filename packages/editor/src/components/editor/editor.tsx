@@ -1,5 +1,5 @@
 import { paragraphStyle } from '@hexx/renderer';
-import { css, styled, StitchesCssProp } from '@hexx/theme';
+import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
 import {
   forwardRef,
@@ -7,7 +7,6 @@ import {
   MutableRefObject,
   ReactNode,
   useImperativeHandle,
-  useRef,
 } from 'react';
 import {
   DragDropContext,
@@ -20,21 +19,21 @@ import {
   blockMapAtom,
   blockSelectAtom,
   blocksIdMapAtom,
+  editorDefaultBlockAtom,
   editorIdAtom,
+  editorWrapperAtom,
   isEditorSelectAllAtom,
+  redo,
+  undo,
   _blockIdListAtom,
   _blocksIdMapAtom,
   _hexxScope,
-  history,
-  editorWrapperAtom,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
-import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
-import { useSelectionChange } from '../../hooks/use-selection-change';
-import { processor } from '../../parser/html/html';
+import { PastHtmlPlugin } from '../../plugins/paste';
 import {
   findLastBlock,
   focusLastBlock,
@@ -43,8 +42,6 @@ import {
 import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
 import { TextBlock } from '../block/text';
-import toDOM from 'hast-util-to-dom';
-import { PastHtmlPlugin } from '../../plugins/paste';
 
 export type BlockType<T = any> = {
   id: string;
@@ -65,9 +62,6 @@ interface HexxProps {
   defaultBlock?: Omit<BlockType, 'id'>;
   css?: StitchesCssProp;
   blockCss?: StitchesCssProp;
-  onSelectionChange?: (
-    e: DocumentEventMap['selectionchange'],
-  ) => void;
 }
 
 const Wrapper = styled('div', {
@@ -100,7 +94,7 @@ interface HexxHandler {
   getData: () => BlockType[];
   focus: () => void;
   watch: (cb: Function) => void;
-  history: () => void;
+  undo: () => void;
 }
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
@@ -167,13 +161,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     watch: (cb) => {
       typeof cb === 'function' && cb();
     },
-    history: () => {
-      const last = history.pop();
-      if (last) {
-        console.log(last);
-        last.undo();
-      }
-    },
+    undo: undo,
+    redo: redo,
   }));
 
   return (
@@ -242,13 +231,13 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
         initialValues={[
           [_blockIdListAtom, ids],
           [_blocksIdMapAtom, byId],
+          [editorDefaultBlockAtom, defaultBlock],
           [editorIdAtom, v4()],
           [blockMapAtom, props.blockMap],
         ]}
       >
         <Hexx
           ref={ref}
-          onSelectionChange={props.onSelectionChange}
           wrapperRef={props.wrapperRef}
           defaultBlock={defaultBlock}
           tuneButton={props.tuneButton}

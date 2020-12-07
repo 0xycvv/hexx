@@ -158,6 +158,29 @@ ListBlock.block = {
     items: [''],
     style: 'unordered',
   },
+  paste: {
+    tags: ['ul', 'ol'],
+    onPaste: (ast, toDom) => {
+      let { style } = ListBlock.block.defaultValue;
+      switch (ast.tagName) {
+        case 'ul':
+          style = 'unordered';
+          break;
+        case 'ol':
+          style = 'ordered';
+          break;
+        default:
+          break;
+      }
+      return {
+        style,
+        items: ast.children
+          .map((s) => toDom(s).innerHTML)
+          .filter(Boolean),
+      };
+    },
+    target: (d) => d.items,
+  },
   tune: [
     {
       icon: {

@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "dist/hexx-editor.cjs.js",
   "preconstruct": {
     "entrypoints": [

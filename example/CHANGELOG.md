@@ -1,5 +1,16 @@
 # example
 
+## 0.3.0
+
+### Minor Changes
+
+- Paste config and undo
+
+### Patch Changes
+
+- Updated dependencies [undefined]
+  - @hexx/editor@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes

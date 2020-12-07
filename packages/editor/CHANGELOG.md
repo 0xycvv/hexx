@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.4.0
+
+### Minor Changes
+
+- Paste config and undo
+
 ## 0.3.0
 
 ### Minor Changes

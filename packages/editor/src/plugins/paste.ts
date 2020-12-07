@@ -1,11 +1,64 @@
 import toDOM from 'hast-util-to-dom';
+import { useMemo } from 'react';
 import { useEventListener } from '../hooks';
 import { processor } from '../parser/html/html';
 import { usePlugin } from './plugin';
 
+export interface ReHypeTree {
+  type: string;
+  tagName: string;
+  properties: string;
+  value?: string;
+  children?: ReHypeTree;
+}
+
 export function PastHtmlPlugin() {
-  const { wrapperRef, editor, activeBlock } = usePlugin();
-  const { idList, insertBlock, setIdMap } = editor;
+  const {
+    wrapperRef,
+    editor,
+    activeBlock,
+    defaultBlock,
+  } = usePlugin();
+  const {
+    idList,
+    setIdMap,
+    blockMap,
+    batchInsertBlocks,
+  } = editor;
+
+  const allPasteConfig = useMemo(() => {
+    let result: Record<
+      string,
+      {
+        type: string;
+        onPaste?: Function;
+      }
+    > = {};
+    const arrayTagsConfig = Object.values(blockMap)
+      .map((map) => {
+        if (map.block?.paste) {
+          return {
+            key: map.block.type,
+            ...map.block.paste,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as {
+      tags: string[];
+      key: string;
+      onPaste?: Function;
+    }[];
+    for (const config of arrayTagsConfig) {
+      for (const tag of config.tags) {
+        result[tag] = {
+          type: config.key,
+          onPaste: config.onPaste,
+        };
+      }
+    }
+    return result;
+  }, []);
 
   useEventListener(
     'paste',
@@ -17,97 +70,44 @@ export function PastHtmlPlugin() {
         let slots: any = [];
         let results: any[] = [];
         for (const children of htmlAST.children) {
-          switch (children.tagName) {
-            case 'meta':
-              break;
-            case 'div':
-            case 'p':
-              if (slots.length > 0) {
-                results.push({
-                  type: 'paragraph',
-                  data: {
-                    text: toDOM({
-                      type: 'element',
-                      tagName: 'p',
-                      children: slots,
-                    }).outerHTML,
-                  },
-                });
-              }
+          if (children.tagName === 'meta') {
+            continue;
+          }
+          if (children.tagName in allPasteConfig) {
+            if (slots.length > 0) {
               results.push({
-                type: 'paragraph',
+                type: defaultBlock.type,
                 data: {
-                  text: toDOM(children).outerHTML,
+                  text: toDOM({
+                    type: 'element',
+                    tagName: 'p',
+                    children: slots,
+                  }).outerHTML,
                 },
               });
-              slots = [];
-              break;
-            case 'ol':
-              {
-                if (slots.length > 0) {
-                  results.push({
-                    type: 'paragraph',
-                    data: {
-                      text: toDOM({
-                        type: 'element',
-                        tagName: 'p',
-                        children: slots,
-                      }).innerHTML,
-                    },
-                  });
-                }
-                const items = children.children.map(
-                  (s) => toDOM(s).innerHTML,
-                );
-                results.push({
-                  type: 'list',
-                  data: {
-                    style: 'ordered',
-                    items,
-                  },
-                });
-                slots = [];
-              }
-              break;
-            case 'ul':
-              if (slots.length > 0) {
-                results.push({
-                  type: 'paragraph',
-                  data: {
-                    text: toDOM({
-                      type: 'element',
-                      tagName: 'p',
-                      children: slots,
-                    }).outerHTML,
-                  },
-                });
-              }
-              let items = children.children.map(
-                (s) => toDOM(s).innerHTML,
-              );
-              results.push({
-                type: 'list',
-                data: {
-                  style: 'unordered',
-                  items,
-                },
-              });
-              slots = [];
-              break;
-            default:
-              slots.push(children);
-              break;
+            }
+            let block = {
+              type: allPasteConfig[children.tagName].type,
+              data:
+                typeof allPasteConfig[children.tagName].onPaste ===
+                'function'
+                  ? allPasteConfig[children.tagName].onPaste!(
+                      children,
+                      toDOM,
+                    )
+                  : null,
+            };
+            results.push(block);
+            slots = [];
+          } else {
+            slots.push(children);
           }
         }
         const index = idList.findIndex(
           (id) => id === activeBlock?.id,
         );
         if (results.length > 0) {
-          requestAnimationFrame(() => {
-            for (const parsed of results) {
-              insertBlock({ block: parsed, index });
-            }
-          });
+          batchInsertBlocks({ blocks: results, index });
           e.preventDefault();
         }
         if (slots.length > 0) {

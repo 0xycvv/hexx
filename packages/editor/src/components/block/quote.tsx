@@ -47,5 +47,11 @@ QuoteBlock.block = {
     text: '',
     alignment: 'left',
   },
+  paste: {
+    tags: ['blockquote'],
+    onPaste: (ast, toDOM) => ({
+      text: toDOM(ast).outerHTML,
+    }),
+  },
   isEmpty: (d) => !d.text.trim(),
 };

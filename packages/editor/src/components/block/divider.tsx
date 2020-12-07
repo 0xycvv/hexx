@@ -15,5 +15,8 @@ Divider.block = {
     text: 'Divider',
     svg: DividerSvg,
   },
+  paste: {
+    tags: ['hr'],
+  },
   defaultValue: {},
 };

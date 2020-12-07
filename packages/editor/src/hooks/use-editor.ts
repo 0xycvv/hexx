@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import { v4 } from 'uuid';
+import { BlockType } from '../components/editor';
 import {
   blockIdListAtom,
   blockMapAtom,
@@ -8,7 +9,8 @@ import {
   blocksIdMapAtom,
   hoverBlockAtom,
 } from '../constants/atom';
-import { insert } from '../utils/insert';
+import { insert, insertArray } from '../utils/insert';
+import { normalize } from '../utils/normalize';
 import { usePreviousExistValue } from './use-previous-exist-value';
 
 export const EditableMap = new WeakMap<
@@ -132,6 +134,36 @@ export function useEditor() {
     }
   };
 
+  const batchInsertBlocks = ({
+    index,
+    blocks,
+  }: {
+    index?: number;
+    blocks: any[];
+  }) => {
+    let newBlocks: BlockType[] = [];
+    for (const block of blocks) {
+      newBlocks.push({
+        id: v4(),
+        ...block,
+      });
+    }
+    const { byId, ids } = normalize(newBlocks, 'id');
+    if (typeof index === 'undefined') {
+      setIdList((s) => [...s, ...ids]);
+      setIdMap((s) => ({
+        ...s,
+        ...byId,
+      }));
+    } else {
+      setIdList((s) => insertArray(s, index, ids));
+      setIdMap((s) => ({
+        ...s,
+        ...byId,
+      }));
+    }
+  };
+
   const updateBlockDataWithId = ({
     id,
     data,
@@ -187,6 +219,7 @@ export function useEditor() {
     updateBlockDataWithId,
     setIdMap,
     removeBlockWithId,
+    batchInsertBlocks,
     clear,
     // data
     blockSelect,
