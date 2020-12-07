@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.4.1
+
+### Patch Changes
+
+- 412db97: sortable
+
 ## 0.4.1-next.0
 
 ### Patch Changes

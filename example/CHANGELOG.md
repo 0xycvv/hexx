@@ -1,5 +1,12 @@
 # example
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [412db97]
+  - @hexx/editor@0.4.1
+
 ## 0.3.1-next.0
 
 ### Patch Changes
