@@ -18,6 +18,7 @@ const Plus = styled('div', {
   border: '1px solid #D3D6D8',
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
   borderRadius: '26px 26px 0 26px',
+  svg: { pointerEvents: 'none' },
   variants: {
     color: {
       active: {

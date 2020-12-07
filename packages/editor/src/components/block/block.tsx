@@ -230,10 +230,10 @@ function useBlockWrapper({
   };
 }
 
-export interface BlockProps<T = any> {
-  block: BlockType;
+export interface BlockProps<T = any, C = any> {
+  block: BlockType<T>;
   index: number;
-  config?: T;
+  config?: C;
   children?: ReactNode;
   css?: StitchesCssProp;
 }

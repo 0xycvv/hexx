@@ -1,4 +1,4 @@
-import { headerStyle } from '@hexx/renderer';
+import { headerStyle, Header } from '@hexx/renderer';
 import { styled } from '@hexx/theme';
 import * as React from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
@@ -10,7 +10,11 @@ import { BlockProps } from './block';
 
 const Heading = styled(Editable, headerStyle);
 
-export function HeaderBlock({ block, index, config }: BlockProps) {
+export function HeaderBlock({
+  block,
+  index,
+  config,
+}: BlockProps<Header['data'], { placeholder: string }>) {
   const { register, update } = useBlock(block.id, index);
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -21,9 +25,8 @@ export function HeaderBlock({ block, index, config }: BlockProps) {
 
   return (
     <Heading
-      // @ts-ignore
-      h={block.data.level || 3}
-      placeholder={config.placeholder}
+      h={String(block.data.level) || '3'}
+      placeholder={config?.placeholder}
       ref={composeRefs(ref, register)}
       onChange={(evt) =>
         update({

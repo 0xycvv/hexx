@@ -33,6 +33,7 @@ import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
 import { useSelectionChange } from '../../hooks/use-selection-change';
+import { processor } from '../../parser/html';
 import {
   findLastBlock,
   focusLastBlock,
@@ -149,8 +150,10 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   useEventListener(
     'paste',
     (e) => {
-      console.log(e.clipboardData?.getData('text/plain'));
-      console.log(e.clipboardData?.getData('text/html'));
+      const html = e.clipboardData?.getData('text/html');
+      if (!html) return;
+      const htmlAST = processor.parse(html);
+      console.log(htmlAST);
     },
     wrapperRef.current,
   );

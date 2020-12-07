@@ -109,7 +109,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
         {...getProps}
         {...props}
       >
-        <Link />
+        <Link title="link" />
       </IconWrapper>
       <PortalPopper popper={popper} pointerEvent="auto">
         <LinkInput

@@ -79,7 +79,7 @@ export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
       }}
       {...props}
     >
-      <Bold />
+      <Bold title="bold" />
     </DefaultInlineTool>
   );
 }
@@ -95,7 +95,7 @@ export function InlineItalic(
       }}
       {...props}
     >
-      <Italic />
+      <Italic title="italic" />
     </DefaultInlineTool>
   );
 }
@@ -111,7 +111,7 @@ export function InlineUnderline(
         document.execCommand('underline', false);
       }}
     >
-      <Underlined />
+      <Underlined title="underlined" />
     </DefaultInlineTool>
   );
 }
@@ -127,7 +127,6 @@ export function InlineToolBarPreset({
       <InlineBold />
       <InlineItalic />
       <InlineUnderline />
-      {/* <InlineLink /> */}
       {children}
     </Wrapper>
   );
