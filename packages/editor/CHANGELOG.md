@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.2.3
+
+### Patch Changes
+
+- Fix svg not being clickable
+
 ## 0.2.2
 
 ### Patch Changes

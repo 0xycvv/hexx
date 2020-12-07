@@ -24,7 +24,8 @@ export function useReactPopper(props: {
   useEventListener('mousedown', (e) => {
     if (
       e.target &&
-      e.target instanceof HTMLElement &&
+      (e.target instanceof HTMLElement ||
+        e.target instanceof SVGElement) &&
       popperElement?.contains(e.target)
     ) {
       e.preventDefault();
