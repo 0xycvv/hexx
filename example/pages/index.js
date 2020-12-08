@@ -32,45 +32,65 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Hexx Editor</title>
+        {/* <script
+          type="module"
+          dangerouslySetInnerHTML={{
+            __html: `
+            import prismjs from 'https://cdn.skypack.dev/prismjs';
+            prismjs.highlightAll()
+          `,
+          }}
+        /> */}
       </Head>
       <Header>
         {SVG}
-        <span style={{ marginLeft: '6px', fontSize: 20 }}>
-          Hexx
-        </span>
+        <span style={{ marginLeft: '6px', fontSize: 20 }}>Hexx</span>
       </Header>
       <main className={styles.main}>
         <EditorUsage
-          // data={[
-          //   {
-          //     id: '1asdfs123123',
-          //     data: {
-          //       text: 'Hello World',
-          //       level: 2,
-          //     },
-          //     type: 'header',
-          //   },
-          //   {
-          //     id: '1asdfs',
-          //     data: {
-          //       text:
-          //         'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
-          //     },
-          //     type: 'paragraph',
-          //   },
-          //   {
-          //     id: 'asdfasdf',
-          //     data: {
-          //       items: ['yoyo', 'text'],
-          //     },
-          //     type: 'list',
-          //   },
-          //   {
-          //     id: '123',
-          //     data: {},
-          //     type: 'delimiter',
-          //   },
-          // ]}
+          data={[
+            {
+              id: '1asdfs1231231',
+              data: {
+                code: ` onSubmit(e) {
+      e.preventDefault();
+      const job = {
+        title: 'Developer',
+        company: 'Facebook'
+        };
+      }`,
+              },
+              type: 'code',
+            },
+            // {
+            //   id: '1asdfs123123',
+            //   data: {
+            //     text: 'Hello World',
+            //     level: 2,
+            //   },
+            //   type: 'header',
+            // },
+            // {
+            //   id: '1asdfs',
+            //   data: {
+            //     text:
+            //       'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
+            //   },
+            //   type: 'paragraph',
+            // },
+            // {
+            //   id: 'asdfasdf',
+            //   data: {
+            //     items: ['yoyo', 'text'],
+            //   },
+            //   type: 'list',
+            // },
+            // {
+            //   id: '123',
+            //   data: {},
+            //   type: 'delimiter',
+            // },
+          ]}
         />
       </main>
     </div>
