@@ -1,3 +1,4 @@
+import { EROFS } from 'constants';
 import { useEventListener } from './use-event-listener';
 
 export function useSelectionChange(
@@ -7,6 +8,7 @@ export function useSelectionChange(
   useEventListener(
     'selectstart',
     () => {
+      ref?.addEventListener('keyup', handler);
       ref?.addEventListener('mouseup', handler);
     },
     ref,
@@ -14,6 +16,7 @@ export function useSelectionChange(
 
   return () => {
     if (handler) {
+      ref?.removeEventListener('keyup', handler);
       ref?.removeEventListener('mouseup', handler);
     }
   };

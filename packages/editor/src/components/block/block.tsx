@@ -242,8 +242,6 @@ const SortableItem = SortableElement(
   ({
     blockComponent,
     block,
-    index,
-    children,
     isBlockSelect,
     isEditorSelectAll,
     selectInputRef,
@@ -256,7 +254,6 @@ const SortableItem = SortableElement(
           index: i,
           config: blockComponent.block.config,
         })}
-        {children}
         {(isBlockSelect || isEditorSelectAll) && (
           <SortableOverlay selectInputRef={selectInputRef} />
         )}
@@ -266,7 +263,7 @@ const SortableItem = SortableElement(
   },
 );
 
-export function Block({ block, index, children, css }: BlockProps) {
+export function Block({ block, index, css }: BlockProps) {
   const {
     selectInputRef,
     getBlockProps,
@@ -293,9 +290,7 @@ export function Block({ block, index, children, css }: BlockProps) {
         blockComponent={blockComponent}
         index={index}
         i={index}
-      >
-        {children}
-      </SortableItem>
+      />
     </Wrapper>
   );
 }

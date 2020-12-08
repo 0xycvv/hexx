@@ -51,11 +51,17 @@ export const IconWrapper = styled('div', {
 
 function DefaultInlineTool({
   type,
+  shortcut,
+  onToggle,
   ...props
 }: UseInlineToolConfig & {
   children: ReactNode;
 } & StitchesProps<typeof IconWrapper>) {
-  const { getProps } = useDefaultInlineTool({ type });
+  const { getProps } = useDefaultInlineTool({
+    type,
+    shortcut,
+    onToggle,
+  });
   return (
     <IconWrapper {...props} {...getProps}>
       {props.children}
@@ -74,7 +80,7 @@ export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
   return (
     <DefaultInlineTool
       type="bold"
-      onClick={() => {
+      onToggle={() => {
         document.execCommand('bold', false);
       }}
       {...props}
@@ -90,7 +96,7 @@ export function InlineItalic(
   return (
     <DefaultInlineTool
       type="italic"
-      onClick={() => {
+      onToggle={() => {
         document.execCommand('italic', false);
       }}
       {...props}
@@ -105,9 +111,10 @@ export function InlineUnderline(
 ) {
   return (
     <DefaultInlineTool
+      shortcut="⌘ + u"
       type="underline"
       {...props}
-      onClick={() => {
+      onToggle={() => {
         document.execCommand('underline', false);
       }}
     >

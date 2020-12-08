@@ -183,6 +183,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
+        useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
         blockIdList={blockIdList}
@@ -195,7 +196,15 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
 });
 
 const SortableBlockList = SortableContainer(
-  ({ blockCss, blockIdList, blockIdMap }) => (
+  ({
+    blockCss,
+    blockIdList,
+    blockIdMap,
+  }: {
+    blockCss: any;
+    blockIdList: string[];
+    blockIdMap: Record<string, BlockType>;
+  }) => (
     <div
       className={css({
         width: '100%',

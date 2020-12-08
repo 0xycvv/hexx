@@ -5,7 +5,17 @@ import { surround } from '../../../utils/find-blocks';
 import { getSelectionRange } from '../../../utils/ranges';
 import { StitchesProps } from '@hexx/theme';
 export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
-  const { getProps, setIsActive, isActive } = useInlineTool();
+  const { getProps, setIsActive } = useInlineTool({
+    onToggle: (isActive) => {
+      if (isActive) {
+        document.execCommand('removeFormat');
+        setIsActive(false);
+      } else {
+        surround('code');
+        setIsActive(true);
+      }
+    },
+  });
 
   useEventChangeSelection(() => {
     const r = getSelectionRange();
@@ -22,19 +32,7 @@ export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
   });
 
   return (
-    <IconWrapper
-      {...getProps}
-      onClick={() => {
-        if (isActive) {
-          document.execCommand('removeFormat');
-          setIsActive(false);
-        } else {
-          surround('code');
-          setIsActive(true);
-        }
-      }}
-      {...props}
-    >
+    <IconWrapper {...getProps} {...props}>
       <SvgCode title="code" />
     </IconWrapper>
   );
