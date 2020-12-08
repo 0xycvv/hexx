@@ -32,7 +32,7 @@ export const uiStateAtom = atom<UIState>({
 
 uiStateAtom.scope = _hexxScope;
 
-type ActiveBlock = {
+export type ActiveBlock = {
   id: string;
   editable?: HTMLDivElement;
   blockEl: HTMLDivElement;

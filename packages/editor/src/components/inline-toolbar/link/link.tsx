@@ -1,13 +1,10 @@
 import { StitchesProps, styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
+import { useEffect, useRef, useState } from 'react';
 import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { activeBlockIdAtom } from '../../../constants/atom';
+  ActiveBlock,
+  activeBlockIdAtom,
+} from '../../../constants/atom';
 import { getSelectionRange } from '../../../utils/ranges';
 import Link from '../../icons/link';
 import { PortalPopper } from '../../popper/portal-popper';
@@ -55,6 +52,7 @@ const Input = styled('input', {
 function highlight(r: Range | null) {
   if (!r) return;
   const el = document.createElement('span');
+  el.classList.add('hexx-link-target');
   el.style.backgroundColor = 'rgba(45, 170, 219, 0.3)';
   r.surroundContents(el);
   return el;
@@ -63,7 +61,9 @@ function highlight(r: Range | null) {
 export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const [initialValue, setInitialValue] = useState('');
-
+  const [currentActiveBlock, setCurrentActiveBlock] = useState<
+    ActiveBlock
+  >(null);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
@@ -94,6 +94,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
       if (!editable) {
         return;
       }
+      setCurrentActiveBlock(activeBlock);
       editableSnap.current = editable;
       snapHTML.current = editable?.innerHTML;
       if (!selRange) return;
@@ -124,15 +125,21 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
             defaultValue={initialValue}
             onClose={(value) => {
               const selection = window.getSelection();
-              const r = document.createRange();
-              console.log(selectionWrapper);
+              const r = document.createRange().cloneRange();
               if (!selectionWrapper.current || !r || !selection) {
                 return;
               }
-              r.selectNodeContents(selectionWrapper.current);
+              // @ts-ignore
+              const target = currentActiveBlock?.blockEl?.querySelector(
+                '.hexx-link-target',
+              );
+              if (!target) return;
+              r.selectNodeContents(target);
               selection.removeAllRanges();
               selection.addRange(r);
               setHasChanged(true);
+              document.execCommand('removeFormat');
+              target.classList.remove('hexx-link-target');
               document.execCommand('createLink', false, value);
               if (selection.anchorNode?.parentElement) {
                 selection.anchorNode.parentElement.setAttribute(
@@ -144,7 +151,6 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
                   'noopener noreferrer',
                 );
                 editableSnap.current?.focus();
-                document.execCommand('removeFormat');
                 popper.setActive(false);
                 setIsActive(false);
               }
@@ -168,27 +174,11 @@ const LinkInput = (props) => {
       <InputWrapper>
         <Input
           ref={ref}
-          // onFocus={(e) => {
-          //   e.stopPropagation();
-          //   e.preventDefault();
-          // }}
           defaultValue={props.defaultValue}
           autoFocus
           type="url"
           pattern="https?://.+"
           placeholder="Paste link or type to search"
-          // onMouseUp={(e) => {
-          //   e.stopPropagation();
-          //   e.preventDefault();
-          // }}
-          // onMouseDown={(e) => {
-          //   e.stopPropagation();
-          //   e.preventDefault();
-          // }}
-          // onClick={(e) => {
-          //   e.stopPropagation();
-          //   e.preventDefault();
-          // }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               props.onClose(ref?.current?.value);

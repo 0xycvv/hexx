@@ -45,10 +45,11 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
         class: 'selection',
         // px, how many pixels the point should move before starting the selection (combined distance).
         // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
-        startThreshold: 10,
+        startThreshold: 50,
 
         // Disable the selection functionality for touch devices
         disableTouch: false,
+        singleClick: false,
 
         // On which point an element should be selected.
         // Available modes are cover (cover the entire element), center (touch the center) or
