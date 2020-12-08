@@ -154,7 +154,7 @@ function Selection(options = {}) {
       that.clearSelection(false);
 
       // Prevent default select event
-      // on(frame, 'selectstart', preventDefault);
+      on(frame, 'selectstart', preventDefault);
 
       // Add listener
       on(frame, ['touchmove', 'mousemove'], that._delayedTapMove, {

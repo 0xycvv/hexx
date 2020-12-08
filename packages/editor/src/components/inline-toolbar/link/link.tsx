@@ -61,9 +61,10 @@ function highlight(r: Range | null) {
 export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const [initialValue, setInitialValue] = useState('');
-  const [currentActiveBlock, setCurrentActiveBlock] = useState<
-    ActiveBlock
-  >(null);
+  const [
+    currentActiveBlock,
+    setCurrentActiveBlock,
+  ] = useState<ActiveBlock | null>(null);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);

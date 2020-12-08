@@ -1,5 +1,4 @@
 import { css } from '@hexx/theme';
-import SelectionJs from './selection';
 import { atom, useAtom } from 'jotai';
 import {
   forwardRef,
@@ -12,7 +11,7 @@ import {
   uiStateAtom,
   _hexxScope,
 } from '../../constants/atom';
-import { usePlugin } from '../plugin';
+import SelectionJs from './selection';
 
 const blockIdSelectionAtom = atom<string[]>([]);
 
@@ -93,6 +92,14 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
               return true;
             }
             return false;
+            // @ts-ignore
+          } else if (oe.target.parentElement instanceof HTMLElement) {
+            const isEditable =
+              // @ts-ignore
+              oe.target.parentElement.getAttribute(
+                'contenteditable',
+              ) === 'true';
+            return !isEditable;
           }
           // @ts-ignore
           return oe.target.tagName !== 'INPUT';
@@ -139,7 +146,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
         // Behaviour on single-click
         // Available modes are 'native' (element was mouse-event target) or
         // 'touch' (element got touched)
-        tapMode: 'native',
+        tapMode: 'touch',
 
         // Query selectors from elements which can be selected
         selectables: ['.hexx-block-wrapper'],
