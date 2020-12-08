@@ -14,6 +14,7 @@ import {
 import {
   SelectionChangePlugin,
   Unstable_UndoPlugin,
+  SelectionPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
@@ -76,6 +77,7 @@ const EditorUsage = (props: EditorProps) => {
         blockMap={BlockMap}
       >
         <Unstable_UndoPlugin />
+        <SelectionPlugin />
         <SelectionChangePlugin
           onSelectionChange={(range) => {
             const rect = range.getBoundingClientRect();
