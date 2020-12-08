@@ -7,6 +7,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
+import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import {
   blockMapAtom,
   blockSelectAtom,
@@ -15,7 +16,6 @@ import {
   isEditorSelectAllAtom,
 } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
-import { SortableHandle } from 'react-sortable-hoc';
 import { useEditor } from '../../hooks/use-editor';
 import {
   findBlockByIndex,
@@ -60,7 +60,7 @@ const SelectOverlay = styled('div', {
   backgroundColor: '$success',
   zIndex: 1,
   opacity: 0.2,
-  cursor: 'grab'
+  cursor: 'grab',
 });
 
 function useBlockWrapper({
@@ -190,9 +190,9 @@ function useBlockWrapper({
     editorId,
     isHovering,
     blockComponent: currentBlock,
-    getBlockProps: () => ({
+    getBlockProps: {
       'data-block-id': block.id,
-      className: 'e-block',
+      className: 'hexx-block-wrapper',
       onKeyDown,
       onFocus: () => {
         setHoverBlockId({
@@ -221,7 +221,7 @@ function useBlockWrapper({
           el: ref.current,
         });
       },
-    }),
+    },
     isBlockSelect,
     isEditorSelectAll,
     setIsBlockSelect: (value: boolean) => {
@@ -237,6 +237,35 @@ export interface BlockProps<T = any, C = any> {
   children?: ReactNode;
   css?: StitchesCssProp;
 }
+
+const SortableItem = SortableElement(
+  ({
+    blockComponent,
+    block,
+    index,
+    children,
+    isBlockSelect,
+    isEditorSelectAll,
+    selectInputRef,
+    i,
+  }) => {
+    return (
+      <div className="hexx-block">
+        {createElement(blockComponent, {
+          block,
+          index: i,
+          config: blockComponent.block.config,
+        })}
+        {children}
+        {(isBlockSelect || isEditorSelectAll) && (
+          <SortableOverlay selectInputRef={selectInputRef} />
+        )}
+        <RightIndicator className="hexx-right-indicator" />
+      </div>
+    );
+  },
+);
+
 export function Block({ block, index, children, css }: BlockProps) {
   const {
     selectInputRef,
@@ -255,24 +284,18 @@ export function Block({ block, index, children, css }: BlockProps) {
   }
 
   return (
-    <Wrapper
-      css={css}
-      ref={ref}
-      // style={{
-      //   cursor: !isBlockSelect ? 'auto' : 'grab',
-      // }}
-      {...getBlockProps()}
-    >
-      {createElement(blockComponent, {
-        block,
-        index,
-        config: blockComponent.block.config,
-      })}
-      {children}
-      {(isBlockSelect || isEditorSelectAll) && (
-        <SortableOverlay selectInputRef={selectInputRef} />
-      )}
-      <RightIndicator className="hexx-right-indicator" />
+    <Wrapper css={css} ref={ref} {...getBlockProps}>
+      <SortableItem
+        selectInputRef={selectInputRef}
+        isBlockSelect={isBlockSelect}
+        isEditorSelectAll={isEditorSelectAll}
+        block={block}
+        blockComponent={blockComponent}
+        index={index}
+        i={index}
+      >
+        {children}
+      </SortableItem>
     </Wrapper>
   );
 }

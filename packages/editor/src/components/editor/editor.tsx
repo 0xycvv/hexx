@@ -183,7 +183,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
-        lockAxis="y"
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
         blockIdList={blockIdList}
@@ -194,10 +193,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     </Wrapper>
   );
 });
-
-const SortableBlock = SortableElement(({ blockCss, block, i }) => (
-  <Block css={blockCss} index={i} block={block} />
-));
 
 const SortableBlockList = SortableContainer(
   ({ blockCss, blockIdList, blockIdMap }) => (
@@ -210,11 +205,10 @@ const SortableBlockList = SortableContainer(
         (bId, i) =>
           bId &&
           blockIdMap[bId] && (
-            <SortableBlock
-              blockCss={blockCss}
+            <Block
               key={bId}
+              css={blockCss}
               index={i}
-              i={i}
               block={blockIdMap[bId]}
             />
           ),

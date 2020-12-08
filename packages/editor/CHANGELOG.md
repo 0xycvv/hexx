@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.4.2
+
+### Patch Changes
+
+- fix sortable margin problem
+
 ## 0.4.1
 
 ### Patch Changes

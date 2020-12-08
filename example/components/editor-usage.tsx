@@ -59,6 +59,19 @@ const EditorUsage = (props: EditorProps) => {
         ref={editorRef as any}
         plusButton={<PlusButton />}
         tuneButton={<TuneButton />}
+        blockCss={{
+          marginTop: 8,
+          marginBottom: 8,
+          maxWidth: '720px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
+        css={{
+          paddingLeft: '2rem',
+          paddingRight: '3.75rem',
+          maxWidth: '960px',
+          margin: 'auto',
+        }}
         {...props}
         blockMap={BlockMap}
       >
