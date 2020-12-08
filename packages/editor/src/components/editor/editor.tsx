@@ -112,10 +112,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const { insertBlock, clear, batchRemoveBlocks } = useEditor();
 
   useEffect(() => {
-    console.log(
-      blockIdList.length === 0,
-      Object.keys(blockIdMap).length === 0,
-    );
     if (
       blockIdList.length === 0 ||
       Object.keys(blockIdMap).length === 0

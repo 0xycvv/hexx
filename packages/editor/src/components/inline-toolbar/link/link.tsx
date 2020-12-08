@@ -82,7 +82,21 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
     ],
   });
   const selectionWrapper = useRef<HTMLSpanElement>();
-  const { getProps, setIsActive } = useInlineTool();
+  const { getProps, setIsActive } = useInlineTool({
+    shortcut: '⌘ + k',
+    onToggle: (isActive) => {
+      const editable = activeBlock?.editable;
+      if (!editable) {
+        return;
+      }
+      editableSnap.current = editable;
+      snapHTML.current = editable?.innerHTML;
+      const selRange = saveSelection();
+      if (!selRange) return;
+      selectionWrapper.current = highlight(selRange);
+      popper.setActive(!isActive);
+    },
+  });
 
   useEventChangeSelection(() => {
     const [isAnchor, url] = isAnchorElement();
@@ -94,18 +108,6 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
     <>
       <IconWrapper
         ref={popper.setReferenceElement}
-        onClick={() => {
-          const editable = activeBlock?.editable;
-          if (!editable) {
-            return;
-          }
-          editableSnap.current = editable;
-          snapHTML.current = editable?.innerHTML;
-          const selRange = saveSelection();
-          if (!selRange) return;
-          selectionWrapper.current = highlight(selRange);
-          popper.setActive((s) => !s);
-        }}
         {...getProps}
         {...props}
       >

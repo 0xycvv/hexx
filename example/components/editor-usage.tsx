@@ -5,16 +5,17 @@ import {
 } from '@hexx/editor';
 import {
   BlockMap,
+  InlineCode,
+  InlineLink,
+  InlineMarker,
   InlineToolBarPreset,
   PortalPopper,
-  InlineCode,
-  InlineMarker,
   useReactPopper,
 } from '@hexx/editor/components';
 import {
   SelectionChangePlugin,
-  Unstable_UndoPlugin,
   SelectionPlugin,
+  Unstable_UndoPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
@@ -101,6 +102,7 @@ const EditorUsage = (props: EditorProps) => {
           >
             <InlineMarker />
             <InlineCode />
+            <InlineLink />
           </InlineToolBarPreset>
         </PortalPopper>
       </Editor>
