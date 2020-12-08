@@ -1416,6 +1416,11 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@simonwep/selection-js@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@simonwep/selection-js/-/selection-js-1.7.1.tgz#bbee77c3914bd8b226294275c0ff96821230e3c6"
+  integrity sha512-3UI3SBUuhce53RV9oRExh9hEaaXn0y3vOmgxS294uRMknWfMO1D//ZJ9UqdXmwbMf6s/UMl227jHBuJK4iHMjQ==
+
 "@size-limit/file@4.9.1":
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/@size-limit/file/-/file-4.9.1.tgz#ce1798b5b4c87d6d4c0caf5ddd6ce5a7638b3307"

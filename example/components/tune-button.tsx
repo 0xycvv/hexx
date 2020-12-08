@@ -83,8 +83,8 @@ export const TuneButton = forwardRef((props: any, ref) => {
       popper.setActive(false);
     }
   }, [hoverBlock]);
-  const blockIndex = findBlockIndexById(lastHoverBlock?.id);
-  const isSelecting = blockSelect === blockIndex;
+
+  const isSelecting = blockSelect.includes(lastHoverBlock?.id);
   const currentBlockData =
     lastHoverBlock?.id && IdMap[lastHoverBlock.id];
 
@@ -110,6 +110,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
               return (
                 <Icon
                   key={i}
+                  title={tune.icon.text}
                   as={tune.icon.svg}
                   color={
                     tune.icon.isActive(currentBlockData.data)

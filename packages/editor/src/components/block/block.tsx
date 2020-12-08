@@ -27,9 +27,9 @@ import {
 import {
   extractFragmentFromPosition,
   getSelectionRange,
+  isEditableSelectAll,
   removeRanges,
 } from '../../utils/ranges';
-import { isEditableSelectAll } from '../editable';
 import { BlockType } from '../editor';
 import { TextBlock } from './text';
 
@@ -84,7 +84,7 @@ function useBlockWrapper({
   const isHovering =
     hoverBlockId && block && hoverBlockId.id === block.id;
   const currentBlock = block && blocksMap[block.type];
-  const isBlockSelect = blockSelect === index;
+  const isBlockSelect = blockSelect.includes(block.id);
 
   const onKeyDown = (e: KeyboardEvent) => {
     setHoverBlockId(null);
@@ -159,7 +159,7 @@ function useBlockWrapper({
         index !== 0
       ) {
         removeBlockWithId({ id: block.id });
-        setBlockSelect(-1);
+        setBlockSelect([]);
         requestAnimationFrame(() => {
           const previousBlock = findBlockByIndex(index - 1);
           if (!previousBlock) {
@@ -213,7 +213,7 @@ function useBlockWrapper({
         if (!ref.current) return;
         const editable = findContentEditable(ref.current);
         if (!editable) {
-          setBlockSelect(index);
+          setBlockSelect([block.id]);
           e.stopPropagation();
         }
         setHoverBlockId({
@@ -225,7 +225,7 @@ function useBlockWrapper({
     isBlockSelect,
     isEditorSelectAll,
     setIsBlockSelect: (value: boolean) => {
-      setBlockSelect(value ? index : -1);
+      setBlockSelect(value ? [block.id] : []);
     },
   };
 }
@@ -242,8 +242,6 @@ const SortableItem = SortableElement(
   ({
     blockComponent,
     block,
-    index,
-    children,
     isBlockSelect,
     isEditorSelectAll,
     selectInputRef,
@@ -256,7 +254,6 @@ const SortableItem = SortableElement(
           index: i,
           config: blockComponent.block.config,
         })}
-        {children}
         {(isBlockSelect || isEditorSelectAll) && (
           <SortableOverlay selectInputRef={selectInputRef} />
         )}
@@ -266,7 +263,7 @@ const SortableItem = SortableElement(
   },
 );
 
-export function Block({ block, index, children, css }: BlockProps) {
+export function Block({ block, index, css }: BlockProps) {
   const {
     selectInputRef,
     getBlockProps,
@@ -293,15 +290,13 @@ export function Block({ block, index, children, css }: BlockProps) {
         blockComponent={blockComponent}
         index={index}
         i={index}
-      >
-        {children}
-      </SortableItem>
+      />
     </Wrapper>
   );
 }
 
 const SortableOverlay = SortableHandle(({ selectInputRef }) => (
-  <SelectOverlay>
+  <SelectOverlay className="hexx-block-overlay">
     <input ref={selectInputRef} autoFocus style={{ opacity: 0 }} />
   </SelectOverlay>
 ));

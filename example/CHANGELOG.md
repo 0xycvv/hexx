@@ -1,5 +1,23 @@
 # example
 
+## 0.4.0
+
+### Minor Changes
+
+- 0a55c55: Add selection plugin
+
+### Patch Changes
+
+- fix link tool
+- 674f920: add link shortcut
+- 98db114: Add svg title
+- Updated dependencies [undefined]
+- Updated dependencies [98db114]
+- Updated dependencies [0a55c55]
+- Updated dependencies [674f920]
+- Updated dependencies [98db114]
+  - @hexx/editor@0.5.0
+
 ## 0.3.2
 
 ### Patch Changes

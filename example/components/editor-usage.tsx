@@ -5,14 +5,16 @@ import {
 } from '@hexx/editor';
 import {
   BlockMap,
+  InlineCode,
+  InlineLink,
+  InlineMarker,
   InlineToolBarPreset,
   PortalPopper,
-  InlineCode,
-  InlineMarker,
   useReactPopper,
 } from '@hexx/editor/components';
 import {
   SelectionChangePlugin,
+  SelectionPlugin,
   Unstable_UndoPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
@@ -76,6 +78,7 @@ const EditorUsage = (props: EditorProps) => {
         blockMap={BlockMap}
       >
         <Unstable_UndoPlugin />
+        <SelectionPlugin />
         <SelectionChangePlugin
           onSelectionChange={(range) => {
             const rect = range.getBoundingClientRect();
@@ -99,6 +102,7 @@ const EditorUsage = (props: EditorProps) => {
           >
             <InlineMarker />
             <InlineCode />
+            <InlineLink />
           </InlineToolBarPreset>
         </PortalPopper>
       </Editor>

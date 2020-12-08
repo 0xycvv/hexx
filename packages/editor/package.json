@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "main": "dist/hexx-editor.cjs.js",
   "module": "dist/hexx-editor.esm.js",
   "preconstruct": {
@@ -31,6 +31,7 @@
     "@hexx/renderer": "^0.2.1",
     "@hexx/theme": "^0.1.2",
     "@popperjs/core": "^2.5.4",
+    "@simonwep/selection-js": "^1.7.1",
     "hast-util-to-dom": "^2.0.6",
     "jotai": "^0.11.2",
     "react-contenteditable": "^3.3.5",

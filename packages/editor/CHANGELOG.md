@@ -1,5 +1,18 @@
 # @hexx/editor
 
+## 0.5.0
+
+### Minor Changes
+
+- 0a55c55: Add selection plugin
+
+### Patch Changes
+
+- fix link tool
+- 98db114: add underline shortcut
+- 674f920: add link shortcut
+- 98db114: Add svg title
+
 ## 0.4.2
 
 ### Patch Changes

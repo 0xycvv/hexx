@@ -1,15 +1,18 @@
-import { useAtom } from 'jotai';
-import { useRef, useState } from 'react';
 import { StitchesProps, styled } from '@hexx/theme';
-import { activeBlockIdAtom } from '../../../constants/atom';
-import { saveSelection } from '../../../utils/ranges';
-import Link from '../../icons/link';
-import { useReactPopper } from '../../popper/use-react-popper';
-import { PortalPopper } from '../../popper/portal-popper';
+import { useAtom } from 'jotai';
+import { useEffect, useRef, useState } from 'react';
 import {
+  ActiveBlock,
+  activeBlockIdAtom,
+} from '../../../constants/atom';
+import { getSelectionRange } from '../../../utils/ranges';
+import Link from '../../icons/link';
+import { PortalPopper } from '../../popper/portal-popper';
+import { useReactPopper } from '../../popper/use-react-popper';
+import {
+  isAnchorElement,
   useEventChangeSelection,
   useInlineTool,
-  isAnchorElement,
 } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 
@@ -48,11 +51,9 @@ const Input = styled('input', {
 
 function highlight(r: Range | null) {
   if (!r) return;
-
   const el = document.createElement('span');
-  el.style.borderRadius = '1px';
-  el.style.background = 'rgba(45, 170, 219, 0.3)';
-  el.style.boxShadow = '0 0 0 3px rgba(45, 170, 219, 0.3)';
+  el.classList.add('hexx-link-target');
+  el.style.backgroundColor = 'rgba(45, 170, 219, 0.3)';
   r.surroundContents(el);
   return el;
 }
@@ -60,6 +61,9 @@ function highlight(r: Range | null) {
 export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
   const [activeBlock] = useAtom(activeBlockIdAtom);
   const [initialValue, setInitialValue] = useState('');
+  const [currentActiveBlock, setCurrentActiveBlock] = useState<
+    ActiveBlock
+  >(null);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
@@ -68,7 +72,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
       if (!hasChanged && snapHTML.current && editableSnap.current) {
         editableSnap.current.innerHTML = snapHTML.current;
         editableSnap.current.focus();
-        document.execCommand('formatBlock', false, 'p');
+        document.execCommand('removeFormat');
       }
     },
     placement: 'bottom',
@@ -82,7 +86,25 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
     ],
   });
   const selectionWrapper = useRef<HTMLSpanElement>();
-  const { getProps, setIsActive } = useInlineTool();
+  const { getProps, setIsActive } = useInlineTool({
+    shortcut: '⌘ + k',
+    onToggle: (isActive) => {
+      const selRange = getSelectionRange();
+      const editable = activeBlock?.editable;
+      if (!editable) {
+        return;
+      }
+      setCurrentActiveBlock(activeBlock);
+      editableSnap.current = editable;
+      snapHTML.current = editable?.innerHTML;
+      if (!selRange) return;
+      selectionWrapper.current = highlight(selRange);
+      document.execCommand('formatBlock', false, 'p');
+      requestAnimationFrame(() => {
+        popper.setActive((s) => !s);
+      });
+    },
+  });
 
   useEventChangeSelection(() => {
     const [isAnchor, url] = isAnchorElement();
@@ -94,108 +116,78 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
     <>
       <IconWrapper
         ref={popper.setReferenceElement}
-        onClick={() => {
-          const editable = activeBlock?.editable;
-          if (!editable) {
-            return;
-          }
-          editableSnap.current = editable;
-          snapHTML.current = editable?.innerHTML;
-          const selRange = saveSelection();
-          if (!selRange) return;
-          selectionWrapper.current = highlight(selRange);
-          popper.setActive((s) => !s);
-        }}
         {...getProps}
         {...props}
       >
         <Link title="link" />
-      </IconWrapper>
-      <PortalPopper popper={popper} pointerEvent="auto">
-        <LinkInput
-          defaultValue={initialValue}
-          onClose={(value) => {
-            const selection = window.getSelection();
-            const r = document.createRange();
-            if (!selectionWrapper.current || !selection) {
-              return;
-            }
-            r.selectNodeContents(selectionWrapper.current);
-            selection.removeAllRanges();
-            selection.addRange(r);
-
-            selectionWrapper.current.style.borderBottom =
-              '0.05em solid';
-            selectionWrapper.current.style.borderColor =
-              'rgba(55,53,47,0.4)';
-            selectionWrapper.current.style.background = '';
-            selectionWrapper.current.style.boxShadow = '';
-            selectionWrapper.current.style.borderRadius = '';
-            setHasChanged(true);
-            document.execCommand('createLink', false, value);
-            if (selection.anchorNode?.parentElement) {
-              selection.anchorNode.parentElement.setAttribute(
-                'target',
-                '_blank',
+        <PortalPopper popper={popper} pointerEvent="auto">
+          <LinkInput
+            defaultValue={initialValue}
+            onClose={(value) => {
+              const selection = window.getSelection();
+              const r = document.createRange().cloneRange();
+              if (!selectionWrapper.current || !r || !selection) {
+                return;
+              }
+              // @ts-ignore
+              const target = currentActiveBlock?.blockEl?.querySelector(
+                '.hexx-link-target',
               );
-              selection.anchorNode.parentElement.setAttribute(
-                'rel',
-                'noopener noreferrer',
-              );
-              editableSnap.current?.focus();
+              if (!target) return;
+              r.selectNodeContents(target);
+              selection.removeAllRanges();
+              selection.addRange(r);
+              setHasChanged(true);
               document.execCommand('removeFormat');
-              popper.setActive(false);
-              setIsActive(false);
-            }
-          }}
-        />
-      </PortalPopper>
-    </>
-  );
-}
-
-function LinkInput(props: {
-  onClose: (value?: string) => void;
-  defaultValue?: string;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <>
-      <LinkWrapper>
-        <InputWrapper>
-          <Input
-            onFocus={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            defaultValue={props.defaultValue}
-            autoFocus
-            ref={ref}
-            type="url"
-            pattern="https?://.+"
-            placeholder="Paste link or type to search"
-            onMouseUp={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                props.onClose(ref.current?.value);
-                e.preventDefault();
-                e.stopPropagation();
+              target.classList.remove('hexx-link-target');
+              document.execCommand('createLink', false, value);
+              if (selection.anchorNode?.parentElement) {
+                selection.anchorNode.parentElement.setAttribute(
+                  'target',
+                  '_blank',
+                );
+                selection.anchorNode.parentElement.setAttribute(
+                  'rel',
+                  'noopener noreferrer',
+                );
+                editableSnap.current?.focus();
+                popper.setActive(false);
+                setIsActive(false);
               }
             }}
           />
-        </InputWrapper>
-      </LinkWrapper>
+        </PortalPopper>
+      </IconWrapper>
     </>
   );
 }
+
+const LinkInput = (props) => {
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
+  return (
+    <LinkWrapper>
+      <InputWrapper>
+        <Input
+          ref={ref}
+          defaultValue={props.defaultValue}
+          autoFocus
+          type="url"
+          pattern="https?://.+"
+          placeholder="Paste link or type to search"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              props.onClose(ref?.current?.value);
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+        />
+      </InputWrapper>
+    </LinkWrapper>
+  );
+};

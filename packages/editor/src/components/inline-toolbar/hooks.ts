@@ -2,29 +2,75 @@ import { useCallback, useState } from 'react';
 import { getSelectionRange } from '../../utils/ranges';
 import { useEventListener } from '../../hooks/use-event-listener';
 import { useLatestRef } from '../../hooks/use-latest-ref';
+import { usePlugin } from '../../plugins';
+import { commandKey } from '../../constants/key';
 
 export interface UseInlineToolConfig {
   type?: string;
+  shortcut?: string;
+  onToggle: (active: boolean) => void;
 }
 
-export function useInlineTool() {
+const getShortcutArray = (shortcut: string) =>
+  shortcut.split('+').map((s) => s.trim());
+
+const COMMAND_SYMBOL = '⌘';
+
+const commandCombo = (shortcut?: string) => {
+  if (!shortcut) {
+    return [false, null] as const;
+  }
+  const shortcuts = getShortcutArray(shortcut);
+  const hasCommand = shortcuts.includes(COMMAND_SYMBOL);
+
+  return [
+    hasCommand,
+    shortcuts.filter((s) => s !== COMMAND_SYMBOL)[0],
+  ] as const;
+};
+
+export function useInlineTool({
+  shortcut,
+  onToggle,
+}: {
+  shortcut?: string;
+  onToggle: (active: boolean) => void;
+}) {
   const [isActive, setIsActive] = useState(false);
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
   }, []);
+  const { wrapperRef } = usePlugin();
+  const [isCommandCombo, key] = commandCombo(shortcut);
+
+  useEventListener(
+    'keydown',
+    (e) => {
+      if (isCommandCombo && key && e[commandKey] && e.key === key) {
+        onToggle(isActive);
+      }
+    },
+    wrapperRef,
+  );
 
   return {
     isActive,
     setIsActive,
     getProps: {
       onMouseDown,
+      onClick: (e) => {
+        onToggle(isActive);
+      },
       color: isActive ? ('active' as const) : ('inactive' as const),
     },
   };
 }
 
 export function useDefaultInlineTool(props: UseInlineToolConfig) {
-  const inlineTool = useInlineTool();
+  const inlineTool = useInlineTool({
+    shortcut: props.shortcut,
+    onToggle: props.onToggle,
+  });
   const handler = useCallback(() => {
     if (props.type) {
       const commandState = document.queryCommandState(props.type);

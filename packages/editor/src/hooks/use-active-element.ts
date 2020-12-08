@@ -34,8 +34,10 @@ export const useActiveBlockId = () => {
 
   useEffect(() => {
     document.addEventListener('mouseup', handleClick);
+    document.addEventListener('keyup', handleClick);
     return () => {
       document.removeEventListener('mouseup', handleClick);
+      document.removeEventListener('keyup', handleClick);
     };
   }, []);
 

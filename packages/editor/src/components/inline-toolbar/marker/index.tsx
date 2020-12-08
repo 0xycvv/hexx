@@ -11,7 +11,20 @@ export function InlineMarker({
 }: {
   highlightColor?: string;
 }) {
-  const { getProps, isActive, setIsActive } = useInlineTool();
+  const { getProps, setIsActive } = useInlineTool({
+    onToggle: (isActive) => {
+      if (isActive) {
+        document.execCommand('removeFormat');
+      } else {
+        // https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-removeformat-command
+        // `removeFormat` for `mark` should be supported?
+        surround('span', {
+          backgroundColor: 'rgba(228, 178, 2, 0.18)',
+        });
+        setIsActive(true);
+      }
+    },
+  });
 
   useEventChangeSelection(() => {
     const r = getSelectionRange();
@@ -30,21 +43,7 @@ export function InlineMarker({
   });
 
   return (
-    <IconWrapper
-      {...getProps}
-      onClick={() => {
-        if (isActive) {
-          document.execCommand('removeFormat');
-        } else {
-          // https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-removeformat-command
-          // `removeFormat` for `mark` should be supported?
-          surround('span', {
-            backgroundColor: 'rgba(228, 178, 2, 0.18)',
-          });
-          setIsActive(true);
-        }
-      }}
-    >
+    <IconWrapper {...getProps}>
       <SvgMarker title="marker" />
     </IconWrapper>
   );

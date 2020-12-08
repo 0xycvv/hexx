@@ -38,20 +38,3 @@ export const Editable = forwardRef<any, ContentEditableProps>(
     />
   ),
 );
-
-export const isEditableSelectAll = () => {
-  const sel = getSelection();
-  if (!sel) return;
-  if (sel.type === 'Caret') {
-    if (!sel.anchorOffset && sel.isCollapsed) {
-      return true;
-    }
-    return false;
-  }
-  if (sel.type === 'Range') {
-    if (!sel.anchorOffset) {
-      return true;
-    }
-    return false;
-  }
-};

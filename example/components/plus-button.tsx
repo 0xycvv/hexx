@@ -125,7 +125,8 @@ export function PlusButton() {
         >
           {Object.entries(blockMap).map(([key, blockType]) => (
             <Fragment key={key}>
-              {createElement(blockType.block.icon.svg, {
+              {createElement(blockType.block.icon?.svg, {
+                title: blockType.block.icon?.text ?? '',
                 onClick: (e: MouseEvent) => {
                   insertBlockAfter({
                     block: {
