@@ -83,8 +83,8 @@ export const TuneButton = forwardRef((props: any, ref) => {
       popper.setActive(false);
     }
   }, [hoverBlock]);
-  const blockIndex = findBlockIndexById(lastHoverBlock?.id);
-  const isSelecting = blockSelect === blockIndex;
+
+  const isSelecting = blockSelect.includes(lastHoverBlock?.id);
   const currentBlockData =
     lastHoverBlock?.id && IdMap[lastHoverBlock.id];
 

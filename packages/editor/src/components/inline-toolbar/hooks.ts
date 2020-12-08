@@ -42,6 +42,7 @@ export function useInlineTool({
   }, []);
   const { wrapperRef } = usePlugin();
   const [isCommandCombo, key] = commandCombo(shortcut);
+
   useEventListener(
     'keydown',
     (e) => {
@@ -57,7 +58,9 @@ export function useInlineTool({
     setIsActive,
     getProps: {
       onMouseDown,
-      onClick: () => onToggle(isActive),
+      onClick: (e) => {
+        onToggle(isActive);
+      },
       color: isActive ? ('active' as const) : ('inactive' as const),
     },
   };

@@ -10,16 +10,6 @@ export function removeRanges() {
   }
 }
 
-export function saveSelection() {
-  const selection = window.getSelection();
-  if (!selection) {
-    return;
-  }
-  return selection.rangeCount === 0
-    ? undefined
-    : selection.getRangeAt(0);
-}
-
 export function restoreSelection(range?: Range) {
   const selection = window.getSelection();
   if (!selection || !range) {
