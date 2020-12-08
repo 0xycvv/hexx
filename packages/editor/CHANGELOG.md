@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.5.1
+
+### Patch Changes
+
+- multiple selection drag
+
 ## 0.5.0
 
 ### Minor Changes

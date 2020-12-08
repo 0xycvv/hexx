@@ -8,6 +8,7 @@ import {
   ReactNode,
   useEffect,
   useImperativeHandle,
+  useState,
 } from 'react';
 import {
   SortableContainer,
@@ -121,7 +122,11 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   }, [blockIdList, blockIdMap]);
 
   const handleClick = (e: MouseEvent) => {
-    if (blockSelect.length > 0 && !uiState.isDragging) {
+    if (
+      blockSelect.length > 0 &&
+      !uiState.isDragging &&
+      !uiState.isSorting
+    ) {
       setBlockSelect([]);
       return;
     }
@@ -155,11 +160,27 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     newIndex,
     oldIndex,
   }) => {
-    const newBlocks = [...blockIdList];
-    const dragBlock = newBlocks.splice(oldIndex, 1);
-    newBlocks.splice(newIndex, 0, dragBlock[0]);
-    setBlockIdList(newBlocks);
-    setUIState((s) => ({ ...s, isDragging: false }));
+    if (blockSelect.length > 1) {
+      const items = blockIdList.filter(
+        (v) => !blockSelect.includes(v),
+      );
+      const newBlocks = [
+        ...items.slice(0, newIndex),
+        ...blockSelect,
+        ...items.slice(newIndex, items.length),
+      ];
+      setBlockIdList(newBlocks);
+    } else {
+      const newBlocks = [...blockIdList];
+      const dragBlock = newBlocks.splice(oldIndex, 1);
+      newBlocks.splice(newIndex, 0, dragBlock[0]);
+      setBlockIdList(newBlocks);
+    }
+    setUIState((s) => ({
+      ...s,
+      isSorting: false,
+      sortingItemKey: undefined,
+    }));
   };
 
   useImperativeHandle(ref, () => ({
@@ -197,13 +218,30 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
-        onSortStart={() => {
-          setUIState((s) => ({ ...s, isDragging: true }));
+        updateBeforeSortStart={({ index }) => {
+          setUIState((s) => ({
+            ...s,
+            isSorting: true,
+            sortingItemKey: blockIdList[index],
+          }));
         }}
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
-        blockIdList={blockIdList}
+        blockIdList={blockIdList.filter((id) => {
+          // Do not hide the ghost of the element currently being sorted
+          if (uiState.sortingItemKey === id) {
+            return true;
+          }
+
+          // Hide the other items that are selected
+          if (uiState.isSorting && blockSelect.includes(id)) {
+            return false;
+          }
+
+          // Do not hide any other items
+          return true;
+        })}
         blockIdMap={blockIdMap}
       />
       {props.tuneButton}

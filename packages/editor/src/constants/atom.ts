@@ -24,10 +24,13 @@ editorDefaultBlockAtom.scope = _hexxScope;
 // UI
 type UIState = {
   isDragging: boolean;
+  isSorting: boolean;
+  sortingItemKey?: string;
 };
 
 export const uiStateAtom = atom<UIState>({
   isDragging: false,
+  isSorting: false,
 });
 
 uiStateAtom.scope = _hexxScope;
