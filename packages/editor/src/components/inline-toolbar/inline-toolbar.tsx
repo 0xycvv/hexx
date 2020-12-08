@@ -118,7 +118,7 @@ export function InlineUnderline(
         document.execCommand('underline', false);
       }}
     >
-      <Underlined title="underlined" />
+      <Underlined title="underline" />
     </DefaultInlineTool>
   );
 }
