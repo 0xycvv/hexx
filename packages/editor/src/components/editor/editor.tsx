@@ -6,11 +6,11 @@ import {
   MouseEvent,
   MutableRefObject,
   ReactNode,
+  useEffect,
   useImperativeHandle,
 } from 'react';
 import {
   SortableContainer,
-  SortableElement,
   SortEndHandler,
 } from 'react-sortable-hoc';
 import { v4 } from 'uuid';
@@ -24,6 +24,7 @@ import {
   editorWrapperAtom,
   isEditorSelectAllAtom,
   redo,
+  uiStateAtom,
   undo,
   _blockIdListAtom,
   _blocksIdMapAtom,
@@ -99,6 +100,7 @@ interface HexxHandler {
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [id] = useAtom(editorIdAtom);
+  const [uiState, setUIState] = useAtom(uiStateAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
   const active = useActiveBlockId();
@@ -107,11 +109,24 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     isEditorSelectAllAtom,
   );
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
-  const { insertBlock, clear } = useEditor();
+  const { insertBlock, clear, batchRemoveBlocks } = useEditor();
+
+  useEffect(() => {
+    console.log(
+      blockIdList.length === 0,
+      Object.keys(blockIdMap).length === 0,
+    );
+    if (
+      blockIdList.length === 0 ||
+      Object.keys(blockIdMap).length === 0
+    ) {
+      insertBlock({ block: props.defaultBlock, index: 0 });
+    }
+  }, [blockIdList, blockIdMap]);
 
   const handleClick = (e: MouseEvent) => {
-    if (blockSelect > -1) {
-      setBlockSelect(-1);
+    if (blockSelect.length > 0 && !uiState.isDragging) {
+      setBlockSelect([]);
       return;
     }
     if (isSelectAll) {
@@ -144,11 +159,11 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     newIndex,
     oldIndex,
   }) => {
-    setBlockSelect(newIndex);
     const newBlocks = [...blockIdList];
     const dragBlock = newBlocks.splice(oldIndex, 1);
     newBlocks.splice(newIndex, 0, dragBlock[0]);
     setBlockIdList(newBlocks);
+    setUIState((s) => ({ ...s, isDragging: false }));
   };
 
   useImperativeHandle(ref, () => ({
@@ -177,12 +192,18 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             focusLastBlock();
             lastCursor();
           });
+        } else if (e.key === BackspaceKey && blockSelect.length > 0) {
+          batchRemoveBlocks({ ids: blockSelect });
+          setBlockSelect([]);
         }
       }}
     >
       <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
+        onSortStart={() => {
+          setUIState((s) => ({ ...s, isDragging: true }));
+        }}
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}

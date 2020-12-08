@@ -21,6 +21,17 @@ export const editorDefaultBlockAtom = atom<
 });
 editorDefaultBlockAtom.scope = _hexxScope;
 
+// UI
+type UIState = {
+  isDragging: boolean;
+};
+
+export const uiStateAtom = atom<UIState>({
+  isDragging: false,
+});
+
+uiStateAtom.scope = _hexxScope;
+
 type ActiveBlock = {
   id: string;
   editable?: HTMLDivElement;
@@ -34,7 +45,8 @@ activeBlockIdAtom.scope = _hexxScope;
 
 export const isEditorSelectAllAtom = atom<boolean>(false);
 isEditorSelectAllAtom.scope = _hexxScope;
-export const blockSelectAtom = atom(-1);
+
+export const blockSelectAtom = atom<string[]>([]);
 
 blockSelectAtom.scope = _hexxScope;
 

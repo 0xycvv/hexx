@@ -83,8 +83,7 @@ export function useEditor() {
   };
 
   const selectBlock = (id?: string) => {
-    const index = findBlockIndexById(id);
-    setBlockSelect(index);
+    setBlockSelect(id ? [id] : []);
   };
 
   const insertBlockAfter = ({
@@ -184,6 +183,10 @@ export function useEditor() {
     setIdList((s) => s.filter((s) => s !== id));
   };
 
+  const batchRemoveBlocks = ({ ids }: { ids: string[] }) => {
+    setIdList((s) => s.filter((s) => !ids.includes(s)));
+  };
+
   const splitBlock = ({
     index,
     block,
@@ -218,6 +221,7 @@ export function useEditor() {
     splitBlock,
     updateBlockDataWithId,
     setIdMap,
+    batchRemoveBlocks,
     removeBlockWithId,
     batchInsertBlocks,
     clear,
