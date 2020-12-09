@@ -3,7 +3,7 @@ import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
-import { css, styled } from '@hexx/theme';
+import { css, styled, BlockProps, applyBlock } from '@hexx/theme';
 import {
   findContentEditable,
   lastCursor,
@@ -11,12 +11,15 @@ import {
 import { extractFragmentFromPosition } from '../../utils/ranges';
 import { Editable } from '../editable';
 import { list as ListSvg } from '../icons';
-import { BlockProps } from './block';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
 
-export function ListBlock({ index, block, config }: BlockProps) {
+function _ListBlock({
+  index,
+  block,
+  config,
+}: BlockProps<List['data']>) {
   const ref = React.useRef<HTMLElement>(null);
   const [
     activeListItemIndex,
@@ -146,7 +149,7 @@ function ListItem(props: {
   );
 }
 
-ListBlock.block = {
+export const ListBlock = applyBlock(_ListBlock, {
   type: 'list',
   icon: {
     text: 'List',
@@ -185,7 +188,7 @@ ListBlock.block = {
     },
   ],
   isEmpty: (data) => data.items.length === 0,
-};
+});
 
 function insertItemAtIndex(arr, index, newValue) {
   return [...arr.slice(0, index), newValue, ...arr.slice(index)];

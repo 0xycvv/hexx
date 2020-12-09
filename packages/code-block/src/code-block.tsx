@@ -1,11 +1,14 @@
 import { composeRef, lastCursor, useBlock } from '@hexx/editor';
 import { BlockProps, Editable } from '@hexx/editor/components';
-import { css } from '@hexx/theme';
+import { css, applyBlock } from '@hexx/theme';
 import { useEffect, useRef } from 'react';
-import { codeBlockStyle } from './renderer';
+import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
 
-export function CodeBlock({ block, config, index }: BlockProps) {
+function _CodeBlock({
+  block,
+  index,
+}: BlockProps<TCodeBlock['data']>) {
   const { update, register } = useBlock(block.id, index);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,8 +40,9 @@ export function CodeBlock({ block, config, index }: BlockProps) {
   );
 }
 
-CodeBlock.block = {
+export const CodeBlock = applyBlock(_CodeBlock, {
   type: 'code',
+  isEmpty: (d) => !d.value?.trim(),
   icon: {
     text: 'Code Block',
     svg: SvgCode,
@@ -48,7 +52,6 @@ CodeBlock.block = {
     in: ({ lang, value }) => ({ value, lang }),
   },
   defaultValue: {
-    code: '',
+    value: '',
   },
-  isEmpty: (d) => !d.code?.trim(),
-};
+});

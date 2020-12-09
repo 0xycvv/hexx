@@ -1,15 +1,18 @@
 import * as React from 'react';
 import * as mdast from 'mdast';
-import { quoteStyle } from '@hexx/renderer';
+import { quoteStyle, Quote } from '@hexx/renderer';
 import composeRefs from '../..//hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
-import { css } from '@hexx/theme';
+import { css, applyBlock, BlockProps } from '@hexx/theme';
 import { lastCursor } from '../..//utils/find-blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
-import { BlockProps } from './block';
 
-export function QuoteBlock({ block, config, index }: BlockProps) {
+function _QuoteBlock({
+  block,
+  config,
+  index,
+}: BlockProps<Quote['data'], { placeholder: string }>) {
   const { update, register } = useBlock(block.id, index);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -20,7 +23,7 @@ export function QuoteBlock({ block, config, index }: BlockProps) {
   return (
     <blockquote className={css(quoteStyle.wrapper)}>
       <Editable
-        placeholder={config.placeholder}
+        placeholder={config?.placeholder}
         className={css(quoteStyle.text)}
         onChange={(evt) => {
           update({
@@ -35,7 +38,7 @@ export function QuoteBlock({ block, config, index }: BlockProps) {
   );
 }
 
-QuoteBlock.block = {
+export const QuoteBlock = applyBlock(_QuoteBlock, {
   type: 'quote',
   icon: {
     text: 'Quote',
@@ -55,4 +58,4 @@ QuoteBlock.block = {
     alignment: 'left',
   },
   isEmpty: (d) => !d.text?.trim(),
-};
+});

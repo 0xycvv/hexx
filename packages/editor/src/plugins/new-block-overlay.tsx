@@ -1,4 +1,5 @@
 import { styled } from '@hexx/theme';
+import { ReactNode } from 'react';
 import { useActiveBlockId } from '../hooks/use-active-element';
 import { findLastBlock } from '../utils/find-blocks';
 import { usePlugin } from './plugin';
@@ -11,7 +12,9 @@ const NewBlockOverlay = styled('div', {
   bottom: 0,
 });
 
-export function NewBlockOverlayPlugin() {
+export function NewBlockOverlayPlugin(props: {
+  children?: ReactNode;
+}) {
   const {
     editor,
     uiState: [uiState],
@@ -54,5 +57,9 @@ export function NewBlockOverlayPlugin() {
       active?.editable?.focus();
     }
   };
-  return <NewBlockOverlay onClick={handleClick} />;
+  return (
+    <NewBlockOverlay onClick={handleClick}>
+      {props.children}
+    </NewBlockOverlay>
+  );
 }

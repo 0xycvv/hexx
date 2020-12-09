@@ -5,5 +5,3 @@ export * from './inline-toolbar/code';
 export * from './inline-toolbar/marker';
 export * from './default-block-map';
 export * from './editable';
-
-export type { BlockProps } from './block/block';
