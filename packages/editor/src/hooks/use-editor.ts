@@ -215,6 +215,7 @@ export function useEditor() {
 
   return {
     // method
+    setIdList,
     findBlockIndexById,
     insertBlock,
     insertBlockAfter,

@@ -18,9 +18,15 @@ import {
   Unstable_UndoPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
+import { CodeBlock } from '@hexx/code-block';
 import { ElementRef, useRef } from 'react';
 import { PlusButton } from './plus-button';
 import { TuneButton } from './tune-button';
+
+const blockMap = {
+  ...BlockMap,
+  code: CodeBlock,
+};
 
 const EditorUsage = (props: EditorProps) => {
   const editorRef = useRef<ElementRef<typeof Editor>>();
@@ -75,7 +81,7 @@ const EditorUsage = (props: EditorProps) => {
           margin: 'auto',
         }}
         {...props}
-        blockMap={BlockMap}
+        blockMap={blockMap}
       >
         <Unstable_UndoPlugin />
         <SelectionPlugin />

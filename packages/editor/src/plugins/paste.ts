@@ -1,125 +1,88 @@
 import toDOM from 'hast-util-to-dom';
-import { useMemo } from 'react';
+import { Parent } from 'mdast';
+import toHast from 'mdast-util-to-hast';
 import { useEventListener } from '../hooks';
-import { processor } from '../parser/html/html';
+import {
+  htmlToMdast,
+  isAvailableBlockContent,
+} from '../parser/html/parser';
+import { useBlockMdast } from '../parser/markdown/use-block-mdast';
 import { usePlugin } from './plugin';
-
-export interface ReHypeTree {
-  type: string;
-  tagName: string;
-  properties: string;
-  value?: string;
-  children?: ReHypeTree;
-}
+import fromMarkdown from 'mdast-util-from-markdown';
+import { AllMdastConfig } from '../parser/types';
 
 export function PastHtmlPlugin() {
-  const {
-    wrapperRef,
-    editor,
-    activeBlock,
-    defaultBlock,
-  } = usePlugin();
-  const {
-    idList,
-    setIdMap,
-    blockMap,
-    batchInsertBlocks,
-  } = editor;
-
-  const allPasteConfig = useMemo(() => {
-    let result: Record<
-      string,
-      {
-        type: string;
-        onPaste?: Function;
-      }
-    > = {};
-    const arrayTagsConfig = Object.values(blockMap)
-      .map((map) => {
-        if (map.block?.paste) {
-          return {
-            key: map.block.type,
-            ...map.block.paste,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean) as {
-      tags: string[];
-      key: string;
-      onPaste?: Function;
-    }[];
-    for (const config of arrayTagsConfig) {
-      for (const tag of config.tags) {
-        result[tag] = {
-          type: config.key,
-          onPaste: config.onPaste,
-        };
-      }
-    }
-    return result;
-  }, []);
+  const { wrapperRef, editor, activeBlock } = usePlugin();
+  const { idList, batchInsertBlocks } = editor;
+  const { allMdastConfig } = useBlockMdast();
 
   useEventListener(
     'paste',
     (e) => {
       const html = e.clipboardData?.getData('text/html');
-      if (!html) return;
-      try {
-        const htmlAST = processor.parse(html) as any;
-        let slots: any = [];
-        let results: any[] = [];
-        for (const children of htmlAST.children) {
-          if (children.tagName === 'meta') {
-            continue;
-          }
-          if (children.tagName in allPasteConfig) {
-            if (slots.length > 0) {
-              results.push({
-                type: defaultBlock.type,
-                data: {
-                  text: toDOM({
-                    type: 'element',
-                    tagName: 'p',
-                    children: slots,
-                  }).outerHTML,
-                },
-              });
-            }
-            let block = {
-              type: allPasteConfig[children.tagName].type,
-              data:
-                typeof allPasteConfig[children.tagName].onPaste ===
-                'function'
-                  ? allPasteConfig[children.tagName].onPaste!(
-                      children,
-                      toDOM,
-                    )
-                  : null,
-            };
-            results.push(block);
-            slots = [];
-          } else {
-            slots.push(children);
-          }
+      const text = e.clipboardData?.getData('text/plain');
+      const index = idList.findIndex((id) => id === activeBlock?.id);
+      if (html) {
+        const mdastParent = htmlToMdast(html);
+        try {
+          pushAllResultToBlock(
+            e,
+            mdastParent,
+            allMdastConfig,
+            batchInsertBlocks,
+            index,
+          );
+        } catch (error) {
+          console.error('[hexx] error when pasting html', error);
         }
-        const index = idList.findIndex(
-          (id) => id === activeBlock?.id,
-        );
-        if (results.length > 0) {
-          batchInsertBlocks({ blocks: results, index });
-          e.preventDefault();
+      } else if (text) {
+        const mdast = fromMarkdown(text) as Parent;
+        if (
+          mdast.children.length == 1 &&
+          mdast.children[0].type === 'paragraph'
+        ) {
+          return;
         }
-        if (slots.length > 0) {
-          if (activeBlock?.id) {
-            setIdMap((s) => s);
-          }
+        try {
+          pushAllResultToBlock(
+            e,
+            mdast,
+            allMdastConfig,
+            batchInsertBlocks,
+            index,
+          );
+        } catch (error) {
+          console.error('[hexx] error when pasting markdown', error);
         }
-      } catch (error) {
-        console.error('[hexx] error when pasting html', error);
       }
     },
     wrapperRef,
   );
   return null;
+}
+
+function pushAllResultToBlock(
+  e: ClipboardEvent,
+  parent: Parent,
+  allMdastConfig: AllMdastConfig,
+  batch: any,
+  index?: number,
+) {
+  let results: any[] = [];
+  for (const children of parent.children) {
+    if (isAvailableBlockContent(children, allMdastConfig)) {
+      const mdastConfig = allMdastConfig[children.type];
+      results.push({
+        type: mdastConfig.blockType,
+        data:
+          typeof mdastConfig.in === 'function'
+            ? mdastConfig.in(children, (c) => toDOM(toHast(c)))
+            : {},
+      });
+    }
+  }
+  if (results.length > 0) {
+    batch({ blocks: results, index });
+    e.preventDefault();
+  }
 }

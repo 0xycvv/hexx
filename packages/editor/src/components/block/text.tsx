@@ -1,3 +1,4 @@
+import * as mdast from 'mdast';
 import { css } from '@hexx/theme';
 import { useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
@@ -56,10 +57,10 @@ TextBlock.block = {
   defaultValue: {
     text: '',
   },
-  paste: {
-    tags: ['p', 'div'],
-    onPaste: (ast, toDOM) => ({
-      text: toDOM(ast).outerHTML,
+  mdast: {
+    type: 'paragraph',
+    in: (content: mdast.Paragraph, toHTML) => ({
+      text: toHTML(content).outerHTML,
     }),
   },
   tune: [
