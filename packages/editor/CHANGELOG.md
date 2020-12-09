@@ -1,5 +1,15 @@
 # @hexx/editor
 
+## 0.6.0
+
+### Minor Changes
+
+- ef62ba6: Add change detect plugin
+
+### Patch Changes
+
+- ef62ba6: Add DevTool
+
 ## 0.5.3
 
 ### Patch Changes
