@@ -62,34 +62,34 @@ export default function Home() {
               },
               type: 'code',
             },
-            // {
-            //   id: '1asdfs123123',
-            //   data: {
-            //     text: 'Hello World',
-            //     level: 2,
-            //   },
-            //   type: 'header',
-            // },
-            // {
-            //   id: '1asdfs',
-            //   data: {
-            //     text:
-            //       'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
-            //   },
-            //   type: 'paragraph',
-            // },
-            // {
-            //   id: 'asdfasdf',
-            //   data: {
-            //     items: ['yoyo', 'text'],
-            //   },
-            //   type: 'list',
-            // },
-            // {
-            //   id: '123',
-            //   data: {},
-            //   type: 'delimiter',
-            // },
+            {
+              id: '1asdfs123123',
+              data: {
+                text: 'Hello World',
+                level: 2,
+              },
+              type: 'header',
+            },
+            {
+              id: '1asdfs',
+              data: {
+                text:
+                  'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
+              },
+              type: 'paragraph',
+            },
+            {
+              id: 'asdfasdf',
+              data: {
+                items: ['yoyo', 'text'],
+              },
+              type: 'list',
+            },
+            {
+              id: '123',
+              data: {},
+              type: 'delimiter',
+            },
           ]}
         />
       </main>

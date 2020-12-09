@@ -32,9 +32,11 @@ import {
   _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
+import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
+import { usePlugin } from '../../plugins';
 import { PastHtmlPlugin } from '../../plugins/paste';
 import {
   findLastBlock,
@@ -99,6 +101,51 @@ interface HexxHandler {
   undo: () => void;
 }
 
+function useBlockSelectCopy() {
+  const { wrapperRef, editor } = usePlugin();
+  const { blockSelect, setIdList } = editor;
+  const handleClipboardEvent = (e: ClipboardEvent) => {
+    if (blockSelect.length > 0) {
+      setData(e);
+      e.preventDefault();
+    }
+  };
+
+  const setData = (e: ClipboardEvent) => {
+    const selectedBlockNodeList = blockSelect
+      .map((bId) =>
+        document.querySelector(`[data-block-id='${bId}']`),
+      )
+      .filter(Boolean);
+    const text = selectedBlockNodeList
+      .map((s) => s?.textContent)
+      .join('\n\n');
+
+    const htmlArray = selectedBlockNodeList.map((s) => s?.innerHTML); // TODO: xss
+    let html = document.createElement('div');
+    for (const innerHTML of htmlArray) {
+      const frag = document.createElement('p');
+      frag.innerHTML = innerHTML!;
+      html.appendChild(frag);
+    }
+    e.clipboardData?.setData('text/plain', text);
+    e.clipboardData?.setData('text/html', html.innerHTML);
+  };
+
+  useEventListener('copy', handleClipboardEvent, wrapperRef);
+  useEventListener(
+    'cut',
+    (e) => {
+      if (blockSelect.length > 0) {
+        setData(e);
+        setIdList((s) => s.filter((id) => !blockSelect.includes(id)));
+        e.preventDefault();
+      }
+    },
+    wrapperRef,
+  );
+}
+
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [id] = useAtom(editorIdAtom);
   const [uiState, setUIState] = useAtom(uiStateAtom);
@@ -155,6 +202,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       active?.editable?.focus();
     }
   };
+
+  useBlockSelectCopy();
 
   const onDragEndHandler: SortEndHandler = ({
     newIndex,
