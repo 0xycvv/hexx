@@ -24,8 +24,8 @@
     "@babel/preset-env": "^7.12.7",
     "@babel/preset-react": "^7.12.7",
     "@babel/preset-typescript": "^7.12.7",
-    "@size-limit/preset-big-lib": "^4.9.1",
     "@types/mdast": "^3.0.3",
+    "@size-limit/preset-big-lib": "^4.9.1",
     "size-limit": "^4.9.1"
   },
   "dependencies": {
@@ -44,7 +44,6 @@
     "rehype-remark": "^8.0.0",
     "remark-parse": "^9.0.0",
     "unified": "^9.2.0",
-    "use-debounce": "^5.1.0",
     "use-deep-compare-effect": "^1.5.0",
     "uuid": "^8.3.1"
   },

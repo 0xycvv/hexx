@@ -49,7 +49,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           startThreshold: 50,
 
           // Disable the selection functionality for touch devices
-          disableTouch: false,
+          disableTouch: true,
           singleClick: false,
 
           // On which point an element should be selected.
@@ -141,7 +141,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           startThreshold: 100,
 
           // Disable the selection functionality for touch devices
-          disableTouch: false,
+          disableTouch: true,
 
           // On which point an element should be selected.
           // Available modes are cover (cover the entire element), center (touch the center) or
