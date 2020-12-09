@@ -17,6 +17,7 @@ import {
   SelectionPlugin,
   Unstable_UndoPlugin,
   HexxDevTool,
+  ChangeDetectPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { CodeBlock } from '@hexx/code-block';
@@ -87,6 +88,11 @@ const EditorUsage = (props: EditorProps) => {
         <Unstable_UndoPlugin />
         <SelectionPlugin />
         <HexxDevTool />
+        <ChangeDetectPlugin
+          onChange={() => {
+            console.log('change');
+          }}
+        />
         <SelectionChangePlugin
           onSelectionChange={(range) => {
             const rect = range.getBoundingClientRect();
