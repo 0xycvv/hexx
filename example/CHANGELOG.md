@@ -1,5 +1,16 @@
 # example
 
+## 0.4.1
+
+### Patch Changes
+
+- 89972ad: copy block and paste
+- 89972ad: Markdown paste support
+- Updated dependencies [89972ad]
+- Updated dependencies [89972ad]
+  - @hexx/code-block@0.0.2
+  - @hexx/editor@0.5.2
+
 ## 0.4.0
 
 ### Minor Changes

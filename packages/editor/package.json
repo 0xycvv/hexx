@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "main": "dist/hexx-editor.cjs.js",
   "module": "dist/hexx-editor.esm.js",
   "preconstruct": {

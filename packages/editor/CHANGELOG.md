@@ -1,5 +1,12 @@
 # @hexx/editor
 
+## 0.5.2
+
+### Patch Changes
+
+- 89972ad: copy block and paste
+- 89972ad: Markdown paste support
+
 ## 0.5.1
 
 ### Patch Changes
