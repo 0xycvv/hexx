@@ -89,5 +89,5 @@ TextBlock.block = {
       updater: (data) => ({ ...data, alignment: 'right' }),
     },
   ],
-  isEmpty: (data) => !data.text.trim(),
+  isEmpty: (data) => !data.text?.trim(),
 };

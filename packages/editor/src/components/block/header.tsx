@@ -60,5 +60,5 @@ HeaderBlock.block = {
     text: '',
     level: 3,
   },
-  isEmpty: (d) => !d.text.trim(),
+  isEmpty: (d) => !d.text?.trim(),
 };

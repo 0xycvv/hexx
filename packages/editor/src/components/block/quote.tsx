@@ -54,5 +54,5 @@ QuoteBlock.block = {
     text: '',
     alignment: 'left',
   },
-  isEmpty: (d) => !d.text.trim(),
+  isEmpty: (d) => !d.text?.trim(),
 };
