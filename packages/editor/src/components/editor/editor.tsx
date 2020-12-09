@@ -37,6 +37,7 @@ import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor } from '../../hooks/use-editor';
 import { usePlugin } from '../../plugins';
+import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
 import {
   findLastBlock,
@@ -97,7 +98,6 @@ const Wrapper = styled('div', {
 interface HexxHandler {
   getData: () => BlockType[];
   focus: () => void;
-  watch: (cb: Function) => void;
   undo: () => void;
 }
 
@@ -168,41 +168,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }
   }, [blockIdList, blockIdMap]);
 
-  const handleClick = (e: MouseEvent) => {
-    if (
-      blockSelect.length > 0 &&
-      !uiState.isDragging &&
-      !uiState.isSorting
-    ) {
-      setBlockSelect([]);
-      return;
-    }
-    if (isSelectAll) {
-      setIsSelectAll(false);
-    }
-    if (!active) {
-      const lastBlock = findLastBlock();
-      if (lastBlock) {
-        if (lastBlock.editable) {
-          if ((lastBlock?.editable?.textContent?.length ?? 0) > 0) {
-            insertBlock({
-              block: props.defaultBlock,
-            });
-            lastBlock.editable?.focus();
-          } else {
-            lastBlock.editable?.focus();
-          }
-        } else {
-          insertBlock({
-            block: props.defaultBlock,
-          });
-        }
-      }
-    } else {
-      active?.editable?.focus();
-    }
-  };
-
   useBlockSelectCopy();
 
   const onDragEndHandler: SortEndHandler = ({
@@ -235,9 +200,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     getData: () => blockIdList.map((bId) => blockIdMap[bId]),
     focus: () => findLastBlock()?.editable?.focus(),
-    watch: (cb) => {
-      typeof cb === 'function' && cb();
-    },
     undo: undo,
     redo: redo,
   }));
@@ -249,7 +211,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         composeRefs(props.wrapperRef, (s) => setWrapperRef(s)) as any
       }
       className={`hexx ${css(paragraphStyle)}`}
-      onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === BackspaceKey && isSelectAll) {
           clear();
@@ -264,6 +225,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         }
       }}
     >
+      <NewBlockOverlayPlugin />
       <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
@@ -275,6 +237,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           }));
         }}
         useDragHandle
+        pressDelay={10}
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
         blockIdList={blockIdList.filter((id) => {

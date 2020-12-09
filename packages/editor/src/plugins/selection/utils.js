@@ -104,6 +104,9 @@ export function intersects(a, b, mode) {
         a.top <= b.bottom
       );
     }
+    case 'outside': {
+      return a.height > b.height + 50;
+    }
     default: {
       throw new Error(`Unkown intersection mode: ${mode}`);
     }

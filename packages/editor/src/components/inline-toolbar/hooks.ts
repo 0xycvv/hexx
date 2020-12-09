@@ -37,9 +37,6 @@ export function useInlineTool({
   onToggle: (active: boolean) => void;
 }) {
   const [isActive, setIsActive] = useState(false);
-  const onMouseDown = useCallback((e) => {
-    e.preventDefault();
-  }, []);
   const { wrapperRef } = usePlugin();
   const [isCommandCombo, key] = commandCombo(shortcut);
 
@@ -57,7 +54,6 @@ export function useInlineTool({
     isActive,
     setIsActive,
     getProps: {
-      onMouseDown,
       onClick: (e) => {
         onToggle(isActive);
       },

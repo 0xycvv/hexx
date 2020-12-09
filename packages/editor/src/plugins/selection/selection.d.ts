@@ -24,6 +24,7 @@ declare namespace Selection {
     class?: string;
     frame?: Node;
     mode?: Mode;
+    firstItemMode?: Mode | 'outside';
     tapMode?: TapMode;
     startThreshold?: number;
     singleClick?: boolean;

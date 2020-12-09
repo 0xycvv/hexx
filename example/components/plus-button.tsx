@@ -104,9 +104,8 @@ export function PlusButton() {
         <Plus
           color={menuPopper.active ? 'active' : 'inactive'}
           ref={menuPopper.setReferenceElement}
-          onClick={(e) => {
+          onClick={() => {
             menuPopper.setActive(true);
-            e.stopPropagation();
           }}
         >
           <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
@@ -118,11 +117,7 @@ export function PlusButton() {
         </Plus>
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
-        <AddMenu
-          onMouseDown={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <AddMenu>
           {Object.entries(blockMap).map(([key, blockType]) => (
             <Fragment key={key}>
               {createElement(blockType.block.icon?.svg, {
@@ -136,8 +131,6 @@ export function PlusButton() {
                     id: lastHoverBlock.id,
                   });
                   menuPopper.setActive(false);
-                  e.preventDefault();
-                  e.stopPropagation();
                 },
               })}
             </Fragment>

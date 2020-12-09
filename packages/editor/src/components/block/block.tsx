@@ -52,6 +52,7 @@ const RightIndicator = styled('div', {
 
 const SelectOverlay = styled('div', {
   position: 'absolute',
+  userSelect: 'none',
   borderRadius: 4,
   top: 0,
   left: 0,

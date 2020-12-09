@@ -83,7 +83,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           manualScrollSpeed: 750,
         })
           .on('beforestart', ({ oe }) => {
-            if (uiState.isDragging) return false;
+            if (uiState.isDragging || uiState.isSorting) return false;
             if (oe.target instanceof HTMLDivElement) {
               if (oe.target.classList.contains('hexx-block-overlay')) {
                 return false;
@@ -119,7 +119,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           })
           .on('stop', ({ inst }) => {
             // Remember selection in case the user wants to add smth in the next one
-            inst.keepSelection();
+            // inst.keepSelection();
             requestAnimationFrame(() => {
               setUIState((s) => ({ ...s, isDragging: false }));
             });
@@ -128,9 +128,9 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
     }, []);
 
     useEffect(() => {
-      if (!props.enableInputCrossSelection) {
-        return;
-      }
+      // if (!props.enableInputCrossSelection) {
+      //   return;
+      // }
       import('./selection').then(s => {
         const SelectionJs = s.default;
         inputSelectionRef.current = new SelectionJs({
@@ -147,6 +147,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           // Available modes are cover (cover the entire element), center (touch the center) or
           // the default mode is touch (just touching it).
           mode: 'touch',
+          firstItemMode: 'outside',
 
           // Behaviour on single-click
           // Available modes are 'native' (element was mouse-event target) or
@@ -174,16 +175,17 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           manualScrollSpeed: 750,
         })
           .on('beforestart', ({ oe }) => {
-            if (uiState.isDragging) return false;
+            if (uiState.isDragging || uiState.isSorting) return false;
             if (oe.target instanceof HTMLDivElement) {
               if (oe.target.classList.contains('hexx-block-overlay')) {
                 return false;
               }
-              // const isEditable =
-              //   oe.target.getAttribute('contenteditable') === 'true';
-              // if (!isEditable) {
+              const isEditable =
+                oe.target.getAttribute('contenteditable') === 'true';
+              if (isEditable) {
+                setBlockSelect([]);
               //   return true;
-              // }
+              }
               // return false;
             }
             return true;
@@ -201,7 +203,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           })
           .on('stop', ({ inst }) => {
             // Remember selection in case the user wants to add smth in the next one
-            inst.keepSelection();
+            // inst.keepSelection();
             requestAnimationFrame(() => {
               setUIState((s) => ({ ...s, isDragging: false }));
             });

@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.6.1
+
+### Patch Changes
+
+- Improve cross selection
+
 ## 0.6.0
 
 ### Minor Changes

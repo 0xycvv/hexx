@@ -28,6 +28,7 @@ function Selection(options = {}) {
         class: 'selection-area',
         frame: document,
         mode: 'touch',
+        firstItemMode: 'touch',
         tapMode: 'native',
         startThreshold: 10,
         singleClick: true,
@@ -154,7 +155,7 @@ function Selection(options = {}) {
       that.clearSelection(false);
 
       // Prevent default select event
-      on(frame, 'selectstart', preventDefault);
+      // on(frame, 'selectstart', preventDefault);
 
       // Add listener
       on(frame, ['touchmove', 'mousemove'], that._delayedTapMove, {
@@ -262,7 +263,7 @@ function Selection(options = {}) {
           abs(x + y - (_ax1 + _ay1)) >= startThreshold) ||
         (thresholdType === 'object' &&
           abs(x - _ax1) >= startThreshold.x) ||
-          abs(y - _ay1) >= startThreshold.y
+        abs(y - _ay1) >= startThreshold.y
       ) {
         off(frame, ['mousemove', 'touchmove'], that._delayedTapMove, {
           passive: false,
@@ -533,7 +534,7 @@ function Selection(options = {}) {
 
     _updatedTouchingElements() {
       const { _selected, _selectables, options, _areaDomRect } = that;
-      const { mode } = options;
+      const { mode, firstItemMode } = options;
 
       // Update
       const touched = [];
@@ -545,8 +546,14 @@ function Selection(options = {}) {
         const node = _selectables[i];
 
         // Check if area intersects element
+        const intersectsMode =
+          _selected.length === 0 ? firstItemMode : mode;
         if (
-          intersects(_areaDomRect, node.getBoundingClientRect(), mode)
+          intersects(
+            _areaDomRect,
+            node.getBoundingClientRect(),
+            intersectsMode,
+          )
         ) {
           // Check if the element wasn't present in the last selection.
           if (!_selected.includes(node)) {
@@ -760,5 +767,4 @@ Selection.utils = {
  * @param {Object} [options]
  */
 Selection.create = (options) => Selection(options);
-;
 export default Selection;
