@@ -52,7 +52,7 @@ export default function Home() {
             {
               id: '1asdfs1231231',
               data: {
-                code: ` onSubmit(e) {
+                value: ` onSubmit(e) {
       e.preventDefault();
       const job = {
         title: 'Developer',

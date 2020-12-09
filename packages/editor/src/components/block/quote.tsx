@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as mdast from 'mdast';
 import { quoteStyle } from '@hexx/renderer';
 import composeRefs from '../..//hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
@@ -43,15 +44,15 @@ QuoteBlock.block = {
   config: {
     placeholder: 'quote',
   },
+  mdast: {
+    type: 'blockquote',
+    in: (content: mdast.Blockquote, toHTML) => ({
+      text: toHTML(content).innerHTML,
+    }),
+  },
   defaultValue: {
     text: '',
     alignment: 'left',
-  },
-  paste: {
-    tags: ['blockquote'],
-    onPaste: (ast, toDOM) => ({
-      text: toDOM(ast).outerHTML,
-    }),
   },
   isEmpty: (d) => !d.text.trim(),
 };

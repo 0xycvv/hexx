@@ -18,5 +18,5 @@ export const insertArray = <T>(
 ) => [
   ...arr.slice(0, index),
   ...newItems,
-  ...arr.slice(index + newItems.length),
+  ...arr.slice(index),
 ];

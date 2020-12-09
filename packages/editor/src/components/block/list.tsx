@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
@@ -158,28 +159,12 @@ ListBlock.block = {
     items: [''],
     style: 'unordered',
   },
-  paste: {
-    tags: ['ul', 'ol'],
-    onPaste: (ast, toDom) => {
-      let { style } = ListBlock.block.defaultValue;
-      switch (ast.tagName) {
-        case 'ul':
-          style = 'unordered';
-          break;
-        case 'ol':
-          style = 'ordered';
-          break;
-        default:
-          break;
-      }
-      return {
-        style,
-        items: ast.children
-          .map((s) => toDom(s).innerHTML)
-          .filter(Boolean),
-      };
-    },
-    target: (d) => d.items,
+  mdast: {
+    type: 'list',
+    in: (content: mdast.List, toHTML) => ({
+      style: content.ordered ? 'ordered' : 'unordered',
+      items: content.children.map((child) => toHTML(child).innerHTML),
+    }),
   },
   tune: [
     {

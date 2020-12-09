@@ -1,23 +1,29 @@
-import { css, StitchesStyleObject } from '@hexx/theme';
+import { css, StitchesCssProp } from '@hexx/theme';
 import ReactHtmlParser from 'react-html-parser';
 
-export type CodeBlock = {
+export type TCodeBlock = {
   type: 'code';
   data: {
-    code: string;
+    value: string;
+    lang?: string;
   };
 };
 
-export const codeBlockStyle: StitchesStyleObject = {};
+export const codeBlockStyle: StitchesCssProp = {
+  backgroundColor: '#DAE5F4',
+  color: '#0148D1',
+  padding: '24px 32px',
+  borderRadius: '4px',
+};
 
 export const CodeBlockRenderer = ({
   data,
 }: {
-  data: CodeBlock['data'];
+  data: TCodeBlock['data'];
 }) => {
   return (
     <pre className={css(codeBlockStyle)}>
-      <code>{ReactHtmlParser(data.code)}</code>
+      <code>{ReactHtmlParser(data.value)}</code>
     </pre>
   );
 };
