@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.5.3
+
+### Patch Changes
+
+- lazy load selection js
+
 ## 0.5.2
 
 ### Patch Changes
