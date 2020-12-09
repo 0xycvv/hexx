@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { SetStateAction } from 'react';
 import { BlockType } from '../components/editor';
+import { debounce } from '../utils/debounce';
 
 export const _hexxScope = Symbol();
 
@@ -11,6 +12,7 @@ editorIdAtom.scope = _hexxScope;
 export const editorWrapperAtom = atom<HTMLElement | null>(null);
 editorWrapperAtom.scope = _hexxScope;
 
+// TODO: put it to state
 export const editorDefaultBlockAtom = atom<
   Pick<BlockType<any>, 'type' | 'data'>
 >({
@@ -57,6 +59,7 @@ export const blockMapAtom = atom<Record<string, any>>({});
 blockMapAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
+_blockIdListAtom.scope = _hexxScope;
 export const _blocksIdMapAtom = atom<Record<string, any>>({});
 _blocksIdMapAtom.scope = _hexxScope;
 
@@ -91,30 +94,20 @@ export const redo = () => {
   }
 };
 
-function debounce(func, wait, immediate): any {
-  var timeout;
-  return function() {
-    var context = this,
-      args = arguments;
-    var later = function() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-}
+const MAX_HISTORY_COUNT = 100;
 
 function updateHistory(data) {
   history.push(data);
+  if (history.length > MAX_HISTORY_COUNT) {
+    history.shift();
+  }
   canUpdate = true;
 }
 
 const debounceUpdateHistory = debounce(updateHistory, 200, false);
 let firstOldValue: Record<string, any> | null = null;
 let canUpdate = false;
+
 export const blocksIdMapAtom = atom(
   (get) => get(_blocksIdMapAtom),
   (get, set, arg: SetStateAction<Record<string, any>>) => {

@@ -50,5 +50,5 @@ CodeBlock.block = {
   defaultValue: {
     code: '',
   },
-  isEmpty: (d) => !d.code.trim(),
+  isEmpty: (d) => !d.code?.trim(),
 };

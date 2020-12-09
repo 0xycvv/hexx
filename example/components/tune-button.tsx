@@ -67,7 +67,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
     blockSelect,
     findBlockIndexById,
     removeBlockWithId,
-    IdMap,
+    idMap,
   } = useEditor();
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
 
   const isSelecting = blockSelect.includes(lastHoverBlock?.id);
   const currentBlockData =
-    lastHoverBlock?.id && IdMap[lastHoverBlock.id];
+    lastHoverBlock?.id && idMap[lastHoverBlock.id];
 
   const tunes =
     currentBlockData?.type &&

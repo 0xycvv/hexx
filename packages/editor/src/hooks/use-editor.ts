@@ -26,7 +26,7 @@ export function useBlock(id: string, blockIndex?: number) {
   const {
     removeBlockWithId,
     updateBlockDataWithId,
-    IdMap,
+    idMap,
   } = useEditor();
   const remove = () => {
     removeBlockWithId({ id });
@@ -63,7 +63,7 @@ export function useBlock(id: string, blockIndex?: number) {
   );
 
   return {
-    block: IdMap[id],
+    block: idMap[id],
     remove,
     update,
     registerWithIndex,
@@ -76,7 +76,7 @@ export function useEditor() {
   const [blockMap] = useAtom(blockMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [idList, setIdList] = useAtom(blockIdListAtom);
-  const [IdMap, setIdMap] = useAtom(blocksIdMapAtom);
+  const [idMap, setIdMap] = useAtom(blocksIdMapAtom);
   const lastHoverBlock = usePreviousExistValue(hoverBlock);
   const findBlockIndexById = (id?: string) => {
     return idList.findIndex((d) => d === id);
@@ -233,6 +233,6 @@ export function useEditor() {
     lastHoverBlock,
     selectBlock,
     idList,
-    IdMap,
+    idMap,
   };
 }

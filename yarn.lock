@@ -953,7 +953,7 @@
     "@babel/helper-validator-option" "^7.12.1"
     "@babel/plugin-transform-typescript" "^7.12.1"
 
-"@babel/runtime@7.12.5", "@babel/runtime@^7.10.4", "@babel/runtime@^7.2.0", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.7", "@babel/runtime@^7.8.4":
+"@babel/runtime@7.12.5", "@babel/runtime@^7.10.4", "@babel/runtime@^7.12.5", "@babel/runtime@^7.2.0", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.7", "@babel/runtime@^7.8.4":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
   integrity sha512-plcc+hbExy3McchJCEQG3knOsuh3HH+Prx1P6cLIkET/0dLuQDEnrT+s27Axgc9bqfsmNUNHfscgMUdBpC9xfg==
@@ -1676,6 +1676,13 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
+
+"@types/use-deep-compare-effect@^1.2.0":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/use-deep-compare-effect/-/use-deep-compare-effect-1.5.1.tgz#738e24ace9610a1bf672d698a837c7c115ae4a00"
+  integrity sha512-IpPu2lOV4HWjuzncETLsPpeYKJEOfYHbx6Bn7leBwp5X+a8TBmd4jIBcMQJ5F+WXz/lYkeKphmB4uUij3W4Gdg==
+  dependencies:
+    use-deep-compare-effect "*"
 
 "@types/uuid@^8.3.0":
   version "8.3.0"
@@ -3395,6 +3402,11 @@ depd@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
+
+dequal@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/dequal/-/dequal-2.0.2.tgz#85ca22025e3a87e65ef75a7a437b35284a7e319d"
+  integrity sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==
 
 des.js@^1.0.0:
   version "1.0.1"
@@ -8599,6 +8611,21 @@ use-context-selector@1.2.11:
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-1.2.11.tgz#2b7dd6ed045e4594c1936134f1465d46d01267e7"
   integrity sha512-roElSNplrQSxUV3dM4ouCVC8xnLAIvh4ulF16Wgsyb+b7Gd23rUughZKkL0DvH48FI4mewwmwqVCU+z5PUEfAg==
+
+use-debounce@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-5.1.0.tgz#3df34bd7449da7dd2dbb10a6513efe701fc79d02"
+  integrity sha512-fU7O7iel2bA19fxSiPfRkieVGxrow503phSUAGZ/EqiJtCPrU9AdUdrKOAdgh803IrjdIzhj+8eDsDGn4OPy8g==
+
+use-deep-compare-effect@*, use-deep-compare-effect@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/use-deep-compare-effect/-/use-deep-compare-effect-1.5.0.tgz#3408459680f02fdff7b06219b22b993c230779e3"
+  integrity sha512-rHNHjYxVfoBFP1HZQMz8U/foLVkJ121zFnO3t6hJICKBwVSe4TwDoBDD9ERjq2hgH6NCD5tZdrmrGQRneYcbXQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@types/react" "^17.0.0"
+    "@types/use-deep-compare-effect" "^1.2.0"
+    dequal "^2.0.2"
 
 use-subscription@1.5.1:
   version "1.5.1"
