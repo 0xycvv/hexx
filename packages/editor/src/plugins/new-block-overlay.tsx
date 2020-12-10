@@ -61,7 +61,11 @@ export function NewBlockOverlayPlugin(props: {
           // @ts-ignore
           blockType.block.isEmpty(block.data)
         ) {
-          lastBlock?.editable?.focus();
+          if (lastBlock?.editable) {
+            lastBlock?.editable?.focus();
+          } else {
+            insertBlock({ block: defaultBlock });
+          }
         } else {
           insertBlock({ block: defaultBlock });
         }
