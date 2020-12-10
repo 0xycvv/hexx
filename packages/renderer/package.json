@@ -5,8 +5,7 @@
   "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
-    "react": "^16 || ^17",
-    "@hexx/theme": "^0.1.5"
+    "react": "^16 || ^17"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
@@ -16,6 +15,7 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "react-html-parser": "^2.0.2"
+    "react-html-parser": "^2.0.2",
+    "@hexx/theme": "^0.1.5"
   }
 }

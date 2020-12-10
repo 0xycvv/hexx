@@ -133,7 +133,7 @@ export function useEditor() {
           ...s,
           [newBlock.id]: newBlock,
         }));
-        setIdList((s) => insert(s, arg.index, newBlock.id));
+        setIdList((s) => insert(s, arg.index!, newBlock.id));
       }
       return newBlock;
     },
