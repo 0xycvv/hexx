@@ -16,6 +16,7 @@ import {
   SelectionChangePlugin,
   SelectionPlugin,
   Unstable_UndoPlugin,
+  FileDropPlugin,
   HexxDevTool,
   ChangeDetectPlugin,
 } from '@hexx/editor/plugins';
@@ -88,9 +89,10 @@ const EditorUsage = (props: EditorProps) => {
         <Unstable_UndoPlugin />
         <SelectionPlugin />
         <HexxDevTool />
+        <FileDropPlugin />
         <ChangeDetectPlugin
           onChange={() => {
-            console.log('change');
+            // console.log('change');
           }}
         />
         <SelectionChangePlugin

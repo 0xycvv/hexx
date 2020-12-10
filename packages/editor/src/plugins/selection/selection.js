@@ -357,7 +357,7 @@ function Selection(options = {}) {
         that._emit('start', evt);
       }
 
-      evt.preventDefault(); // Prevent swipe-down refresh
+      // evt.preventDefault(); // Prevent swipe-down refresh
     },
 
     _onTapMove(evt) {

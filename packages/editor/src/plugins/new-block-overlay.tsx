@@ -22,7 +22,13 @@ export function NewBlockOverlayPlugin(props: {
     defaultBlock,
   } = usePlugin();
   const active = useActiveBlockId();
-  const { blockSelect, selectBlock, insertBlock } = editor;
+  const {
+    blockSelect,
+    selectBlock,
+    insertBlock,
+    idMap,
+    blockMap,
+  } = editor;
   const handleClick = () => {
     if (
       blockSelect.length > 0 &&
@@ -37,28 +43,32 @@ export function NewBlockOverlayPlugin(props: {
     }
     if (!active) {
       const lastBlock = findLastBlock();
-      if (lastBlock) {
-        if (lastBlock.editable) {
-          if ((lastBlock?.editable?.textContent?.length ?? 0) > 0) {
-            insertBlock({
-              block: defaultBlock,
-            });
-            lastBlock.editable?.focus();
-          } else {
-            lastBlock.editable?.focus();
-          }
+      if (lastBlock && lastBlock.blockId) {
+        const block = idMap[lastBlock.blockId];
+        const blockType = blockMap[block.type];
+        if (
+          (blockType.block &&
+            // @ts-ignore
+            typeof blockType.block.isEmpty === 'function' &&
+            // @ts-ignore
+            blockType.block.isEmpty(block.data))
+        ) {
+          lastBlock?.editable?.focus();
         } else {
-          insertBlock({
-            block: defaultBlock,
-          });
+          insertBlock({ block: defaultBlock });
         }
+      } else {
+        insertBlock({ block: defaultBlock });
       }
     } else {
       active?.editable?.focus();
     }
   };
   return (
-    <NewBlockOverlay onClick={handleClick}>
+    <NewBlockOverlay
+      className="hexx-block-overlay"
+      onClick={handleClick}
+    >
       {props.children}
     </NewBlockOverlay>
   );

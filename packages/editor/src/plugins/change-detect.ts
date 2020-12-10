@@ -1,18 +1,25 @@
-import { useState } from 'react';
-import useDeepCompareEffect from 'use-deep-compare-effect';
-import { usePlugin } from './plugin';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import {
+  _blockIdListAtom,
+  _blocksIdMapAtom
+} from '../constants/atom';
 
 export function ChangeDetectPlugin(props: { onChange: () => void }) {
   const [isMount, setIsMount] = useState(false);
-  const { editor } = usePlugin();
-  const { idMap, idList } = editor;
-  useDeepCompareEffect(() => {
+  const [idMapAtom] = useAtom(_blocksIdMapAtom);
+  const [idsAtom] = useAtom(_blockIdListAtom);
+
+  useEffect(() => {
     if (isMount) {
-      props.onChange();
+      props?.onChange();
     }
     return () => {
-      setIsMount(true);
+      if (!isMount && typeof props?.onChange === 'function') {
+        setIsMount(true);
+      }
     };
-  }, [idMap, idList]);
+  }, [idMapAtom, idsAtom]);
+
   return null;
 }

@@ -123,6 +123,8 @@ export const TuneButton = forwardRef((props: any, ref) => {
                       id: lastHoverBlock.id,
                       data: tune.updater(currentBlockData.data),
                     });
+                    selectBlock(null);
+                    popper.popperJs.update();
                     e.stopPropagation();
                   }}
                 />
