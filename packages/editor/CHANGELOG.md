@@ -1,5 +1,13 @@
 # @hexx/editor
 
+## 0.6.4
+
+### Patch Changes
+
+- fix types and inline code split
+- Updated dependencies [undefined]
+  - @hexx/theme@0.1.5
+
 ## 0.6.3
 
 ### Patch Changes

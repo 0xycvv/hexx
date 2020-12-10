@@ -42,7 +42,7 @@ export function extractFragmentFromPosition() {
   const wrapper = document.createElement('div');
   wrapper.append(next);
   return {
-    next: wrapper.innerHTML,
+    next: !wrapper.textContent ? '' : wrapper.innerHTML,
     // @ts-ignore
     current: range.commonAncestorContainer.innerHTML,
   };

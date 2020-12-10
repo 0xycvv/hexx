@@ -1,5 +1,14 @@
 # @hexx/code-block
 
+## 1.0.3
+
+### Patch Changes
+
+- fix types and inline code split
+- Updated dependencies [undefined]
+  - @hexx/editor@0.6.4
+  - @hexx/theme@0.1.5
+
 ## 1.0.2
 
 ### Patch Changes

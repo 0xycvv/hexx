@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, NamedExoticComponent } from 'react';
 import { StitchesCssProp } from './stitches.config';
 
 export type BlockType<T = any> = {
@@ -35,13 +35,11 @@ export interface BlockProps<C = any> {
   css?: StitchesCssProp;
 }
 
-interface BlockComponentBefore<
-  BlockData = unknown,
-  Config = unknown
-> {
+interface BlockComponentBefore<BlockData = unknown, Config = unknown>
+  extends NamedExoticComponent {
   block?: BlockConfig<BlockData, Config>;
-  (props: BlockProps<Config>): JSX.Element;
 }
+
 export interface BlockComponent<
   BlockConfig = unknown,
   Config = undefined

@@ -1,6 +1,6 @@
 {
   "name": "@hexx/code-block",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/hexx-code-block.cjs.js",
   "module": "dist/hexx-code-block.esm.js",
   "peerDependencies": {
@@ -15,7 +15,7 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "@hexx/theme": "^0.1.4",
+    "@hexx/theme": "^0.1.5",
     "prismjs": "^1.22.0",
     "react-html-parser": "^2.0.2"
   }

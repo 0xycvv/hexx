@@ -5,10 +5,10 @@ import * as React from 'react';
 import { codeBlockStyle } from './renderer';
 import SvgCode from './svg';
 
-const _CodeBlock = React.memo(function _CodeBlock({
+const _CodeBlock = React.memo<BlockProps>(function _CodeBlock({
   id,
   index,
-}: BlockProps) {
+}) {
   const { update, register, block } = useBlock(id, index);
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -43,7 +43,6 @@ const _CodeBlock = React.memo(function _CodeBlock({
   );
 });
 
-// @ts-ignore
 export const CodeBlock = applyBlock(_CodeBlock, {
   type: 'code',
   isEmpty: (d) => !d.value?.trim(),

@@ -1,5 +1,11 @@
 # @hexx/theme
 
+## 0.1.5
+
+### Patch Changes
+
+- fix types and inline code split
+
 ## 0.1.4
 
 ### Patch Changes
