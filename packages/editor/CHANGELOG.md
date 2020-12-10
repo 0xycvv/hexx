@@ -1,5 +1,17 @@
 # @hexx/editor
 
+## 0.6.2
+
+### Patch Changes
+
+- e3aecf7: Disable touch selection
+- Fix selection bug
+- 557d325: add applyBlock function
+- Updated dependencies [undefined]
+- Updated dependencies [557d325]
+  - @hexx/renderer@0.2.2
+  - @hexx/theme@0.1.3
+
 ## 0.6.1
 
 ### Patch Changes

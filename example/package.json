@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,10 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
-    "@hexx/editor": "^0.6.1",
-    "@hexx/renderer": "^0.2.1",
-    "@hexx/theme": "^0.1.2",
-    "@hexx/code-block": "^1.0.0",
+    "@hexx/editor": "^0.6.2",
+    "@hexx/renderer": "^0.2.2",
+    "@hexx/theme": "^0.1.3",
+    "@hexx/code-block": "^1.0.1",
     "@preconstruct/next": "^2.0.0",
     "next": "10.0.3",
     "react": "17.0.1",

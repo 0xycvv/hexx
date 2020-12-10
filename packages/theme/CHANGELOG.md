@@ -1,5 +1,12 @@
 # @hexx/theme
 
+## 0.1.3
+
+### Patch Changes
+
+- Fix selection bug
+- 557d325: add applyBlock function
+
 ## 0.1.2
 
 ### Patch Changes
