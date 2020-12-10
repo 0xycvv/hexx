@@ -3,7 +3,7 @@ import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock } from '../../hooks/use-editor';
-import { css, styled, BlockProps, applyBlock } from '@hexx/theme';
+import { css, styled } from '@hexx/theme';
 import {
   findContentEditable,
   lastCursor,
@@ -11,6 +11,7 @@ import {
 import { extractFragmentFromPosition } from '../../utils/ranges';
 import { Editable } from '../editable';
 import { list as ListSvg } from '../icons';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
@@ -161,7 +162,6 @@ function ListItem(props: {
 export const ListBlock = applyBlock<
   List['data'],
   { placeholder: string }
-  // @ts-ignore
 >(_ListBlock, {
   type: 'list',
   icon: {

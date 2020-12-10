@@ -1,8 +1,9 @@
-import { BlockProps, styled } from '@hexx/theme';
+import { styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
   KeyboardEvent,
+  useCallback,
   useEffect,
   useRef,
 } from 'react';
@@ -14,10 +15,12 @@ import {
   editorIdAtom,
   hoverBlockAtom,
   isEditorSelectAllAtom,
+  isHoveringFamily,
   _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
 import { useEditor } from '../../hooks/use-editor';
+import { BlockProps } from '../../utils/blocks';
 import {
   findBlockByIndex,
   findContentEditable,
@@ -83,9 +86,12 @@ function useBlockWrapper({
   const selectInputRef = useRef<HTMLInputElement>(null);
   const family = blockMapFamily(id);
   family.scope = _hexxScope;
-  const [block] = useAtom(family);
-  const isHovering =
-    hoverBlockId && block && hoverBlockId.id === block.id;
+  const [block] = useAtom<any>(family);
+  const isHoverFamily = isHoveringFamily(id);
+  isHoverFamily.scope = _hexxScope;
+  const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
+  // const isHovering =
+  //   hoverBlockId && block && hoverBlockId.id === block.id;
   const currentBlock = block && blocksMap[block.type];
   const isBlockSelect = blockSelect.includes(block.id);
 
@@ -187,6 +193,13 @@ function useBlockWrapper({
     console.error(`missing block type ${block.type}`);
   }
 
+  const setHoverId = useCallback(() => {
+    setHovering({
+      id: block.id,
+      el: ref.current!,
+    });
+  }, [block.id, ref.current]);
+
   return {
     block,
     ref,
@@ -198,21 +211,11 @@ function useBlockWrapper({
       'data-block-id': block.id,
       className: 'hexx-block-wrapper',
       onKeyDown,
-      onFocus: () => {
-        setHoverBlockId({
-          id: block.id,
-          el: ref.current!,
-        });
-      },
+      onFocus: setHoverId,
       onBlur: () => {
         setHoverBlockId(null);
       },
-      onMouseMove: () => {
-        setHoverBlockId({
-          id: block.id,
-          el: ref.current!,
-        });
-      },
+      onMouseEnter: setHoverId,
       onClick: (e) => {
         if (!ref.current) return;
         const editable = findContentEditable(ref.current);
@@ -220,10 +223,7 @@ function useBlockWrapper({
           setBlockSelect([block.id]);
           e.stopPropagation();
         }
-        setHoverBlockId({
-          id: block.id,
-          el: ref.current,
-        });
+        setHoverId();
       },
     },
     isBlockSelect,
@@ -247,7 +247,6 @@ const SortableItem = SortableElement(
     return (
       <div className="hexx-block">
         {createElement(blockComponent, {
-          block,
           id,
           index: i,
           config: blockComponent.block.config,

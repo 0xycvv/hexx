@@ -1,9 +1,8 @@
-import { useEditor } from '@hexx/editor';
+import { useEditor, styled } from '@hexx/editor';
 import {
   PortalPopper,
   useReactPopper,
 } from '@hexx/editor/components';
-import { styled } from '@hexx/theme';
 import { createElement, Fragment, useEffect } from 'react';
 
 const Plus = styled('div', {

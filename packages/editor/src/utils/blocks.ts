@@ -1,5 +1,5 @@
 import { ReactNode, NamedExoticComponent } from 'react';
-import { StitchesCssProp } from './stitches.config';
+import { StitchesCssProp } from '@hexx/theme';
 
 export type BlockType<T = any> = {
   id: string;
@@ -15,7 +15,7 @@ interface BlockConfig<Data, Config> {
     svg: any;
   };
   defaultValue: Partial<Data>;
-  isEmpty: (d: Data) => boolean;
+  isEmpty?: (d: Data) => boolean;
   tune?: Array<{
     icon: {
       text: string;
@@ -27,7 +27,7 @@ interface BlockConfig<Data, Config> {
   [x: string]: any;
 }
 
-export interface BlockProps<C = any> {
+export interface BlockProps<C = {}> {
   id: string;
   index: number;
   config?: C;
@@ -36,7 +36,7 @@ export interface BlockProps<C = any> {
 }
 
 interface BlockComponentBefore<BlockData = unknown, Config = unknown>
-  extends NamedExoticComponent {
+  extends NamedExoticComponent<BlockProps<Config>> {
   block?: BlockConfig<BlockData, Config>;
 }
 

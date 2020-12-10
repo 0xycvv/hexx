@@ -3,10 +3,11 @@ import * as mdast from 'mdast';
 import { quoteStyle, Quote } from '@hexx/renderer';
 import composeRefs from '../..//hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
-import { css, applyBlock, BlockProps } from '@hexx/theme';
+import { css } from '@hexx/theme';
 import { lastCursor } from '../..//utils/find-blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 
 function _QuoteBlock({
   config,
@@ -40,9 +41,10 @@ function _QuoteBlock({
     </blockquote>
   );
 }
-
-// @ts-ignore
-export const QuoteBlock = applyBlock(React.memo(_QuoteBlock), {
+export const QuoteBlock = applyBlock<
+  Quote['data'],
+  { placeholder: string }
+>(React.memo(_QuoteBlock), {
   type: 'quote',
   icon: {
     text: 'Quote',

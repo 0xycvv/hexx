@@ -12,8 +12,13 @@ import fromMarkdown from 'mdast-util-from-markdown';
 import { AllMdastConfig } from '../parser/types';
 
 export function PastHtmlPlugin() {
-  const { wrapperRef, editor, activeBlock } = usePlugin();
-  const { idList, batchInsertBlocks } = editor;
+  const {
+    wrapperRef,
+    activeBlock,
+    editor,
+    ids: [idList],
+  } = usePlugin();
+  const { batchInsertBlocks } = editor;
   const { allMdastConfig } = useBlockMdast();
 
   useEventListener(

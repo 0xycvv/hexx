@@ -1,9 +1,7 @@
-import { BlockComponent } from '@hexx/theme';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils.cjs';
 import { SetStateAction } from 'react';
-import { BlockData } from '../../../renderer/dist/declarations/src/types';
-import { BlockType } from '../components/editor';
+import { BlockType, BlockComponent } from '../utils/blocks';
 import { debounce } from '../utils/debounce';
 
 export const _hexxScope = Symbol();
@@ -59,7 +57,7 @@ export const blockSelectAtom = atom<string[]>([]);
 blockSelectAtom.scope = _hexxScope;
 
 export const blockMapAtom = atom<
-  Record<string, BlockComponent<any, any, any>>
+  Record<string, BlockComponent<any, any>>
 >({});
 blockMapAtom.scope = _hexxScope;
 
@@ -73,6 +71,20 @@ export const hoverBlockAtom = atom<{
   el: HTMLElement;
 } | null>(null);
 hoverBlockAtom.scope = _hexxScope;
+
+export const isHoveringFamily = atomFamily(
+  (id: string) => (get) => get(hoverBlockAtom)?.id === id,
+  (id) => (
+    get,
+    set,
+    arg: {
+      id: string;
+      el: HTMLElement;
+    } | null,
+  ) => {
+    set(hoverBlockAtom, arg);
+  },
+);
 
 // history
 type EditorHistory = Array<{
@@ -165,21 +177,29 @@ export const blockIdListAtom = atom(
 
 blockIdListAtom.scope = _hexxScope;
 
-export const blockMapFamily = atomFamily(
+export const blockMapFamily = atomFamily<
+  string,
+  BlockType<unknown>,
+  BlockType<unknown> | SetStateAction<Record<string, any>>
+>(
   (id: string) => (get) => get(blocksIdMapAtom)[id],
-  (id) => (get, set, arg: BlockData) => {
-    set(blocksIdMapAtom, (prev) => {
-      return {
-        ...prev,
-        [id]: {
-          ...prev[id],
-          ...arg,
-          data: {
-            ...prev[id].data,
-            ...arg.data,
+  (id) => (get, set, arg) => {
+    if (typeof arg === 'function') {
+      set(blocksIdMapAtom, arg);
+    } else {
+      set(blocksIdMapAtom, (prev) => {
+        return {
+          ...prev,
+          [id]: {
+            ...prev[id],
+            ...arg,
+            data: {
+              ...prev[id].data,
+              ...arg.data,
+            },
           },
-        },
-      };
-    });
+        };
+      });
+    }
   },
 );
