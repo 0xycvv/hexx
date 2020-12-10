@@ -37,6 +37,7 @@ import { useEditor } from '../../hooks/use-editor';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
+import { BlockType } from '../../utils/blocks';
 import {
   findLastBlock,
   focusLastBlock,
@@ -45,12 +46,6 @@ import {
 import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
 import { TextBlock } from '../block/text';
-
-export type BlockType<T = any> = {
-  id: string;
-  type: string;
-  data: T;
-};
 
 export interface EditorProps extends HexxProps {
   data?: BlockType[];
@@ -100,8 +95,12 @@ interface HexxHandler {
 }
 
 function useBlockSelectCopy() {
-  const { wrapperRef, editor } = usePlugin();
-  const { blockSelect, setIdList } = editor;
+  const {
+    wrapperRef,
+    ids: [, setIdList],
+    blockSelect: [blockSelect],
+  } = usePlugin();
+
   const handleClipboardEvent = (e: ClipboardEvent) => {
     if (blockSelect.length > 0) {
       setData(e);
@@ -279,13 +278,7 @@ const SortableBlockList = SortableContainer(
         (bId, i) =>
           bId &&
           blockIdMap[bId] && (
-            <Block
-              key={bId}
-              css={blockCss}
-              id={bId}
-              index={i}
-              // block={blockIdMap[bId]}
-            />
+            <Block key={bId} css={blockCss} id={bId} index={i} />
           ),
       )}
     </div>

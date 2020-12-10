@@ -2,6 +2,7 @@ import {
   Editor,
   EditorProps,
   generateGetBoundingClientRect,
+  css,
 } from '@hexx/editor';
 import {
   BlockMap,
@@ -20,7 +21,6 @@ import {
   HexxDevTool,
   ChangeDetectPlugin,
 } from '@hexx/editor/plugins';
-import { css } from '@hexx/theme';
 import { CodeBlock } from '@hexx/code-block';
 import { ElementRef, useRef } from 'react';
 import { PlusButton } from './plus-button';

@@ -1,5 +1,8 @@
 import { styled } from '@hexx/theme';
+import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
+import { activeBlockIdAtom } from '../constants/atom';
+import { useIdMap } from '../hooks';
 import { useActiveBlockId } from '../hooks/use-active-element';
 import { findLastBlock } from '../utils/find-blocks';
 import { usePlugin } from './plugin';
@@ -16,19 +19,23 @@ export function NewBlockOverlayPlugin(props: {
   children?: ReactNode;
 }) {
   const {
-    editor,
     uiState: [uiState],
     selectAll: [isSelectAll, setIsSelectAll],
-    defaultBlock,
+    defaultBlock: [defaultBlock],
+    editor,
+    activeBlock,
   } = usePlugin();
-  const active = useActiveBlockId();
+
+  const [idMap] = useIdMap();
+
   const {
     blockSelect,
     selectBlock,
     insertBlock,
-    idMap,
+    getBlock,
     blockMap,
   } = editor;
+
   const handleClick = () => {
     if (
       blockSelect.length > 0 &&
@@ -41,17 +48,18 @@ export function NewBlockOverlayPlugin(props: {
     if (isSelectAll) {
       setIsSelectAll(false);
     }
-    if (!active) {
+    if (!activeBlock) {
       const lastBlock = findLastBlock();
       if (lastBlock && lastBlock.blockId) {
         const block = idMap[lastBlock.blockId];
         const blockType = blockMap[block.type];
         if (
-          (blockType.block &&
-            // @ts-ignore
-            typeof blockType.block.isEmpty === 'function' &&
-            // @ts-ignore
-            blockType.block.isEmpty(block.data))
+          blockType &&
+          blockType.block &&
+          // @ts-ignore
+          typeof blockType.block.isEmpty === 'function' &&
+          // @ts-ignore
+          blockType.block.isEmpty(block.data)
         ) {
           lastBlock?.editable?.focus();
         } else {
@@ -61,7 +69,7 @@ export function NewBlockOverlayPlugin(props: {
         insertBlock({ block: defaultBlock });
       }
     } else {
-      active?.editable?.focus();
+      activeBlock?.editable?.focus();
     }
   };
   return (

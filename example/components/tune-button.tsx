@@ -1,9 +1,8 @@
-import { useEditor } from '@hexx/editor';
+import { useEditor, styled, useIdMap } from '@hexx/editor';
 import {
   PortalPopper,
   useReactPopper,
 } from '@hexx/editor/components';
-import { styled } from '@hexx/theme';
 import { forwardRef, useEffect } from 'react';
 
 const Tune = styled('div', {
@@ -58,6 +57,8 @@ export const TuneButton = forwardRef((props: any, ref) => {
     ],
   });
 
+  const [idMap] = useIdMap();
+
   const {
     hoverBlock,
     lastHoverBlock,
@@ -65,9 +66,7 @@ export const TuneButton = forwardRef((props: any, ref) => {
     updateBlockDataWithId,
     selectBlock,
     blockSelect,
-    findBlockIndexById,
     removeBlockWithId,
-    idMap,
   } = useEditor();
 
   useEffect(() => {

@@ -1,14 +1,20 @@
-import { composeRef, lastCursor, useBlock } from '@hexx/editor';
-import { BlockProps, Editable } from '@hexx/editor/components';
-import { applyBlock, css } from '@hexx/theme';
+import {
+  composeRef,
+  lastCursor,
+  useBlock,
+  css,
+  applyBlock,
+  BlockProps,
+} from '@hexx/editor';
+import { Editable } from '@hexx/editor/components';
 import * as React from 'react';
-import { codeBlockStyle } from './renderer';
+import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
 
-const _CodeBlock = React.memo<BlockProps>(function _CodeBlock({
+const _CodeBlock = React.memo(function _CodeBlock({
   id,
   index,
-}) {
+}: BlockProps) {
   const { update, register, block } = useBlock(id, index);
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -43,18 +49,21 @@ const _CodeBlock = React.memo<BlockProps>(function _CodeBlock({
   );
 });
 
-export const CodeBlock = applyBlock(_CodeBlock, {
-  type: 'code',
-  isEmpty: (d) => !d.value?.trim(),
-  icon: {
-    text: 'Code Block',
-    svg: SvgCode,
-  },
-  mdast: {
+export const CodeBlock = applyBlock<TCodeBlock['data'], {}>(
+  _CodeBlock,
+  {
     type: 'code',
-    in: ({ lang, value }) => ({ value, lang }),
+    isEmpty: (d) => !d.value?.trim(),
+    icon: {
+      text: 'Code Block',
+      svg: SvgCode,
+    },
+    mdast: {
+      type: 'code',
+      in: ({ lang, value }) => ({ value, lang }),
+    },
+    defaultValue: {
+      value: '',
+    },
   },
-  defaultValue: {
-    value: '',
-  },
-});
+);

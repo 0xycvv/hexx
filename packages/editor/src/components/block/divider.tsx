@@ -1,11 +1,12 @@
+import { dividerStyles } from '@hexx/renderer';
+import { css } from '@hexx/theme';
 import * as React from 'react';
-import { dividerStyles, Delimiter } from '@hexx/renderer';
+import { applyBlock } from '../../utils/blocks';
 import { divider as DividerSvg } from '../icons';
-import { css, applyBlock } from '@hexx/theme';
 
 const styles = css(dividerStyles);
 
-export const Divider = applyBlock(
+export const Divider = applyBlock<{}, {}>(
   // @ts-ignore
   React.memo(() => {
     return <div role="separator" className={styles} />;

@@ -1,6 +1,5 @@
 import {
   Delimiter,
-  EmbedLink,
   Header,
   List,
   Paragraph,
@@ -9,7 +8,6 @@ import {
 
 export type Block =
   | Delimiter
-  | EmbedLink
   | Header
   | List
   | Paragraph

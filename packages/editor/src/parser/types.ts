@@ -1,5 +1,5 @@
 import { BlockContent } from 'mdast';
-import { BlockType } from '../components/editor';
+import { BlockType } from '../utils/blocks';
 
 export type MdastConfig<K = BlockContent['type']> = {
   type: K;
