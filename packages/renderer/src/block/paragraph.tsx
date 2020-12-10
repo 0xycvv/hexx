@@ -30,7 +30,6 @@ export const paragraphStyle: StitchesStyleObject = {
     a: {
       cursor: 'pointer',
       textDecoration: 'underline',
-      color: 'inherit',
     },
   },
 };

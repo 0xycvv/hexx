@@ -5,7 +5,7 @@ import { styled } from '@hexx/theme';
 const EditorUsage = dynamic(
   () => import('../components/editor-usage'),
   {
-    ssr: false,
+    ssr: true,
   },
 );
 

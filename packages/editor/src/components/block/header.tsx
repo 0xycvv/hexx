@@ -1,17 +1,16 @@
 import * as mdast from 'mdast';
 import { headerStyle, Header } from '@hexx/renderer';
-import { styled } from '@hexx/theme';
+import { styled, BlockProps, applyBlock } from '@hexx/theme';
 import * as React from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
 import { header as HeaderSvg } from '../icons';
-import { BlockProps } from './block';
 
 const Heading = styled(Editable, headerStyle);
 
-export function HeaderBlock({
+function _HeaderBlock({
   block,
   index,
   config,
@@ -39,8 +38,7 @@ export function HeaderBlock({
     />
   );
 }
-
-HeaderBlock.block = {
+export const HeaderBlock = applyBlock(_HeaderBlock, {
   type: 'header',
   config: {
     placeholder: 'Heading',
@@ -61,4 +59,4 @@ HeaderBlock.block = {
     level: 3,
   },
   isEmpty: (d) => !d.text?.trim(),
-};
+});

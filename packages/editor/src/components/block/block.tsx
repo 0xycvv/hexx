@@ -1,9 +1,8 @@
-import { StitchesCssProp, styled } from '@hexx/theme';
+import { styled, BlockProps } from '@hexx/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
   KeyboardEvent,
-  ReactNode,
   useEffect,
   useRef,
 } from 'react';
@@ -229,14 +228,6 @@ function useBlockWrapper({
       setBlockSelect(value ? [block.id] : []);
     },
   };
-}
-
-export interface BlockProps<T = any, C = any> {
-  block: BlockType<T>;
-  index: number;
-  config?: C;
-  children?: ReactNode;
-  css?: StitchesCssProp;
 }
 
 const SortableItem = SortableElement(

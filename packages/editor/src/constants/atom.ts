@@ -1,3 +1,4 @@
+import { BlockComponent } from '@hexx/theme';
 import { atom } from 'jotai';
 import { SetStateAction } from 'react';
 import { BlockType } from '../components/editor';
@@ -55,12 +56,14 @@ export const blockSelectAtom = atom<string[]>([]);
 
 blockSelectAtom.scope = _hexxScope;
 
-export const blockMapAtom = atom<Record<string, any>>({});
+export const blockMapAtom = atom<
+  Record<string, BlockComponent<any, any, any>>
+>({});
 blockMapAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
 _blockIdListAtom.scope = _hexxScope;
-export const _blocksIdMapAtom = atom<Record<string, any>>({});
+export const _blocksIdMapAtom = atom<Record<string, BlockType>>({});
 _blocksIdMapAtom.scope = _hexxScope;
 
 export const hoverBlockAtom = atom<{

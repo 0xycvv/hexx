@@ -1,5 +1,17 @@
 # @hexx/code-block
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix selection bug
+- 557d325: add applyBlock function
+- Updated dependencies [e3aecf7]
+- Updated dependencies [undefined]
+- Updated dependencies [557d325]
+  - @hexx/editor@0.6.2
+  - @hexx/theme@0.1.3
+
 ## 1.0.0
 
 ### Minor Changes

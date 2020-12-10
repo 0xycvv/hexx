@@ -3,12 +3,10 @@ import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
 import {
   forwardRef,
-  MouseEvent,
   MutableRefObject,
   ReactNode,
   useEffect,
   useImperativeHandle,
-  useState,
 } from 'react';
 import {
   SortableContainer,

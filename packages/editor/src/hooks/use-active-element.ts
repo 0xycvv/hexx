@@ -1,6 +1,7 @@
-import { atom, useAtom } from 'jotai';
-import { useEffect, useRef, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { activeBlockIdAtom } from '../constants/atom';
+import { debounce } from '../utils/debounce';
 
 export const useActiveBlockId = () => {
   const [active, setActive] = useAtom(activeBlockIdAtom);
@@ -32,12 +33,14 @@ export const useActiveBlockId = () => {
     }
   };
 
+  const debounced = debounce(handleClick, 300, false);
+
   useEffect(() => {
     document.addEventListener('mouseup', handleClick);
-    document.addEventListener('keyup', handleClick);
+    document.addEventListener('keyup', debounced);
     return () => {
       document.removeEventListener('mouseup', handleClick);
-      document.removeEventListener('keyup', handleClick);
+      document.removeEventListener('keyup', debounced);
     };
   }, []);
 

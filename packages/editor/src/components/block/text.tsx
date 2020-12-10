@@ -1,5 +1,6 @@
 import * as mdast from 'mdast';
-import { css } from '@hexx/theme';
+import { css, applyBlock, BlockProps } from '@hexx/theme';
+import type { Paragraph } from '@hexx/renderer';
 import { useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
@@ -11,9 +12,8 @@ import {
   AlignRight,
   text as TextIcon,
 } from '../icons';
-import { BlockProps } from './block';
 
-export function TextBlock({ index, block }: BlockProps) {
+export function _TextBlock({ index, block }: BlockProps<Paragraph['data']>) {
   const ref = useRef<HTMLDivElement>(null);
   const { update, register } = useBlock(block.id, index);
 
@@ -48,7 +48,7 @@ export function TextBlock({ index, block }: BlockProps) {
   );
 }
 
-TextBlock.block = {
+export const TextBlock = applyBlock(_TextBlock, {
   type: 'paragraph',
   icon: {
     text: 'Text',
@@ -90,4 +90,4 @@ TextBlock.block = {
     },
   ],
   isEmpty: (data) => !data.text?.trim(),
-};
+});

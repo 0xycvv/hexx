@@ -1,5 +1,14 @@
 # @hexx/renderer
 
+## 0.2.2
+
+### Patch Changes
+
+- Fix selection bug
+- Updated dependencies [undefined]
+- Updated dependencies [557d325]
+  - @hexx/theme@0.1.3
+
 ## 0.2.1
 
 ### Patch Changes
