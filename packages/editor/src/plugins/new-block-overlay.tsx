@@ -66,7 +66,7 @@ export function NewBlockOverlayPlugin(props: {
   };
   return (
     <NewBlockOverlay
-      className="hexx-block-overlay"
+      className="hexx-new-block-overlay"
       onClick={handleClick}
     >
       {props.children}

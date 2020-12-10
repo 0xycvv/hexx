@@ -56,7 +56,9 @@ export const blockSelectAtom = atom<string[]>([]);
 
 blockSelectAtom.scope = _hexxScope;
 
-export const blockMapAtom = atom<Record<string, BlockComponent>>({});
+export const blockMapAtom = atom<
+  Record<string, BlockComponent<any, any, any>>
+>({});
 blockMapAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
