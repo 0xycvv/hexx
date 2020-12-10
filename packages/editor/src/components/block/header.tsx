@@ -11,11 +11,11 @@ import { header as HeaderSvg } from '../icons';
 const Heading = styled(Editable, headerStyle);
 
 function _HeaderBlock({
-  block,
+  id,
   index,
   config,
-}: BlockProps<Header['data'], { placeholder: string }>) {
-  const { register, update } = useBlock(block.id, index);
+}: BlockProps<{ placeholder: string }>) {
+  const { register, update, block } = useBlock(id, index);
 
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -30,15 +30,20 @@ function _HeaderBlock({
       ref={composeRefs(ref, register)}
       onChange={(evt) =>
         update({
-          ...block.data,
-          text: evt.target.value,
+          ...block,
+          data: {
+            ...block.data,
+            text: evt.target.value,
+          },
         })
       }
       html={block.data.text}
     />
   );
 }
-export const HeaderBlock = applyBlock(_HeaderBlock, {
+
+// @ts-ignore
+export const HeaderBlock = applyBlock(React.memo(_HeaderBlock), {
   type: 'header',
   config: {
     placeholder: 'Heading',

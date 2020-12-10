@@ -282,8 +282,9 @@ const SortableBlockList = SortableContainer(
             <Block
               key={bId}
               css={blockCss}
+              id={bId}
               index={i}
-              block={blockIdMap[bId]}
+              // block={blockIdMap[bId]}
             />
           ),
       )}

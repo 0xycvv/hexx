@@ -5,11 +5,14 @@ import { BlockType } from '../components/editor';
 import {
   blockIdListAtom,
   blockMapAtom,
+  blockMapFamily,
   blockSelectAtom,
   blocksIdMapAtom,
   hoverBlockAtom,
+  _hexxScope,
 } from '../constants/atom';
 import { insert, insertArray } from '../utils/insert';
+import { useUpdateAtom } from '../utils/jotai';
 import { normalize } from '../utils/normalize';
 import { usePreviousExistValue } from './use-previous-exist-value';
 
@@ -22,22 +25,18 @@ export const EditableMap = new WeakMap<
   }
 >();
 
-export function useBlock(id: string, blockIndex?: number) {
-  const {
-    removeBlockWithId,
-    updateBlockDataWithId,
-    idMap,
-  } = useEditor();
+export function useBlock(id: string, blockIndex: number) {
+  const family = blockMapFamily(id);
+  family.scope = _hexxScope;
+  const [block, updateBlockIdMap] = useAtom(family);
+  const setIds = useUpdateAtom(blockIdListAtom);
   const remove = () => {
-    removeBlockWithId({ id });
+    blockMapFamily.remove(id);
+    setIds((s) => s.filter((s) => s !== id));
   };
 
-  const update = (block) => {
-    if (typeof block === 'function') {
-      updateBlockDataWithId(block);
-    } else {
-      updateBlockDataWithId({ id, data: block });
-    }
+  const update = (b) => {
+    updateBlockIdMap(b);
   };
 
   const register = useCallback(
@@ -63,7 +62,7 @@ export function useBlock(id: string, blockIndex?: number) {
   );
 
   return {
-    block: idMap[id],
+    block,
     remove,
     update,
     registerWithIndex,
@@ -71,6 +70,7 @@ export function useBlock(id: string, blockIndex?: number) {
   };
 }
 
+// perf issue
 export function useEditor() {
   const [hoverBlock] = useAtom(hoverBlockAtom);
   const [blockMap] = useAtom(blockMapAtom);

@@ -6,9 +6,10 @@ import { css, applyBlock } from '@hexx/theme';
 const styles = css(dividerStyles);
 
 export const Divider = applyBlock(
-  () => {
+  // @ts-ignore
+  React.memo(() => {
     return <div role="separator" className={styles} />;
-  },
+  }),
   {
     type: 'delimiter',
     icon: {

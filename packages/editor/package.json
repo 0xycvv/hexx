@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "main": "dist/hexx-editor.cjs.js",
   "module": "dist/hexx-editor.esm.js",
   "preconstruct": {
@@ -30,11 +30,11 @@
   },
   "dependencies": {
     "@hexx/renderer": "^0.2.2",
-    "@hexx/theme": "^0.1.3",
+    "@hexx/theme": "^0.1.4",
     "@popperjs/core": "^2.5.4",
     "hast-util-to-dom": "^2.0.6",
     "hast-util-to-mdast": "^7.1.3",
-    "jotai": "^0.11.2",
+    "jotai": "^0.11.3",
     "mdast-util-from-markdown": "0.8.1",
     "mdast-util-to-hast": "^10.0.1",
     "react-contenteditable": "^3.3.5",

@@ -1,4 +1,3 @@
-import { EROFS } from 'constants';
 import { useEventListener } from './use-event-listener';
 
 export function useSelectionChange(

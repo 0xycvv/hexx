@@ -1,4 +1,4 @@
-import { useSelectionChange } from '../hooks/use-selection-change';
+import { useEventListener } from '../hooks';
 import { usePlugin } from './plugin';
 
 export function SelectionChangePlugin({
@@ -7,19 +7,26 @@ export function SelectionChangePlugin({
   onSelectionChange?: (range: Range) => void;
 }) {
   const { wrapperRef } = usePlugin();
-  useSelectionChange((e) => {
+
+  useEventListener('selectionchange', (e) => {
     const selection = window.getSelection();
     if (!selection || !selection.rangeCount) {
       return;
     }
     let selectedRange = selection.getRangeAt(0);
     if (
-      Math.abs(selectedRange.startOffset - selectedRange.endOffset) >
-      0
+      selectedRange.commonAncestorContainer &&
+      wrapperRef?.contains(selectedRange.commonAncestorContainer)
     ) {
-      onSelectionChange?.(selectedRange);
+      if (
+        Math.abs(
+          selectedRange.startOffset - selectedRange.endOffset,
+        ) > 0
+      ) {
+        onSelectionChange?.(selectedRange);
+      }
     }
-  }, wrapperRef);
+  });
 
   return null;
 }

@@ -1,7 +1,7 @@
 import * as mdast from 'mdast';
 import { css, applyBlock, BlockProps } from '@hexx/theme';
 import type { Paragraph } from '@hexx/renderer';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
 import { lastCursor } from '../../utils/find-blocks';
@@ -13,9 +13,9 @@ import {
   text as TextIcon,
 } from '../icons';
 
-export function _TextBlock({ index, block }: BlockProps<Paragraph['data']>) {
+function _TextBlock({ index, id }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { update, register } = useBlock(block.id, index);
+  const { update, register, block } = useBlock(id, index);
 
   useEffect(() => {
     ref.current?.focus();
@@ -31,10 +31,7 @@ export function _TextBlock({ index, block }: BlockProps<Paragraph['data']>) {
       textAlign: block.data.alignment || 'left',
     },
     onChange: (evt) => {
-      update({
-        ...block.data,
-        text: evt.target.value,
-      });
+      update({ data: { text: evt.target.value }});
     },
   };
 
@@ -48,7 +45,10 @@ export function _TextBlock({ index, block }: BlockProps<Paragraph['data']>) {
   );
 }
 
-export const TextBlock = applyBlock(_TextBlock, {
+export const TextBlock = applyBlock<Paragraph['data']>(
+  // @ts-ignore
+  memo(_TextBlock)
+  , {
   type: 'paragraph',
   icon: {
     text: 'Text',

@@ -1,5 +1,13 @@
 # @hexx/editor
 
+## 0.6.3
+
+### Patch Changes
+
+- use atomFamily, reduce rerender
+- Updated dependencies [undefined]
+  - @hexx/theme@0.1.4
+
 ## 0.6.2
 
 ### Patch Changes

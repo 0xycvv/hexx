@@ -27,8 +27,8 @@ interface BlockConfig<Data, Config> {
   [x: string]: any;
 }
 
-export interface BlockProps<T = any, C = any> {
-  block: BlockType<T>;
+export interface BlockProps<C = any> {
+  id: string;
   index: number;
   config?: C;
   children?: ReactNode;
@@ -37,21 +37,20 @@ export interface BlockProps<T = any, C = any> {
 
 interface BlockComponentBefore<
   BlockData = unknown,
-  Config = undefined
+  Config = unknown
 > {
   block?: BlockConfig<BlockData, Config>;
-  (props: BlockProps<BlockData, Config>): JSX.Element;
+  (props: BlockProps<Config>): JSX.Element;
 }
 export interface BlockComponent<
-  BlockData = unknown,
-  Config = undefined,
-  BlockConfig = unknown
+  BlockConfig = unknown,
+  Config = undefined
 > {
   block: BlockConfig;
-  (props: BlockProps<BlockData, Config>): JSX.Element;
+  (props: BlockProps<Config>): JSX.Element;
 }
 
-export function applyBlock<Data = unknown, Config = undefined>(
+export function applyBlock<Data = unknown, Config = unknown>(
   Component: BlockComponentBefore<Data, Config>,
   block: BlockConfig<Data, Config>,
 ) {
@@ -63,5 +62,8 @@ export function applyBlock<Data = unknown, Config = undefined>(
   } else {
     Component.block = block;
   }
-  return Component as BlockComponent<Data, Config>;
+  return Component as BlockComponent<
+    BlockConfig<Data, Config>,
+    Config
+  >;
 }

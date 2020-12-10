@@ -9,11 +9,11 @@ import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
 
 function _QuoteBlock({
-  block,
   config,
   index,
-}: BlockProps<Quote['data'], { placeholder: string }>) {
-  const { update, register } = useBlock(block.id, index);
+  id,
+}: BlockProps<{ placeholder: string }>) {
+  const { update, register, block } = useBlock(id, index);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     ref.current?.focus();
@@ -27,8 +27,11 @@ function _QuoteBlock({
         className={css(quoteStyle.text)}
         onChange={(evt) => {
           update({
-            ...block.data,
-            text: evt.target.value,
+            ...block,
+            data: {
+              ...block.data,
+              text: evt.target.value,
+            },
           });
         }}
         ref={composeRefs(ref, register)}
@@ -38,7 +41,8 @@ function _QuoteBlock({
   );
 }
 
-export const QuoteBlock = applyBlock(_QuoteBlock, {
+// @ts-ignore
+export const QuoteBlock = applyBlock(React.memo(_QuoteBlock), {
   type: 'quote',
   icon: {
     text: 'Quote',

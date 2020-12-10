@@ -1,5 +1,14 @@
 # @hexx/code-block
 
+## 1.0.2
+
+### Patch Changes
+
+- use atomFamily, reduce rerender
+- Updated dependencies [undefined]
+  - @hexx/editor@0.6.3
+  - @hexx/theme@0.1.4
+
 ## 1.0.1
 
 ### Patch Changes

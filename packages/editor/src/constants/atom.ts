@@ -1,6 +1,8 @@
 import { BlockComponent } from '@hexx/theme';
 import { atom } from 'jotai';
+import { atomFamily } from 'jotai/utils.cjs';
 import { SetStateAction } from 'react';
+import { BlockData } from '../../../renderer/dist/declarations/src/types';
 import { BlockType } from '../components/editor';
 import { debounce } from '../utils/debounce';
 
@@ -162,3 +164,22 @@ export const blockIdListAtom = atom(
 );
 
 blockIdListAtom.scope = _hexxScope;
+
+export const blockMapFamily = atomFamily(
+  (id: string) => (get) => get(blocksIdMapAtom)[id],
+  (id) => (get, set, arg: BlockData) => {
+    set(blocksIdMapAtom, (prev) => {
+      return {
+        ...prev,
+        [id]: {
+          ...prev[id],
+          ...arg,
+          data: {
+            ...prev[id].data,
+            ...arg.data,
+          },
+        },
+      };
+    });
+  },
+);

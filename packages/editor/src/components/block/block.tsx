@@ -1,4 +1,4 @@
-import { styled, BlockProps } from '@hexx/theme';
+import { BlockProps, styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
 import {
   createElement,
@@ -9,10 +9,12 @@ import {
 import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import {
   blockMapAtom,
+  blockMapFamily,
   blockSelectAtom,
   editorIdAtom,
   hoverBlockAtom,
   isEditorSelectAllAtom,
+  _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
 import { useEditor } from '../../hooks/use-editor';
@@ -29,7 +31,6 @@ import {
   isEditableSelectAll,
   removeRanges,
 } from '../../utils/ranges';
-import { BlockType } from '../editor';
 import { TextBlock } from './text';
 
 const Wrapper = styled('div', {
@@ -64,10 +65,10 @@ const SelectOverlay = styled('div', {
 });
 
 function useBlockWrapper({
-  block,
+  id,
   index,
 }: {
-  block: BlockType;
+  id: string;
   index: number;
 }) {
   const { removeBlockWithId, splitBlock } = useEditor();
@@ -80,7 +81,9 @@ function useBlockWrapper({
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const ref = useRef<HTMLDivElement>(null);
   const selectInputRef = useRef<HTMLInputElement>(null);
-
+  const family = blockMapFamily(id);
+  family.scope = _hexxScope;
+  const [block] = useAtom(family);
   const isHovering =
     hoverBlockId && block && hoverBlockId.id === block.id;
   const currentBlock = block && blocksMap[block.type];
@@ -185,6 +188,7 @@ function useBlockWrapper({
   }
 
   return {
+    block,
     ref,
     selectInputRef,
     editorId,
@@ -237,12 +241,14 @@ const SortableItem = SortableElement(
     isBlockSelect,
     isEditorSelectAll,
     selectInputRef,
+    id,
     i,
   }) => {
     return (
       <div className="hexx-block">
         {createElement(blockComponent, {
           block,
+          id,
           index: i,
           config: blockComponent.block.config,
         })}
@@ -255,8 +261,9 @@ const SortableItem = SortableElement(
   },
 );
 
-export function Block({ block, index, css }: BlockProps) {
+export function Block({ id, index, css }: BlockProps) {
   const {
+    block,
     selectInputRef,
     getBlockProps,
     isBlockSelect,
@@ -264,7 +271,7 @@ export function Block({ block, index, css }: BlockProps) {
     blockComponent,
     ref,
   } = useBlockWrapper({
-    block,
+    id,
     index,
   });
 
@@ -279,6 +286,7 @@ export function Block({ block, index, css }: BlockProps) {
         isBlockSelect={isBlockSelect}
         isEditorSelectAll={isEditorSelectAll}
         block={block}
+        id={block.id}
         blockComponent={blockComponent}
         index={index}
         i={index}

@@ -1,18 +1,18 @@
 import { composeRef, lastCursor, useBlock } from '@hexx/editor';
 import { BlockProps, Editable } from '@hexx/editor/components';
-import { css, applyBlock } from '@hexx/theme';
-import { useEffect, useRef } from 'react';
-import { codeBlockStyle, TCodeBlock } from './renderer';
+import { applyBlock, css } from '@hexx/theme';
+import * as React from 'react';
+import { codeBlockStyle } from './renderer';
 import SvgCode from './svg';
 
-function _CodeBlock({
-  block,
+const _CodeBlock = React.memo(function _CodeBlock({
+  id,
   index,
-}: BlockProps<TCodeBlock['data']>) {
-  const { update, register } = useBlock(block.id, index);
-  const ref = useRef<HTMLDivElement>(null);
+}: BlockProps) {
+  const { update, register, block } = useBlock(id, index);
+  const ref = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     ref.current?.focus();
     lastCursor();
   }, []);
@@ -28,8 +28,11 @@ function _CodeBlock({
           placeholder={'<code-block></code-block>'}
           onChange={(evt) => {
             update({
-              ...block.data,
-              value: evt.target.value,
+              ...block,
+              data: {
+                ...block.data,
+                value: evt.target.value,
+              },
             });
           }}
           ref={composeRef(ref, register)}
@@ -38,8 +41,9 @@ function _CodeBlock({
       </code>
     </pre>
   );
-}
+});
 
+// @ts-ignore
 export const CodeBlock = applyBlock(_CodeBlock, {
   type: 'code',
   isEmpty: (d) => !d.value?.trim(),

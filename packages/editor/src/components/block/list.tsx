@@ -15,18 +15,18 @@ import { list as ListSvg } from '../icons';
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
 
-function _ListBlock({
+const _ListBlock = React.memo(function({
   index,
-  block,
+  id,
   config,
-}: BlockProps<List['data']>) {
+}: BlockProps<{ placeholder: string }>) {
   const ref = React.useRef<HTMLElement>(null);
   const [
     activeListItemIndex,
     setActiveListItemIndex,
   ] = React.useState<number>(0);
 
-  const { update } = useBlock(block.id, index);
+  const { update, block } = useBlock(id, index);
 
   let listItems = React.Children.toArray(
     block.data.items.map((item, i) => (
@@ -34,21 +34,27 @@ function _ListBlock({
         index={i}
         blockId={block.id}
         blockIndex={index}
-        placeholder={config.placeholder}
+        placeholder={config?.placeholder}
         onFocus={() => setActiveListItemIndex(i)}
         onEmpty={() => {
           const items = removeItemAtIndex(block.data.items, i);
           update({
-            ...block.data,
-            items,
+            ...block,
+            data: {
+              ...block.data,
+              items,
+            },
           });
         }}
         onChange={(value) => {
           let items = block.data.items;
           items = replaceItemAtIndex(block.data.items, i, value);
           update({
-            ...block.data,
-            items,
+            ...block,
+            data: {
+              ...block.data,
+              items,
+            },
           });
         }}
         data={item}
@@ -73,8 +79,11 @@ function _ListBlock({
           next,
         );
         update({
-          ...block.data,
-          items,
+          ...block,
+          data: {
+            ...block.data,
+            items,
+          },
         });
         e.stopPropagation();
         e.preventDefault();
@@ -113,7 +122,7 @@ function _ListBlock({
       {listItems}
     </Ul>
   );
-}
+});
 
 function ListItem(props: {
   data: string;
@@ -149,7 +158,11 @@ function ListItem(props: {
   );
 }
 
-export const ListBlock = applyBlock(_ListBlock, {
+export const ListBlock = applyBlock<
+  List['data'],
+  { placeholder: string }
+  // @ts-ignore
+>(_ListBlock, {
   type: 'list',
   icon: {
     text: 'List',
