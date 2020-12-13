@@ -18,13 +18,7 @@ export function SelectionChangePlugin({
       selectedRange.commonAncestorContainer &&
       wrapperRef?.contains(selectedRange.commonAncestorContainer)
     ) {
-      if (
-        Math.abs(
-          selectedRange.startOffset - selectedRange.endOffset,
-        ) > 0
-      ) {
-        onSelectionChange?.(selectedRange);
-      }
+      onSelectionChange?.(selectedRange);
     }
   });
 

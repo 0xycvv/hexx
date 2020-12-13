@@ -97,6 +97,10 @@ const EditorUsage = (props: EditorProps) => {
         />
         <SelectionChangePlugin
           onSelectionChange={(range) => {
+            if (range.collapsed) {
+              popper.setActive(false);
+              return;
+            }
             const rect = range.getBoundingClientRect();
             if (rect) {
               if (!popper.active) {

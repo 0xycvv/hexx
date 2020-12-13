@@ -79,6 +79,7 @@ export function InlineToolBar({
 export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
   return (
     <DefaultInlineTool
+      shortcut="⌘ + b"
       type="bold"
       onToggle={() => {
         document.execCommand('bold', false);
@@ -95,6 +96,7 @@ export function InlineItalic(
 ) {
   return (
     <DefaultInlineTool
+      shortcut="⌘ + i"
       type="italic"
       onToggle={() => {
         document.execCommand('italic', false);

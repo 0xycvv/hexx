@@ -1,8 +1,8 @@
-import { forwardRef } from 'react';
 import { css } from '@hexx/theme';
+import { forwardRef } from 'react';
 import {
-  ContentEditableProps,
   ContentEditable,
+  ContentEditableProps,
 } from '../contenteditable';
 
 const styles = css({

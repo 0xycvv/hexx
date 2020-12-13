@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { getSelectionRange } from '../../utils/ranges';
 import { useEventListener } from '../../hooks/use-event-listener';
 import { useLatestRef } from '../../hooks/use-latest-ref';
@@ -20,13 +20,19 @@ const commandCombo = (shortcut?: string) => {
   if (!shortcut) {
     return [false, null] as const;
   }
-  const shortcuts = getShortcutArray(shortcut);
-  const hasCommand = shortcuts.includes(COMMAND_SYMBOL);
+  const shortcuts = useMemo(() => getShortcutArray(shortcut), [
+    shortcut,
+  ]);
+  const shortcutKey = useMemo(
+    () => shortcuts.filter((s) => s !== COMMAND_SYMBOL)[0],
+    [shortcuts],
+  );
+  const hasCommand = useMemo(
+    () => shortcuts.includes(COMMAND_SYMBOL),
+    [shortcuts],
+  );
 
-  return [
-    hasCommand,
-    shortcuts.filter((s) => s !== COMMAND_SYMBOL)[0],
-  ] as const;
+  return [hasCommand, shortcutKey] as const;
 };
 
 export function useInlineTool({
@@ -43,8 +49,31 @@ export function useInlineTool({
   useEventListener(
     'keydown',
     (e) => {
+      if (isActive && e.key === 'Escape') {
+        let range = getSelectionRange();
+        if (range?.collapsed) {
+          document.execCommand('insertText', false, ' ');
+          range = getSelectionRange();
+          requestAnimationFrame(() => {
+            if (!range) return;
+            range.setStart(
+              range.startContainer,
+              range.startOffset - 1,
+            );
+            range.setEnd(range.endContainer, range.endOffset);
+            requestAnimationFrame(() => {
+              onToggle(false);
+              const sel = getSelection();
+              sel?.collapseToEnd();
+            });
+          });
+          e.preventDefault();
+        }
+      }
       if (isCommandCombo && key && e[commandKey] && e.key === key) {
-        onToggle(isActive);
+        onToggle(!isActive);
+        e.preventDefault();
+        return;
       }
     },
     wrapperRef,
@@ -55,7 +84,7 @@ export function useInlineTool({
     setIsActive,
     getProps: {
       onClick: (e) => {
-        onToggle(isActive);
+        onToggle(!isActive);
       },
       color: isActive ? ('active' as const) : ('inactive' as const),
     },

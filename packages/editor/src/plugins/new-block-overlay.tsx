@@ -1,9 +1,6 @@
 import { styled } from '@hexx/theme';
-import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
-import { activeBlockIdAtom } from '../constants/atom';
 import { useIdMap } from '../hooks';
-import { useActiveBlockId } from '../hooks/use-active-element';
 import { findLastBlock } from '../utils/find-blocks';
 import { usePlugin } from './plugin';
 

@@ -7,7 +7,7 @@ import { StitchesProps } from '@hexx/theme';
 export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
   const { getProps, setIsActive } = useInlineTool({
     onToggle: (isActive) => {
-      if (isActive) {
+      if (!isActive) {
         document.execCommand('removeFormat');
         setIsActive(false);
       } else {

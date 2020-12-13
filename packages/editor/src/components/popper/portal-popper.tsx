@@ -15,9 +15,6 @@ export function PortalPopper({
   pointerEvent?: Property.PointerEvents;
   onClose?: () => void;
 } & { popper: Props }) {
-  if (!popper.active) {
-    return null;
-  }
   useEffect(() => {
     return () => {
       props.onClose?.();
@@ -26,7 +23,7 @@ export function PortalPopper({
 
   return (
     <ClientOnlyPortal selector={props.selector || 'body'}>
-      <Overlay
+      {popper.active && <Overlay
         className="hexx-popper-overlay"
         style={{
           pointerEvents: props.pointerEvent || 'none',
@@ -41,7 +38,7 @@ export function PortalPopper({
           e.preventDefault();
           e.stopPropagation();
         }}
-      />
+      />}
       <PopperLayer {...popper.getPopperProps()}>
         {props.children}
       </PopperLayer>

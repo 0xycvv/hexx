@@ -13,7 +13,7 @@ export function InlineMarker({
 }) {
   const { getProps, setIsActive } = useInlineTool({
     onToggle: (isActive) => {
-      if (isActive) {
+      if (!isActive) {
         document.execCommand('removeFormat');
       } else {
         // https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-removeformat-command
