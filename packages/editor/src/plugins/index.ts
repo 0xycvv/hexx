@@ -5,3 +5,4 @@ export * from './selection';
 export * from './debug';
 export * from './change-detect';
 export * from './file-drop';
+export * from './local-storage';

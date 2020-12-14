@@ -1,4 +1,5 @@
-import { useEditor, styled } from '@hexx/editor';
+import { useEditor } from '@hexx/editor';
+import { styled } from '@hexx/theme';
 import {
   PortalPopper,
   useReactPopper,
@@ -49,7 +50,7 @@ const AddMenu = styled('div', {
     paddingRight: 6,
     boxSizing: 'content-box',
     ':hover': {
-      color: '$gay500',
+      color: '$gray500',
     },
     '&.active': {
       color: '$success',

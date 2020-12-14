@@ -129,11 +129,11 @@ export function useEditor() {
           [newBlock.id]: newBlock,
         }));
       } else {
+        setIdList((s) => insert(s, arg.index!, newBlock.id));
         setIdMap((s) => ({
           ...s,
           [newBlock.id]: newBlock,
         }));
-        setIdList((s) => insert(s, arg.index!, newBlock.id));
       }
       return newBlock;
     },

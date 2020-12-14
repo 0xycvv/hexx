@@ -11,7 +11,8 @@ const config = {
     colors: {
       $text: '#000000',
       $bg: 'white',
-      $gay500: '#9B9FA4',
+      $gray200: '#E6E8E9',
+      $gray500: '#9B9FA4',
       $link: '#0278E4',
       $success: '#2BC3A8',
       $highlight: '#E4B202',

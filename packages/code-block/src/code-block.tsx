@@ -2,10 +2,10 @@ import {
   composeRef,
   lastCursor,
   useBlock,
-  css,
   applyBlock,
   BlockProps,
 } from '@hexx/editor';
+import { css } from '@hexx/theme';
 import { Editable } from '@hexx/editor/components';
 import * as React from 'react';
 import { codeBlockStyle, TCodeBlock } from './renderer';

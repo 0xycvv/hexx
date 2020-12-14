@@ -1,8 +1,8 @@
+import { CodeBlock } from '@hexx/code-block';
 import {
   Editor,
   EditorProps,
   generateGetBoundingClientRect,
-  css,
 } from '@hexx/editor';
 import {
   BlockMap,
@@ -14,14 +14,14 @@ import {
   useReactPopper,
 } from '@hexx/editor/components';
 import {
+  ChangeDetectPlugin,
+  HexxDevTool,
+  LocalStoragePlugin,
   SelectionChangePlugin,
   SelectionPlugin,
   Unstable_UndoPlugin,
-  FileDropPlugin,
-  HexxDevTool,
-  ChangeDetectPlugin,
 } from '@hexx/editor/plugins';
-import { CodeBlock } from '@hexx/code-block';
+import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
 import { PlusButton } from './plus-button';
 import { TuneButton } from './tune-button';
@@ -33,6 +33,9 @@ const blockMap = {
 
 const EditorUsage = (props: EditorProps) => {
   const editorRef = useRef<ElementRef<typeof Editor>>();
+  const localSaverRef = useRef<
+    ElementRef<typeof LocalStoragePlugin>
+  >();
 
   const popper = useReactPopper({
     placement: 'bottom-start',
@@ -56,7 +59,8 @@ const EditorUsage = (props: EditorProps) => {
           cursor: 'pointer',
         })}
         onClick={() => {
-          console.log(editorRef.current.getData());
+          localSaverRef.current.save();
+          // console.log(editorRef.current.getData());
         }}
       >
         <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
@@ -68,8 +72,11 @@ const EditorUsage = (props: EditorProps) => {
       </div>
       <Editor
         ref={editorRef as any}
-        plusButton={<PlusButton />}
-        tuneButton={<TuneButton />}
+        onLoad={() => {
+          if (localSaverRef.current) {
+            localSaverRef.current.load();
+          }
+        }}
         blockCss={{
           marginTop: 8,
           marginBottom: 8,
@@ -86,13 +93,16 @@ const EditorUsage = (props: EditorProps) => {
         {...props}
         blockMap={blockMap}
       >
+        <PlusButton />
+        <TuneButton />
         <Unstable_UndoPlugin />
         <SelectionPlugin />
         <HexxDevTool />
-        <FileDropPlugin />
+        {/* <FileDropPlugin /> */}
+        <LocalStoragePlugin ref={localSaverRef} />
         <ChangeDetectPlugin
           onChange={() => {
-            // console.log('change');
+            console.log('change');
           }}
         />
         <SelectionChangePlugin

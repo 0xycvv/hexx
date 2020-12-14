@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import {
   _blockIdListAtom,
-  _blocksIdMapAtom
+  _blocksIdMapAtom,
 } from '../constants/atom';
 
 export function ChangeDetectPlugin(props: { onChange: () => void }) {
