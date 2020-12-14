@@ -1,4 +1,5 @@
 import { CodeBlock } from '@hexx/block-code';
+import { BasicImageBlock } from '@hexx/block-basic-image';
 import {
   Editor,
   EditorProps,
@@ -19,7 +20,8 @@ import {
   LocalStoragePlugin,
   SelectionChangePlugin,
   SelectionPlugin,
-  Unstable_UndoPlugin,
+  HistoryPlugin,
+  EditorWidthPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useRef } from 'react';
@@ -29,6 +31,7 @@ import { TuneButton } from './tune-button';
 const blockMap = {
   ...BlockMap,
   code: CodeBlock,
+  'basic-image': BasicImageBlock,
 };
 
 const EditorUsage = (props: EditorProps) => {
@@ -95,7 +98,8 @@ const EditorUsage = (props: EditorProps) => {
       >
         <PlusButton />
         <TuneButton />
-        <Unstable_UndoPlugin />
+        <HistoryPlugin />
+        <EditorWidthPlugin />
         <SelectionPlugin />
         <HexxDevTool />
         {/* <FileDropPlugin /> */}

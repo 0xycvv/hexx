@@ -7,7 +7,8 @@
     "entrypoints": [
       "index.ts",
       "components/index.ts",
-      "plugins/index.ts"
+      "plugins/index.ts",
+      "components/icons/index.tsx"
     ]
   },
   "scripts": {

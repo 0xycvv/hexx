@@ -29,6 +29,7 @@ type UIState = {
   isDragging: boolean;
   isSorting: boolean;
   sortingItemKey?: string;
+  [x: string]: any;
 };
 
 export const uiStateAtom = atom<UIState>({

@@ -1,4 +1,4 @@
-# @hexx/code-block
+# @hexx/block-code
 
 ## 0.6.5
 

@@ -1,4 +1,4 @@
-# @hexx/basic-image
+# @hexx/block-basic-image
 
 ## 0.6.5
 ### Patch Changes

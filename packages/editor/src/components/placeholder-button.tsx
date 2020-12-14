@@ -1,5 +1,6 @@
 import { styled } from '@hexx/theme';
 export const PlaceholderButton = styled('div', {
+  position: 'relative',
   backgroundColor: '$gray200',
   borderRadius: 4,
   color: '$gray500',
@@ -10,12 +11,17 @@ export const PlaceholderButton = styled('div', {
   display: 'flex',
   alignItems: 'center',
   userSelect: 'none',
+  ':hover': {
+    opacity: 0.8
+  },
 
   variants: {
     icon: {
-      svg: {
-        fontSize: 24,
-        paddingRight: 8,
+      leftIcon: {
+        svg: {
+          fontSize: 24,
+          paddingRight: 8,
+        },
       },
     },
   },

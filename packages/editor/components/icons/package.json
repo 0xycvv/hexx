@@ -1,0 +1,4 @@
+{
+  "main": "dist/hexx-editor-components-icons.cjs.js",
+  "module": "dist/hexx-editor-components-icons.esm.js"
+}

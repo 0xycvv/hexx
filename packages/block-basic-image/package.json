@@ -1,8 +1,8 @@
 {
-  "name": "@hexx/basic-image",
+  "name": "@hexx/block-basic-image",
   "version": "0.6.5",
-  "main": "dist/hexx-basic-image.cjs.js",
-  "module": "dist/hexx-basic-image.esm.js",
+  "main": "dist/hexx-block-basic-image.cjs.js",
+  "module": "dist/hexx-block-basic-image.esm.js",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
     "react": "^16 || ^17",
