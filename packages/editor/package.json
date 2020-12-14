@@ -16,8 +16,8 @@
     "icons": "svgr --template ./icon-template.js --ext tsx --icon --filename-case 'kebab' --title-prop --ref -d ./src/components/icons ./src/components/icons"
   },
   "peerDependencies": {
-    "react": "^16 || ^17",
-    "react-dom": "^16 || ^17"
+    "react": "16.x || 17.x",
+    "react-dom": "16.x || 17.x"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",

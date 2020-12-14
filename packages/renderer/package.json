@@ -4,8 +4,7 @@
   "main": "dist/hexx-renderer.cjs.js",
   "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {
-    "react-dom": "^16 || ^17",
-    "react": "^16 || ^17"
+    "react": "16.x || 17.x"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",

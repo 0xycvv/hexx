@@ -4,9 +4,9 @@
   "main": "dist/hexx-block-basic-image.cjs.js",
   "module": "dist/hexx-block-basic-image.esm.js",
   "peerDependencies": {
-    "react-dom": "^16 || ^17",
-    "react": "^16 || ^17",
-    "@hexx/editor": "*"
+    "react": "16.x || 17.x",
+    "@hexx/editor": "*",
+    "@hexx/theme": "*"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
