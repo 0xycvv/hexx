@@ -41,9 +41,9 @@ const _BasicImageBlock = memo<BlockProps<Config>>(
           type="file"
           id={id}
           accept="image/*"
-          onChange={async (e) => {
+          onChange={(e) => {
             if (e.target.files && config?.onInput) {
-              handleImageUpdate(await config.onInput(e.target.files));
+              config.onInput(e.target.files).then(handleImageUpdate);
             }
           }}
         />
