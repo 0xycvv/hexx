@@ -1,5 +1,15 @@
 # @hexx/renderer
 
+## 0.6.5
+
+### Patch Changes
+
+- 3c3bf37: perf tuning
+- Updated dependencies [3c3bf37]
+- Updated dependencies [undefined]
+- Updated dependencies [2a464bc]
+  - @hexx/theme@0.6.5
+
 ## 0.2.2
 
 ### Patch Changes

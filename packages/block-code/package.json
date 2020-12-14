@@ -1,8 +1,8 @@
 {
-  "name": "@hexx/code-block",
-  "version": "1.0.3",
-  "main": "dist/hexx-code-block.cjs.js",
-  "module": "dist/hexx-code-block.esm.js",
+  "name": "@hexx/block-code",
+  "version": "0.6.5",
+  "main": "dist/hexx-block-code.cjs.js",
+  "module": "dist/hexx-block-code.esm.js",
   "peerDependencies": {
     "react-dom": "^16 || ^17",
     "react": "^16 || ^17",

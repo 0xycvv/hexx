@@ -1,6 +1,6 @@
 {
   "name": "@hexx/theme",
-  "version": "0.1.5",
+  "version": "0.6.5",
   "main": "dist/hexx-theme.cjs.js",
   "module": "dist/hexx-theme.esm.js",
   "peerDependencies": {

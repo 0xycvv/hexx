@@ -1,4 +1,4 @@
-import { CodeBlock } from '@hexx/code-block';
+import { CodeBlock } from '@hexx/block-code';
 import {
   Editor,
   EditorProps,

@@ -1,5 +1,15 @@
 # @hexx/code-block
 
+## 0.6.5
+
+### Patch Changes
+
+- Rename code block to block code
+- Updated dependencies [3c3bf37]
+- Updated dependencies [undefined]
+- Updated dependencies [2a464bc]
+  - @hexx/editor@0.6.5
+
 ## 1.0.3
 
 ### Patch Changes

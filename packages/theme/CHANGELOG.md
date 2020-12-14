@@ -1,5 +1,15 @@
 # @hexx/theme
 
+## 0.6.5
+
+### Patch Changes
+
+- 3c3bf37: perf tuning
+- Rename code block to block code
+- 2a464bc: - Add local storage plugin
+  - Add baisc image block template
+  - Add placeholder button component
+
 ## 0.1.5
 
 ### Patch Changes
