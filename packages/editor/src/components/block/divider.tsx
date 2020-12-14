@@ -9,7 +9,7 @@ const styles = css(dividerStyles);
 export const Divider = applyBlock<{}, {}>(
   // @ts-ignore
   React.memo(() => {
-    return <div role="separator" className={styles} />;
+    return <hr role="separator" className={styles} />;
   }),
   {
     type: 'delimiter',

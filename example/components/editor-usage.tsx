@@ -24,7 +24,7 @@ import {
   EditorWidthPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
-import { ElementRef, useRef } from 'react';
+import { ElementRef, useCallback, useRef } from 'react';
 import { PlusButton } from './plus-button';
 import { TuneButton } from './tune-button';
 
@@ -52,6 +52,30 @@ const EditorUsage = (props: EditorProps) => {
     ],
   });
 
+  const onLoadLocalStorage = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (localSaverRef.current) {
+        localSaverRef.current.load();
+      }
+    });
+  }, [localSaverRef.current]);
+
+  const selectionChange = useCallback((range: Range) => {
+    if (range.collapsed) {
+      popper.setActive(false);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (rect) {
+      if (!popper.active) {
+        popper.setActive(true);
+      }
+      popper.setReferenceElement({
+        getBoundingClientRect: generateGetBoundingClientRect(rect),
+      });
+    }
+  }, []);
+
   return (
     <>
       <div
@@ -75,11 +99,7 @@ const EditorUsage = (props: EditorProps) => {
       </div>
       <Editor
         ref={editorRef as any}
-        onLoad={() => {
-          if (localSaverRef.current) {
-            localSaverRef.current.load();
-          }
-        }}
+        onLoad={onLoadLocalStorage}
         blockCss={{
           marginTop: 8,
           marginBottom: 8,
@@ -109,25 +129,7 @@ const EditorUsage = (props: EditorProps) => {
             console.log('change');
           }}
         />
-        <SelectionChangePlugin
-          onSelectionChange={(range) => {
-            if (range.collapsed) {
-              popper.setActive(false);
-              return;
-            }
-            const rect = range.getBoundingClientRect();
-            if (rect) {
-              if (!popper.active) {
-                popper.setActive(true);
-              }
-              popper.setReferenceElement({
-                getBoundingClientRect: generateGetBoundingClientRect(
-                  rect,
-                ),
-              });
-            }
-          }}
-        />
+        <SelectionChangePlugin onSelectionChange={selectionChange} />
         <PortalPopper popper={popper}>
           <InlineToolBarPreset
             css={{

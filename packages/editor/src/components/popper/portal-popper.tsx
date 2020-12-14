@@ -23,23 +23,25 @@ export function PortalPopper({
 
   return (
     <ClientOnlyPortal selector={props.selector || 'body'}>
-      {popper.active && <Overlay
-        className="hexx-popper-overlay"
-        style={{
-          pointerEvents: props.pointerEvent || 'none',
-        }}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onClick={(e) => {
-          props.onClose?.();
-          popper.setActive(false);
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      />}
-      <PopperLayer {...popper.getPopperProps()}>
+      {popper.active && (
+        <Overlay
+          className="hexx-popper-overlay"
+          style={{
+            pointerEvents: props.pointerEvent || 'none',
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onClick={(e) => {
+            props.onClose?.();
+            popper.setActive(false);
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        />
+      )}
+      <PopperLayer {...popper.getPopperProps}>
         {props.children}
       </PopperLayer>
     </ClientOnlyPortal>
