@@ -50,7 +50,7 @@ export interface BlockComponent<
 
 export function applyBlock<Data = unknown, Config = unknown>(
   Component: BlockComponentBefore<Data, Config>,
-  block: BlockConfig<Data, Config>,
+  block: Partial<BlockConfig<Data, Config>>,
 ) {
   if (Component.block) {
     Component.block = {
@@ -58,6 +58,7 @@ export function applyBlock<Data = unknown, Config = unknown>(
       ...block,
     };
   } else {
+    // @ts-ignore
     Component.block = block;
   }
   return Component as BlockComponent<

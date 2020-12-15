@@ -55,11 +55,10 @@ export interface EditorProps extends HexxProps {
 interface HexxProps {
   wrapperRef?: MutableRefObject<HTMLDivElement>;
   children?: ReactNode;
-  plusButton?: ReactNode;
-  tuneButton?: ReactNode;
   defaultBlock?: Omit<BlockType, 'id'>;
   css?: StitchesCssProp;
   blockCss?: StitchesCssProp;
+  onLoad?: () => void;
 }
 
 const Wrapper = styled('div', {
@@ -148,7 +147,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [uiState, setUIState] = useAtom(uiStateAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
-  const active = useActiveBlockId();
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
     isEditorSelectAllAtom,
@@ -165,6 +163,11 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }
   }, [blockIdList, blockIdMap]);
 
+  useEffect(() => {
+    props.onLoad?.();
+  }, [props.onLoad]);
+
+  useActiveBlockId();
   useBlockSelectCopy();
 
   const onDragEndHandler: SortEndHandler = ({
@@ -253,8 +256,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         })}
         blockIdMap={blockIdMap}
       />
-      {props.tuneButton}
-      {props.plusButton}
     </Wrapper>
   );
 });
@@ -311,10 +312,9 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
           ref={ref}
           wrapperRef={props.wrapperRef}
           defaultBlock={defaultBlock}
-          tuneButton={props.tuneButton}
-          plusButton={props.plusButton}
           css={props.css}
           blockCss={props.blockCss}
+          onLoad={props.onLoad}
         >
           {props.children}
         </Hexx>

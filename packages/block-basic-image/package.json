@@ -1,0 +1,18 @@
+{
+  "name": "@hexx/block-basic-image",
+  "version": "0.6.5",
+  "main": "dist/hexx-block-basic-image.cjs.js",
+  "module": "dist/hexx-block-basic-image.esm.js",
+  "peerDependencies": {
+    "react": "16.x || 17.x",
+    "@hexx/editor": "*",
+    "@hexx/theme": "*"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.8",
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7"
+  },
+  "dependencies": {}
+}

@@ -73,6 +73,7 @@ export function NewBlockOverlayPlugin(props: {
       activeBlock?.editable?.focus();
     }
   };
+
   return (
     <NewBlockOverlay
       className="hexx-new-block-overlay"

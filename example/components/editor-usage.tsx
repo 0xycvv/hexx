@@ -1,8 +1,9 @@
+import { CodeBlock } from '@hexx/block-code';
+import { BasicImageBlock } from '@hexx/block-basic-image';
 import {
   Editor,
   EditorProps,
   generateGetBoundingClientRect,
-  css,
 } from '@hexx/editor';
 import {
   BlockMap,
@@ -14,25 +15,30 @@ import {
   useReactPopper,
 } from '@hexx/editor/components';
 import {
+  ChangeDetectPlugin,
+  HexxDevTool,
+  LocalStoragePlugin,
   SelectionChangePlugin,
   SelectionPlugin,
-  Unstable_UndoPlugin,
-  FileDropPlugin,
-  HexxDevTool,
-  ChangeDetectPlugin,
+  HistoryPlugin,
+  EditorWidthPlugin,
 } from '@hexx/editor/plugins';
-import { CodeBlock } from '@hexx/code-block';
-import { ElementRef, useRef } from 'react';
+import { css } from '@hexx/theme';
+import { ElementRef, useCallback, useRef } from 'react';
 import { PlusButton } from './plus-button';
 import { TuneButton } from './tune-button';
 
 const blockMap = {
   ...BlockMap,
   code: CodeBlock,
+  'basic-image': BasicImageBlock,
 };
 
 const EditorUsage = (props: EditorProps) => {
   const editorRef = useRef<ElementRef<typeof Editor>>();
+  const localSaverRef = useRef<
+    ElementRef<typeof LocalStoragePlugin>
+  >();
 
   const popper = useReactPopper({
     placement: 'bottom-start',
@@ -46,6 +52,30 @@ const EditorUsage = (props: EditorProps) => {
     ],
   });
 
+  const onLoadLocalStorage = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (localSaverRef.current) {
+        localSaverRef.current.load();
+      }
+    });
+  }, [localSaverRef.current]);
+
+  const selectionChange = useCallback((range: Range) => {
+    if (range.collapsed) {
+      popper.setActive(false);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (rect) {
+      if (!popper.active) {
+        popper.setActive(true);
+      }
+      popper.setReferenceElement({
+        getBoundingClientRect: generateGetBoundingClientRect(rect),
+      });
+    }
+  }, []);
+
   return (
     <>
       <div
@@ -56,7 +86,8 @@ const EditorUsage = (props: EditorProps) => {
           cursor: 'pointer',
         })}
         onClick={() => {
-          console.log(editorRef.current.getData());
+          localSaverRef.current.save();
+          // console.log(editorRef.current.getData());
         }}
       >
         <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
@@ -68,8 +99,7 @@ const EditorUsage = (props: EditorProps) => {
       </div>
       <Editor
         ref={editorRef as any}
-        plusButton={<PlusButton />}
-        tuneButton={<TuneButton />}
+        onLoad={onLoadLocalStorage}
         blockCss={{
           marginTop: 8,
           marginBottom: 8,
@@ -86,34 +116,20 @@ const EditorUsage = (props: EditorProps) => {
         {...props}
         blockMap={blockMap}
       >
-        <Unstable_UndoPlugin />
+        <PlusButton />
+        <TuneButton />
+        <HistoryPlugin />
+        <EditorWidthPlugin />
         <SelectionPlugin />
         <HexxDevTool />
-        <FileDropPlugin />
+        {/* <FileDropPlugin /> */}
+        <LocalStoragePlugin ref={localSaverRef} />
         <ChangeDetectPlugin
           onChange={() => {
-            // console.log('change');
+            console.log('change');
           }}
         />
-        <SelectionChangePlugin
-          onSelectionChange={(range) => {
-            if (range.collapsed) {
-              popper.setActive(false);
-              return;
-            }
-            const rect = range.getBoundingClientRect();
-            if (rect) {
-              if (!popper.active) {
-                popper.setActive(true);
-              }
-              popper.setReferenceElement({
-                getBoundingClientRect: generateGetBoundingClientRect(
-                  rect,
-                ),
-              });
-            }
-          }}
-        />
+        <SelectionChangePlugin onSelectionChange={selectionChange} />
         <PortalPopper popper={popper}>
           <InlineToolBarPreset
             css={{

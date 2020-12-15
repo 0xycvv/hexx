@@ -1,9 +1,10 @@
 ---
 "example": patch
-"@hexx/code-block": patch
+"@hexx/block-basic-image": patch
+"@hexx/block-code": patch
 "@hexx/editor": patch
 "@hexx/renderer": patch
 "@hexx/theme": patch
 ---
 
-perf tuning
+baisc image feature

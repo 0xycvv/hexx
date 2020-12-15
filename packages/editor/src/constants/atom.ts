@@ -29,6 +29,7 @@ type UIState = {
   isDragging: boolean;
   isSorting: boolean;
   sortingItemKey?: string;
+  [x: string]: any;
 };
 
 export const uiStateAtom = atom<UIState>({
@@ -161,7 +162,7 @@ export const blockIdListAtom = atom(
     const oldValue = get(_blockIdListAtom);
     set(_blockIdListAtom, arg);
     const newValue = get(_blockIdListAtom);
-    history.push({
+    updateHistory({
       label: `${JSON.stringify(oldValue)} -> ${JSON.stringify(
         newValue,
       )}`,

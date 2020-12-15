@@ -1,11 +1,10 @@
 {
   "name": "@hexx/renderer",
-  "version": "0.2.2",
+  "version": "0.6.5",
   "main": "dist/hexx-renderer.cjs.js",
   "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {
-    "react-dom": "^16 || ^17",
-    "react": "^16 || ^17"
+    "react": "16.x || 17.x"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
@@ -16,6 +15,6 @@
   },
   "dependencies": {
     "react-html-parser": "^2.0.2",
-    "@hexx/theme": "^0.1.5"
+    "@hexx/theme": "^0.6.5"
   }
 }

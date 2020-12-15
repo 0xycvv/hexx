@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
-import { redo, undo, history, undoHistory } from '../constants/atom';
+import { history, redo, undo, undoHistory } from '../constants/atom';
 import { useEventListener } from '../hooks';
 import { usePlugin } from './plugin';
 
-export function Unstable_UndoPlugin() {
+export function HistoryPlugin() {
   const { wrapperRef } = usePlugin();
 
   useEventListener(

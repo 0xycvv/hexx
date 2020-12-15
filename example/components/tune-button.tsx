@@ -1,4 +1,5 @@
-import { useEditor, styled, useIdMap } from '@hexx/editor';
+import { useEditor, useIdMap } from '@hexx/editor';
+import { styled } from '@hexx/theme';
 import {
   PortalPopper,
   useReactPopper,
@@ -26,7 +27,7 @@ const Icon = styled('svg', {
   paddingRight: 6,
   boxSizing: 'content-box',
   ':hover': {
-    color: '$gay500',
+    color: '$gray500',
   },
   variants: {
     color: {

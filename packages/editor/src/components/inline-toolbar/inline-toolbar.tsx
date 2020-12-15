@@ -45,7 +45,7 @@ export const IconWrapper = styled('div', {
     },
   },
   ':hover': {
-    color: '$gay500',
+    color: '$gray500',
   },
 });
 

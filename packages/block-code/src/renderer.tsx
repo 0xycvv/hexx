@@ -1,4 +1,4 @@
-import { css, StitchesCssProp } from '@hexx/editor';
+import { css, StitchesCssProp } from '@hexx/theme';
 import ReactHtmlParser from 'react-html-parser';
 
 export type TCodeBlock = {
