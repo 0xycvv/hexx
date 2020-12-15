@@ -1,5 +1,11 @@
 # @hexx/theme
 
+## 0.6.6
+
+### Patch Changes
+
+- eaac801: baisc image feature
+
 ## 0.6.5
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # example
 
+## 0.5.4
+
+### Patch Changes
+
+- eaac801: baisc image feature
+- Updated dependencies [eaac801]
+  - @hexx/block-basic-image@0.6.6
+  - @hexx/block-code@0.6.6
+  - @hexx/editor@0.6.6
+  - @hexx/renderer@0.6.6
+  - @hexx/theme@0.6.6
+
 ## 0.5.3
 
 ### Patch Changes

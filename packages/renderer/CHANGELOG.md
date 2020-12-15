@@ -1,5 +1,13 @@
 # @hexx/renderer
 
+## 0.6.6
+
+### Patch Changes
+
+- eaac801: baisc image feature
+- Updated dependencies [eaac801]
+  - @hexx/theme@0.6.6
+
 ## 0.6.5
 
 ### Patch Changes
