@@ -24,6 +24,7 @@ interface BlockConfig<Data, Config> {
     };
     updater: (data: Data) => Data;
   }>;
+  css?: StitchesCssProp;
   [x: string]: any;
 }
 

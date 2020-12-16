@@ -10,7 +10,7 @@ import {
 } from '../../utils/find-blocks';
 import { extractFragmentFromPosition } from '../../utils/ranges';
 import { Editable } from '../editable';
-import { list as ListSvg } from '../icons';
+import { list as ListSvg, IcNumList } from '../icons';
 import { applyBlock, BlockProps } from '../../utils/blocks';
 
 const Ul = styled('ul', listStyle.ul);
@@ -194,7 +194,7 @@ export const ListBlock = applyBlock<
     {
       icon: {
         text: 'Number',
-        svg: ListSvg,
+        svg: IcNumList,
         isActive: (data) => data.style === 'ordered',
       },
       updater: (data) => ({ ...data, style: 'ordered' }),

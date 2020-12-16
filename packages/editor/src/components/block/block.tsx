@@ -237,7 +237,6 @@ function useBlockWrapper({
 const SortableItem = SortableElement(
   ({
     blockComponent,
-    block,
     isBlockSelect,
     isEditorSelectAll,
     selectInputRef,
@@ -249,6 +248,7 @@ const SortableItem = SortableElement(
         {createElement(blockComponent, {
           id,
           index: i,
+          css: blockComponent.block.css,
           config: blockComponent.block.config,
         })}
         {(isBlockSelect || isEditorSelectAll) && (

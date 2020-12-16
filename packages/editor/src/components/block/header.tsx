@@ -15,6 +15,7 @@ function _HeaderBlock({
   id,
   index,
   config,
+  css,
 }: BlockProps<{ placeholder: string }>) {
   const { register, update, block } = useBlock(id, index);
 
@@ -39,6 +40,7 @@ function _HeaderBlock({
         })
       }
       html={block.data.text}
+      css={css}
     />
   );
 }
