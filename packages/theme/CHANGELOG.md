@@ -1,5 +1,11 @@
 # @hexx/theme
 
+## 0.6.7
+
+### Patch Changes
+
+- Fix link and add preset add button and tune button
+
 ## 0.6.6
 
 ### Patch Changes

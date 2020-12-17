@@ -1,5 +1,17 @@
 # example
 
+## 0.5.5
+
+### Patch Changes
+
+- Fix link and add preset add button and tune button
+- Updated dependencies [undefined]
+  - @hexx/block-basic-image@0.6.7
+  - @hexx/block-code@0.6.7
+  - @hexx/editor@0.6.7
+  - @hexx/renderer@0.6.7
+  - @hexx/theme@0.6.7
+
 ## 0.5.4
 
 ### Patch Changes

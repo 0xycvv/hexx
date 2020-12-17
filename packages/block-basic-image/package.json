@@ -1,6 +1,6 @@
 {
   "name": "@hexx/block-basic-image",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "main": "dist/hexx-block-basic-image.cjs.js",
   "module": "dist/hexx-block-basic-image.esm.js",
   "peerDependencies": {
