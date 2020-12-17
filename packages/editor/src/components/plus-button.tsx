@@ -16,7 +16,7 @@ const Plus = styled('div', {
   border: '1px solid #D3D6D8',
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
   borderRadius: '26px 26px 0 26px',
-  svg: { pointerEvents: 'none' },
+  backgroundColor: '$bg',
   variants: {
     color: {
       active: {
@@ -63,6 +63,7 @@ export function PlusButton() {
     insertBlockAfter,
     lastHoverBlock,
   } = useEditor();
+
   const popper = useReactPopper({
     defaultActive: false,
     placement: 'left-start',
@@ -94,6 +95,7 @@ export function PlusButton() {
     } else {
       popper.setActive(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hoverBlock]);
 
   return (
@@ -114,13 +116,14 @@ export function PlusButton() {
           </svg>
         </Plus>
       </PortalPopper>
-      <Popper popper={menuPopper}>
+      <PortalPopper popper={menuPopper}>
         <AddMenu>
           {Object.entries(blockMap).map(([key, blockType]) => (
             <Fragment key={key}>
-              {createElement(blockType.block.icon?.svg, {
-                title: blockType.block.icon?.text ?? '',
-                onClick: (e: MouseEvent) => {
+              {createElement(blockType.block.icon.svg, {
+                title: blockType.block.icon.text,
+                onClick: () => {
+                  if (!lastHoverBlock) return;
                   insertBlockAfter({
                     block: {
                       type: blockType.block.type,
@@ -134,7 +137,7 @@ export function PlusButton() {
             </Fragment>
           ))}
         </AddMenu>
-      </Popper>
+      </PortalPopper>
     </>
   );
 }
