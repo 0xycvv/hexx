@@ -10,12 +10,17 @@ const EditorUsage = dynamic(
 );
 
 const Header = styled('header', {
-  display: 'flex',
-  alignItems: 'center',
   width: '100%',
   paddingLeft: 50,
   height: 56,
   fontSize: 26,
+});
+
+const Logo = styled('a', {
+  display: 'flex',
+  alignItems: 'center',
+  height: '100%',
+  color: 'black',
 });
 
 const SVG = (
@@ -43,8 +48,12 @@ export default function Home() {
         /> */}
       </Head>
       <Header>
-        {SVG}
-        <span style={{ marginLeft: '6px', fontSize: 20 }}>Hexx</span>
+        <Logo href="https://github.com/ericyip/hexx">
+          {SVG}
+          <span style={{ marginLeft: '6px', fontSize: 20 }}>
+            Hexx
+          </span>
+        </Logo>
       </Header>
       <main className={styles.main}>
         <EditorUsage
