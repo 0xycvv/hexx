@@ -6,6 +6,42 @@ import { useReactPopper } from './use-react-popper';
 
 type Props = ReturnType<typeof useReactPopper>;
 
+export function Popper({
+  popper,
+  ...props
+}: {
+  children: ReactNode;
+  pointerEvent?: Property.PointerEvents;
+  onClose?: () => void;
+} & { popper: Props }) {
+  if (!popper.active) {
+    return null;
+  }
+  return (
+    <>
+      <Overlay
+        className="hexx-popper-overlay"
+        style={{
+          pointerEvents: props.pointerEvent || 'none',
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onClick={(e) => {
+          props.onClose?.();
+          popper.setActive(false);
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      />
+      <PopperLayer {...popper.getPopperProps}>
+        {props.children}
+      </PopperLayer>
+    </>
+  );
+}
+
 export function PortalPopper({
   popper,
   ...props

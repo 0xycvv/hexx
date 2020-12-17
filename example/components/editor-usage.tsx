@@ -1,32 +1,25 @@
-import { CodeBlock } from '@hexx/block-code';
 import { BasicImageBlock } from '@hexx/block-basic-image';
-import {
-  Editor,
-  EditorProps,
-  generateGetBoundingClientRect,
-} from '@hexx/editor';
+import { CodeBlock } from '@hexx/block-code';
+import { Editor, EditorProps } from '@hexx/editor';
 import {
   BlockMap,
   InlineCode,
   InlineLink,
   InlineMarker,
-  InlineToolBarPreset,
-  PortalPopper,
-  useReactPopper,
+  InlineTool,
+  PlusButton,
+  TuneButton,
 } from '@hexx/editor/components';
 import {
   ChangeDetectPlugin,
-  HexxDevTool,
-  LocalStoragePlugin,
-  SelectionChangePlugin,
-  SelectionPlugin,
-  HistoryPlugin,
   EditorWidthPlugin,
+  HexxDevTool,
+  HistoryPlugin,
+  LocalStoragePlugin,
+  SelectionPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useCallback, useRef } from 'react';
-import { PlusButton } from './plus-button';
-import { TuneButton } from './tune-button';
 
 const blockMap = {
   ...BlockMap,
@@ -40,18 +33,6 @@ const EditorUsage = (props: EditorProps) => {
     ElementRef<typeof LocalStoragePlugin>
   >();
 
-  const popper = useReactPopper({
-    placement: 'bottom-start',
-    modifiers: [
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 8],
-        },
-      },
-    ],
-  });
-
   const onLoadLocalStorage = useCallback(() => {
     requestAnimationFrame(() => {
       if (localSaverRef.current) {
@@ -59,22 +40,6 @@ const EditorUsage = (props: EditorProps) => {
       }
     });
   }, [localSaverRef.current]);
-
-  const selectionChange = useCallback((range: Range) => {
-    if (range.collapsed) {
-      popper.setActive(false);
-      return;
-    }
-    const rect = range.getBoundingClientRect();
-    if (rect) {
-      if (!popper.active) {
-        popper.setActive(true);
-      }
-      popper.setReferenceElement({
-        getBoundingClientRect: generateGetBoundingClientRect(rect),
-      });
-    }
-  }, []);
 
   return (
     <>
@@ -123,24 +88,17 @@ const EditorUsage = (props: EditorProps) => {
         <SelectionPlugin />
         <HexxDevTool />
         {/* <FileDropPlugin /> */}
+        <InlineTool>
+          <InlineMarker />
+          <InlineCode />
+          <InlineLink />
+        </InlineTool>
         <LocalStoragePlugin ref={localSaverRef} />
         <ChangeDetectPlugin
           onChange={() => {
             console.log('change');
           }}
         />
-        <SelectionChangePlugin onSelectionChange={selectionChange} />
-        <PortalPopper popper={popper}>
-          <InlineToolBarPreset
-            css={{
-              borderRadius: '0px 26px 26px 26px',
-            }}
-          >
-            <InlineMarker />
-            <InlineCode />
-            <InlineLink />
-          </InlineToolBarPreset>
-        </PortalPopper>
       </Editor>
     </>
   );

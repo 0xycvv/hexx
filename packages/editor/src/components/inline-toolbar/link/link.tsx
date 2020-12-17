@@ -7,7 +7,7 @@ import {
 } from '../../../constants/atom';
 import { getSelectionRange } from '../../../utils/ranges';
 import Link from '../../icons/link';
-import { PortalPopper } from '../../popper/portal-popper';
+import { Popper } from '../../popper/portal-popper';
 import { useReactPopper } from '../../popper/use-react-popper';
 import {
   isAnchorElement,
@@ -121,7 +121,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
         {...props}
       >
         <Link title="link" />
-        <PortalPopper popper={popper} pointerEvent="auto">
+        <Popper popper={popper} pointerEvent="auto">
           <LinkInput
             defaultValue={initialValue}
             onClose={(value) => {
@@ -157,7 +157,7 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
               }
             }}
           />
-        </PortalPopper>
+        </Popper>
       </IconWrapper>
     </>
   );

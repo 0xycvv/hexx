@@ -1,10 +1,16 @@
 import { StitchesProps, styled } from '@hexx/theme';
-import { ReactNode } from 'react';
+import { ReactNode, useCallback } from 'react';
+import { SelectionChangePlugin } from '../../plugins';
+import { generateGetBoundingClientRect } from '../../utils/virtual-element';
 import Bold from '../icons/bold';
 import Italic from '../icons/italic';
 import Underlined from '../icons/underlined';
+import { PortalPopper } from '../popper/portal-popper';
+import { useReactPopper } from '../popper/use-react-popper';
+import { InlineCode } from './code';
 import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';
 import { InlineLink } from './link/link';
+import { InlineMarker } from './marker';
 
 const Wrapper = styled('div', {
   display: 'grid',
@@ -138,5 +144,49 @@ export function InlineToolBarPreset({
       <InlineUnderline />
       {children}
     </Wrapper>
+  );
+}
+
+export function InlineTool({ children }: { children?: ReactNode }) {
+  const popper = useReactPopper({
+    placement: 'bottom-start',
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 8],
+        },
+      },
+    ],
+  });
+  const selectionChange = useCallback((range: Range) => {
+    if (range.collapsed) {
+      popper.setActive(false);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (rect) {
+      if (!popper.active) {
+        popper.setActive(true);
+      }
+      popper.setReferenceElement({
+        getBoundingClientRect: generateGetBoundingClientRect(rect),
+      });
+    }
+  }, []);
+
+  return (
+    <>
+      <SelectionChangePlugin onSelectionChange={selectionChange} />
+      <PortalPopper popper={popper}>
+        <InlineToolBarPreset
+          css={{
+            borderRadius: '0px 26px 26px 26px',
+          }}
+        >
+          {children}
+        </InlineToolBarPreset>
+      </PortalPopper>
+    </>
   );
 }

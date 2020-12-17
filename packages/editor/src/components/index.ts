@@ -6,3 +6,5 @@ export * from './inline-toolbar/marker';
 export * from './default-block-map';
 export * from './editable';
 export * from './placeholder-button';
+export * from './plus-button';
+export * from './tune-button';
