@@ -50,45 +50,46 @@ export default function Home() {
         <EditorUsage
           data={[
             {
-              id: '1asdfs1231231',
-              data: {
-                value: ` onSubmit(e) {
-      e.preventDefault();
-      const job = {
-        title: 'Developer',
-        company: 'Facebook'
-        };
-      }`,
-              },
-              type: 'code',
-            },
-            {
-              id: '1asdfs123123',
-              data: {
-                text: 'Hello World',
-                level: 2,
-              },
+              id: '9c7ccd4f-b8ae-458e-8763-6cc20f5b8e98',
               type: 'header',
+              data: { text: 'Getting Started', level: 2 },
             },
             {
-              id: '1asdfs',
+              id: 'c4be1814-af8d-4557-8300-f719c7451270',
+              type: 'paragraph',
+              data: { text: '<p>install package</p>' },
+            },
+            {
+              id: 'e157b677-9cb6-45be-a205-caae4e61962b',
+              type: 'code',
+              data: {
+                value:
+                  'npm install @hexx/editor\n# or\nyarn add @hexx/editor',
+                lang: null,
+              },
+            },
+            {
+              id: 'f9c24cae-6ea9-4ba3-ad16-71ea123d7f85',
+              type: 'header',
               data: {
                 text:
-                  'Dolore voluptatibus blanditiis vitae molestiae voluptatem sed rem. Ex id quis. Reiciendis minus eveniet enim quia neque non. Qui rem hic enim. Quia id unde consectetur ipsam facilis. Minima pariatur aut aut et deserunt voluptatem autem aut veniam.',
+                  '<a href="https://github.com/ericyip/hexx#example"></a>Example',
+                level: 2,
               },
-              type: 'paragraph',
             },
             {
-              id: 'asdfasdf',
+              id: 'bc16ac9d-bcf5-4b00-96ba-1b6784406acb',
+              type: 'code',
               data: {
-                items: ['yoyo', 'text'],
+                value:
+                  'import { Editor } from \'@hexx/editor\';\nimport {\n  BlockMap,\n  PlusButton,\n  TuneButton,\n} from \'@hexx/editor/components\';\n<editor {...props}="" blockmap="{BlockMap}"><plusbutton>\n&lt;Editor {...props} blockMap={BlockMap}&gt;\n  &lt;PlusButton /&gt;\n  &lt;TuneButton /&gt;\n  &lt;InlineTool&gt;\n    &lt;InlineMarker /&gt;\n    &lt;InlineCode /&gt;\n    &lt;InlineLink /&gt;\n  &lt;/InlineTool&gt;\n&lt;/Editor&gt;</plusbutton></editor><br>',
+                lang: null,
               },
-              type: 'list',
             },
             {
-              id: '123',
-              data: {},
-              type: 'delimiter',
+              type: 'paragraph',
+              data: { text: '' },
+              id: '0e8c1e0c-1178-47fd-ae39-d03513643199',
             },
           ]}
         />
