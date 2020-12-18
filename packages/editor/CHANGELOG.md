@@ -1,5 +1,14 @@
 # @hexx/editor
 
+## 0.6.8
+
+### Patch Changes
+
+- df21d8d: add tab event to menu
+- 93dd2ee: Fix plus button lag
+- d75b731: allow preset button to be customized
+- 525b72b: add autoFocus prop
+
 ## 0.6.7
 
 ### Patch Changes
