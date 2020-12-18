@@ -92,5 +92,6 @@ const Overlay = styled('div', {
   height: '100vh',
 });
 const PopperLayer = styled('div', {
+  willChange: 'transform',
   zIndex: 1,
 });

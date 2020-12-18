@@ -284,7 +284,6 @@ export function Block({ id, index, css }: BlockProps) {
         selectInputRef={selectInputRef}
         isBlockSelect={isBlockSelect}
         isEditorSelectAll={isEditorSelectAll}
-        block={block}
         id={block.id}
         blockComponent={blockComponent}
         index={index}

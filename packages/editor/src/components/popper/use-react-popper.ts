@@ -54,8 +54,10 @@ export function useReactPopper(props: {
     popperJs: popper,
     getPopperProps: {
       ref: popperElementRef,
-      style: popper.styles.popper,
-      hidden: !active,
+      style: {
+        ...popper.styles.popper,
+        opacity: active ? 1 : 0,
+      },
       ...popper.attributes.popper,
     },
   };

@@ -49,6 +49,7 @@ export function NewBlockOverlayPlugin(props: {
       const lastBlock = findLastBlock();
       if (lastBlock && lastBlock.blockId) {
         const block = idMap[lastBlock.blockId];
+
         const blockType = blockMap[block.type];
         if (
           blockType &&

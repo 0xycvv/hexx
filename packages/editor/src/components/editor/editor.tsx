@@ -7,6 +7,8 @@ import {
   ReactNode,
   useEffect,
   useImperativeHandle,
+  useRef,
+  useState,
 } from 'react';
 import {
   SortableContainer,
@@ -59,6 +61,7 @@ interface HexxProps {
   css?: StitchesCssProp;
   blockCss?: StitchesCssProp;
   onLoad?: () => void;
+  autoFocus?: boolean;
 }
 
 const Wrapper = styled('div', {
@@ -143,7 +146,6 @@ function useBlockSelectCopy() {
 }
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
-  const [id] = useAtom(editorIdAtom);
   const [uiState, setUIState] = useAtom(uiStateAtom);
   const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
@@ -256,9 +258,33 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         })}
         blockIdMap={blockIdMap}
       />
+      {!props.autoFocus && <AutoFocusInput />}
     </Wrapper>
   );
 });
+
+function AutoFocusInput() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      inputRef?.current?.focus();
+    });
+  }, []);
+
+  return (
+    <input
+      ref={inputRef}
+      autoFocus
+      aria-hidden="true"
+      style={{
+        top: 0,
+        position: 'absolute',
+        left: '-100000px',
+      }}
+    />
+  );
+}
 
 const SortableBlockList = SortableContainer(
   ({
@@ -292,17 +318,14 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
       type: TextBlock.block.type,
       data: TextBlock.block.defaultValue,
     };
-    const { byId, ids } = normalize(
-      props.data || [{ ...defaultBlock, id: v4() }],
-      'id',
-    );
+    const [initialData] = useState(() => normalize(props.data, 'id'));
     return (
       <Provider
         scope={_hexxScope}
         // @ts-ignore
         initialValues={[
-          [_blockIdListAtom, ids],
-          [_blocksIdMapAtom, byId],
+          [_blockIdListAtom, initialData.ids],
+          [_blocksIdMapAtom, initialData.byId],
           [editorDefaultBlockAtom, defaultBlock],
           [editorIdAtom, v4()],
           [blockMapAtom, props.blockMap],
@@ -315,6 +338,7 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
           css={props.css}
           blockCss={props.blockCss}
           onLoad={props.onLoad}
+          autoFocus={props.autoFocus}
         >
           {props.children}
         </Hexx>
