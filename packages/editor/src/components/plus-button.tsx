@@ -69,12 +69,24 @@ interface PlusButtonProps {
   menuProps?: StitchesProps<typeof AddMenu>;
 }
 
-function useTabMenu(onActive: () => void, id?: string) {
+function useTabMenu(
+  {
+    onActive,
+    onClose,
+  }: {
+    onActive: () => void;
+    onClose: () => void;
+  },
+  id?: string,
+) {
   const { wrapperRef } = usePlugin();
   const { getBlock, blockMap } = useEditor();
   useEventListener(
     'keydown',
     (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
       if (e.key === 'Tab' && !e.shiftKey) {
         if (id) {
           getBlock({ id })
@@ -121,12 +133,19 @@ export function PlusButton(props: PlusButtonProps) {
     ...props.menuPopper,
   });
 
-  useTabMenu(() => {
-    popper.setActive(true);
-    menuPopper.setActive(true);
-    console.log(menuPopper.popperElement);
-    menuPopper.popperElement?.focus();
-  }, hoverBlock?.id);
+  useTabMenu(
+    {
+      onActive: () => {
+        menuPopper.popperElement?.focus();
+        popper.setActive(true);
+        menuPopper.setActive(true);
+      },
+      onClose: () => {
+        popper.setActive(false);
+      },
+    },
+    hoverBlock?.id,
+  );
 
   useEffect(() => {
     popper.setReferenceElement(hoverBlock?.el);
