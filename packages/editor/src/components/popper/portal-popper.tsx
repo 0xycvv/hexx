@@ -77,7 +77,7 @@ export function PortalPopper({
           }}
         />
       )}
-      <PopperLayer {...popper.getPopperProps}>
+      <PopperLayer tabIndex={0} {...popper.getPopperProps}>
         {props.children}
       </PopperLayer>
     </ClientOnlyPortal>

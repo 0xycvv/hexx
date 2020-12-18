@@ -10,6 +10,8 @@ export interface UseReactPopperProps {
   modifiers?: readonly Partial<Modifier<unknown, object>>[];
 }
 
+export type UseReactPopperReturn = ReturnType<typeof useReactPopper>;
+
 export function useReactPopper(props: UseReactPopperProps) {
   const [active, setActive] = useState(props.defaultActive);
   const popperElementRef = useRef<HTMLElement>();
@@ -58,6 +60,7 @@ export function useReactPopper(props: UseReactPopperProps) {
       ref: popperElementRef,
       style: {
         ...popper.styles.popper,
+        pointerEvents: active ? 'auto' : 'none',
         opacity: active ? 1 : 0,
       },
       ...popper.attributes.popper,

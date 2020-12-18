@@ -67,3 +67,13 @@ export function applyBlock<Data = unknown, Config = unknown>(
     Config
   >;
 }
+
+export function isBlockEmpty(
+  block?: BlockComponent<any, any>,
+  data?: any,
+) {
+  return (
+    typeof block?.block.isEmpty === 'function' &&
+    block?.block.isEmpty(data)
+  );
+}

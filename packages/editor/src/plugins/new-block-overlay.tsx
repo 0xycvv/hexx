@@ -25,13 +25,7 @@ export function NewBlockOverlayPlugin(props: {
 
   const [idMap] = useIdMap();
 
-  const {
-    blockSelect,
-    selectBlock,
-    insertBlock,
-    getBlock,
-    blockMap,
-  } = editor;
+  const { blockSelect, selectBlock, insertBlock, blockMap } = editor;
 
   const handleClick = () => {
     if (

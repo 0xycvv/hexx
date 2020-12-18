@@ -74,6 +74,16 @@ export function useIdMap() {
   return useAtom(blocksIdMapAtom);
 }
 
+export function useGetBlockCallback() {
+  return useAtomCallback(
+    useCallback((get, set, arg: { id: string }) => {
+      const block = get(blocksIdMapAtom)[arg.id];
+
+      return block;
+    }, []),
+  );
+}
+
 // perf issue
 export function useEditor() {
   const hoverBlock = useAtomValue(hoverBlockAtom);
@@ -89,13 +99,7 @@ export function useEditor() {
     setBlockSelect(id ? [id] : []);
   };
 
-  const getBlock = useAtomCallback(
-    useCallback((get, set, arg: { id: string }) => {
-      const block = get(blocksIdMapAtom)[arg.id];
-
-      return block;
-    }, []),
-  );
+  const getBlock = useGetBlockCallback();
 
   const insertBlockAfter = useAtomCallback(
     useCallback((get, set, arg: { id: string; block: any }) => {

@@ -1,6 +1,9 @@
 import { StitchesProps, styled } from '@hexx/theme';
 import { createElement, Fragment, useEffect } from 'react';
-import { useEditor } from '../hooks';
+import { useEditor, useEventListener } from '../hooks';
+import { usePlugin } from '../plugins';
+import { isBlockEmpty } from '../utils/blocks';
+import { BlockMenu } from './block-menu';
 import { PortalPopper } from './popper/portal-popper';
 import {
   useReactPopper,
@@ -66,13 +69,31 @@ interface PlusButtonProps {
   menuProps?: StitchesProps<typeof AddMenu>;
 }
 
+function useTabMenu(onActive: () => void, id?: string) {
+  const { wrapperRef } = usePlugin();
+  const { getBlock, blockMap } = useEditor();
+  useEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'Tab' && !e.shiftKey) {
+        if (id) {
+          getBlock({ id })
+            .then((data) => {
+              const isEmpty = isBlockEmpty(blockMap[data.type], data);
+              if (isEmpty) {
+                onActive();
+              }
+            })
+            .catch((err) => console.log(err));
+        }
+      }
+    },
+    wrapperRef,
+  );
+}
+
 export function PlusButton(props: PlusButtonProps) {
-  const {
-    hoverBlock,
-    blockMap,
-    insertBlockAfter,
-    lastHoverBlock,
-  } = useEditor();
+  const { hoverBlock } = useEditor();
 
   const popper = useReactPopper({
     defaultActive: false,
@@ -99,6 +120,13 @@ export function PlusButton(props: PlusButtonProps) {
     ],
     ...props.menuPopper,
   });
+
+  useTabMenu(() => {
+    popper.setActive(true);
+    menuPopper.setActive(true);
+    console.log(menuPopper.popperElement);
+    menuPopper.popperElement?.focus();
+  }, hoverBlock?.id);
 
   useEffect(() => {
     popper.setReferenceElement(hoverBlock?.el);
@@ -131,24 +159,7 @@ export function PlusButton(props: PlusButtonProps) {
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
         <AddMenu {...props.menuProps}>
-          {Object.entries(blockMap).map(([key, blockType]) => (
-            <Fragment key={key}>
-              {createElement(blockType.block.icon.svg, {
-                title: blockType.block.icon.text,
-                onClick: () => {
-                  if (!lastHoverBlock) return;
-                  insertBlockAfter({
-                    block: {
-                      type: blockType.block.type,
-                      data: blockType.block.defaultValue,
-                    },
-                    id: lastHoverBlock.id,
-                  });
-                  menuPopper.setActive(false);
-                },
-              })}
-            </Fragment>
-          ))}
+          <BlockMenu onAdd={() => menuPopper.setActive(false)} />
         </AddMenu>
       </PortalPopper>
     </>
