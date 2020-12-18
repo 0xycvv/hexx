@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 import { usePopper } from 'react-popper';
 import { useEventListener } from '../../hooks/use-event-listener';
 
-export function useReactPopper(props: {
+export interface UseReactPopperProps {
   defaultActive?: boolean;
   onClose?: () => void;
   placement: Placement;
   modifiers?: readonly Partial<Modifier<unknown, object>>[];
-}) {
+}
+
+export function useReactPopper(props: UseReactPopperProps) {
   const [active, setActive] = useState(props.defaultActive);
   const popperElementRef = useRef<HTMLElement>();
   const [referenceElement, setReferenceElement] = useState<

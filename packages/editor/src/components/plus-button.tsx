@@ -1,8 +1,11 @@
-import { styled } from '@hexx/theme';
+import { StitchesProps, styled } from '@hexx/theme';
 import { createElement, Fragment, useEffect } from 'react';
 import { useEditor } from '../hooks';
-import { PortalPopper, Popper } from './popper/portal-popper';
-import { useReactPopper } from './popper/use-react-popper';
+import { PortalPopper } from './popper/portal-popper';
+import {
+  useReactPopper,
+  UseReactPopperProps,
+} from './popper/use-react-popper';
 
 const Plus = styled('div', {
   userSelect: 'none',
@@ -56,7 +59,14 @@ const AddMenu = styled('div', {
   },
 });
 
-export function PlusButton() {
+interface PlusButtonProps {
+  popper?: UseReactPopperProps;
+  menuPopper?: UseReactPopperProps;
+  iconProps?: StitchesProps<typeof Plus>;
+  menuProps?: StitchesProps<typeof AddMenu>;
+}
+
+export function PlusButton(props: PlusButtonProps) {
   const {
     hoverBlock,
     blockMap,
@@ -75,6 +85,7 @@ export function PlusButton() {
         },
       },
     ],
+    ...props.popper,
   });
   const menuPopper = useReactPopper({
     placement: 'right',
@@ -86,6 +97,7 @@ export function PlusButton() {
         },
       },
     ],
+    ...props.menuPopper,
   });
 
   useEffect(() => {
@@ -103,6 +115,7 @@ export function PlusButton() {
       <PortalPopper popper={popper}>
         <Plus
           color={menuPopper.active ? 'active' : 'inactive'}
+          {...props.iconProps}
           ref={menuPopper.setReferenceElement}
           onClick={() => {
             menuPopper.setActive(true);
@@ -117,7 +130,7 @@ export function PlusButton() {
         </Plus>
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
-        <AddMenu>
+        <AddMenu {...props.menuProps}>
           {Object.entries(blockMap).map(([key, blockType]) => (
             <Fragment key={key}>
               {createElement(blockType.block.icon.svg, {
