@@ -35,7 +35,7 @@ import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
-import { useEditor } from '../../hooks/use-editor';
+import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
@@ -92,6 +92,7 @@ const Wrapper = styled('div', {
 
 interface HexxHandler {
   getData: () => BlockType[];
+  getEditor: () => UseEditorReturn;
   focus: () => void;
   undo: () => void;
 }
@@ -154,7 +155,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     isEditorSelectAllAtom,
   );
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
-  const { insertBlock, clear, batchRemoveBlocks } = useEditor();
+  const editor = useEditor();
+  const { insertBlock, clear, batchRemoveBlocks } = editor;
 
   useEffect(() => {
     if (
@@ -202,6 +204,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     getData: () => blockIdList.map((bId) => blockIdMap[bId]),
     focus: () => findLastBlock()?.editable?.focus(),
+    getEditor: () => editor,
     undo: undo,
     redo: redo,
   }));

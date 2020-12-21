@@ -1,5 +1,5 @@
 import * as atoms from '../constants/atom';
-import { useAtomDevtools } from 'jotai/devtools.cjs';
+// import { useAtomDevtools } from 'jotai/devtools';
 
 if (process.env.NODE_ENV !== 'production') {
   Object.entries(atoms).forEach(([key, a]) => {
@@ -11,9 +11,9 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export function useEditorDevTool() {
-  useAtomDevtools(atoms.uiStateAtom);
-  useAtomDevtools(atoms._blockIdListAtom);
-  useAtomDevtools(atoms._blocksIdMapAtom);
+  // useAtomDevtools(atoms.uiStateAtom);
+  // useAtomDevtools(atoms._blocksIdMapAtom);
+  // useAtomDevtools(atoms._blockIdListAtom);
 }
 
 export function HexxDevTool() {

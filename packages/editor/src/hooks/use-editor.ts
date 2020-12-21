@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useAtomValue } from 'jotai/utils.cjs';
+import { useAtomValue } from 'jotai/utils';
 import { useCallback } from 'react';
 import { v4 } from 'uuid';
 import {
@@ -84,7 +84,7 @@ export function useGetBlockCallback() {
   );
 }
 
-// perf issue
+export type UseEditorReturn = ReturnType<typeof useEditor>;
 export function useEditor() {
   const hoverBlock = useAtomValue(hoverBlockAtom);
   const blockMap = useAtomValue(blockMapAtom);
@@ -171,6 +171,18 @@ export function useEditor() {
     [],
   );
 
+  const replaceBlockWithId = useCallback(
+    ({ id, block }: { id: string; block: BlockType }) => {
+      setIdList((s) => s.map((s) => (s === id ? block.id : s)));
+      setIdMap((s) => ({
+        ...s,
+        [block.id]: block,
+      }));
+      // blockMapFamily.remove(id);
+    },
+    [],
+  );
+
   const updateBlockDataWithId = useCallback(
     ({ id, data }: { id: string; data: any }) => {
       setIdMap((s) => ({
@@ -186,11 +198,14 @@ export function useEditor() {
 
   const removeBlockWithId = useCallback(({ id }: { id: string }) => {
     setIdList((s) => s.filter((s) => s !== id));
+    // blockMapFamily(id);
   }, []);
 
   const batchRemoveBlocks = useCallback(
     ({ ids }: { ids: string[] }) => {
-      setIdList((s) => s.filter((s) => !ids.includes(s)));
+      const filterIds = (s) => !ids.includes(s);
+      setIdList((s) => s.filter(filterIds));
+      // blockMapFamily.setShouldRemove(filterIds);
     },
     [],
   );
@@ -233,6 +248,7 @@ export function useEditor() {
     insertBlockAfter,
     splitBlock,
     updateBlockDataWithId,
+    replaceBlockWithId,
     setIdMap,
     batchRemoveBlocks,
     removeBlockWithId,

@@ -13,13 +13,21 @@ import {
 import {
   ChangeDetectPlugin,
   EditorWidthPlugin,
-  HexxDevTool,
+  // HexxDevTool,
   HistoryPlugin,
   LocalStoragePlugin,
   SelectionPlugin,
+  LinkifyItPlugin,
+  MarkdownShortcutPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useCallback, useRef } from 'react';
+import tlds from 'tlds';
+import Linkify from 'linkify-it';
+
+const linkify = Linkify();
+
+linkify.tlds(tlds);
 
 const blockMap = {
   ...BlockMap,
@@ -27,7 +35,7 @@ const blockMap = {
   'basic-image': BasicImageBlock,
 };
 
-const EditorUsage = (props: EditorProps) => {
+const EditorExample = (props: EditorProps) => {
   const editorRef = useRef<ElementRef<typeof Editor>>();
   const localSaverRef = useRef<
     ElementRef<typeof LocalStoragePlugin>
@@ -51,8 +59,8 @@ const EditorUsage = (props: EditorProps) => {
           cursor: 'pointer',
         })}
         onClick={() => {
-          localSaverRef.current.save();
-          // console.log(editorRef.current.getData());
+          // localSaverRef.current.save();
+          console.log(editorRef.current.getData());
         }}
       >
         <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
@@ -86,8 +94,10 @@ const EditorUsage = (props: EditorProps) => {
         <HistoryPlugin />
         <EditorWidthPlugin />
         <SelectionPlugin />
-        <HexxDevTool />
+        {/* <HexxDevTool /> */}
+        {/* <MarkdownShortcutPlugin /> */}
         {/* <FileDropPlugin /> */}
+        {/* <LinkifyItPlugin linkifyIt={linkify} /> */}
         <InlineTool>
           <InlineMarker />
           <InlineCode />
@@ -104,4 +114,4 @@ const EditorUsage = (props: EditorProps) => {
   );
 };
 
-export default EditorUsage;
+export default EditorExample;

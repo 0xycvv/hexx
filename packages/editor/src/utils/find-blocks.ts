@@ -208,3 +208,11 @@ export function surround(
     console.log(e);
   }
 }
+
+export function createRangeLink(range: Range, url: string) {
+  const aLink = document.createElement('a');
+  aLink.href = url;
+  aLink.target = '_blank';
+  aLink.rel = 'noopener nofollow';
+  range.surroundContents(aLink);
+}

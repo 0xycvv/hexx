@@ -2,8 +2,8 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import dynamic from 'next/dynamic';
 import { styled } from '@hexx/theme';
-const EditorUsage = dynamic(
-  () => import('../components/editor-usage'),
+const EditorExample = dynamic(
+  () => import('../components/editor-example'),
   {
     ssr: true,
   },
@@ -56,7 +56,7 @@ export default function Home() {
         </Logo>
       </Header>
       <main className={styles.main}>
-        <EditorUsage
+        <EditorExample
           data={[
             {
               id: '9c7ccd4f-b8ae-458e-8763-6cc20f5b8e98',
@@ -91,13 +91,13 @@ export default function Home() {
               type: 'code',
               data: {
                 value:
-                  'import { Editor } from \'@hexx/editor\';\nimport {\n  BlockMap,\n  PlusButton,\n  TuneButton,\n} from \'@hexx/editor/components\';\n<editor {...props}="" blockmap="{BlockMap}"><plusbutton>\n&lt;Editor {...props} blockMap={BlockMap}&gt;\n  &lt;PlusButton /&gt;\n  &lt;TuneButton /&gt;\n  &lt;InlineTool&gt;\n    &lt;InlineMarker /&gt;\n    &lt;InlineCode /&gt;\n    &lt;InlineLink /&gt;\n  &lt;/InlineTool&gt;\n&lt;/Editor&gt;</plusbutton></editor><br>',
+                  'import { Editor } from \'@hexx/editor\';\nimport {\n  BlockMap,\n  PlusButton,\n  TuneButton,\n} from \'@hexx/editor/components\';\n<editor {...props}="" blockmap="{BlockMap}"><plusbutton>\n&lt;Editor blockMap={BlockMap}&gt;\n  &lt;PlusButton /&gt;\n  &lt;TuneButton /&gt;\n  &lt;InlineTool&gt;\n    &lt;InlineMarker /&gt;\n    &lt;InlineCode /&gt;\n    &lt;InlineLink /&gt;\n  &lt;/InlineTool&gt;\n&lt;/Editor&gt;</plusbutton></editor><br>',
                 lang: null,
               },
             },
             {
               type: 'paragraph',
-              data: { text: '' },
+              data: { text: '<p><span class=\"\"><a href=\"https://github.com/ericyip/hexx\">github</a></span></p>' },
               id: '0e8c1e0c-1178-47fd-ae39-d03513643199',
             },
           ]}

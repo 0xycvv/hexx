@@ -90,8 +90,6 @@ function useBlockWrapper({
   const isHoverFamily = isHoveringFamily(id);
   isHoverFamily.scope = _hexxScope;
   const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
-  // const isHovering =
-  //   hoverBlockId && block && hoverBlockId.id === block.id;
   const currentBlock = block && blocksMap[block.type];
   const isBlockSelect = blockSelect.includes(block.id);
 

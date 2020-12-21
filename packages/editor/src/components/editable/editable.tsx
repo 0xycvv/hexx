@@ -28,7 +28,7 @@ const styles = css({
   },
 });
 export const Editable = forwardRef<any, ContentEditableProps>(
-  ({ html = '', ...props }, ref) => (
+  ({ html = '', onChange,...props }, ref) => (
     <ContentEditable
       {...props}
       html={html}

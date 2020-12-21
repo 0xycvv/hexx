@@ -16,7 +16,7 @@ import { applyBlock, BlockProps } from '../../utils/blocks';
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
 
-const _ListBlock = React.memo(function({
+const _ListBlock = React.memo(function ({
   index,
   id,
   config,
@@ -90,15 +90,16 @@ const _ListBlock = React.memo(function({
         e.preventDefault();
       }
     } else if (e.key === BackspaceKey) {
-      if (!block.data.items[activeListItemIndex]) {
-        update({
-          ...block.data,
-          items: removeItemAtIndex(
-            block.data.items,
-            activeListItemIndex,
-          ),
-        });
-      }
+      console.log(block.data.items);
+      // if (!block.data.items[activeListItemIndex]) {
+      //   update({
+      //     ...block.data,
+      //     items: removeItemAtIndex(
+      //       block.data.items,
+      //       activeListItemIndex,
+      //     ),
+      //   });
+      // }
     }
   };
 
