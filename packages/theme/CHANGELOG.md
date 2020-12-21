@@ -1,5 +1,11 @@
 # @hexx/theme
 
+## 0.6.9
+
+### Patch Changes
+
+- 82b90b5: add linkify plugin
+
 ## 0.6.7
 
 ### Patch Changes

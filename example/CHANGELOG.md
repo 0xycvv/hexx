@@ -1,5 +1,17 @@
 # example
 
+## 0.5.6
+
+### Patch Changes
+
+- 82b90b5: add linkify plugin
+- Updated dependencies [82b90b5]
+  - @hexx/block-basic-image@0.6.9
+  - @hexx/block-code@0.6.9
+  - @hexx/editor@0.6.9
+  - @hexx/renderer@0.6.9
+  - @hexx/theme@0.6.9
+
 ## 0.5.5
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @hexx/editor
 
+## 0.6.9
+
+### Patch Changes
+
+- 82b90b5: add linkify plugin
+- Updated dependencies [82b90b5]
+  - @hexx/renderer@0.6.9
+  - @hexx/theme@0.6.9
+
 ## 0.6.8
 
 ### Patch Changes

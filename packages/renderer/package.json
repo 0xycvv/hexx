@@ -1,6 +1,6 @@
 {
   "name": "@hexx/renderer",
-  "version": "0.6.7",
+  "version": "0.6.9",
   "main": "dist/hexx-renderer.cjs.js",
   "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {
@@ -14,7 +14,7 @@
     "@babel/preset-typescript": "^7.12.7"
   },
   "dependencies": {
-    "@hexx/theme": "^0.6.7",
+    "@hexx/theme": "^0.6.9",
     "react-html-parser": "^2.0.2"
   }
 }
