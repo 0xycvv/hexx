@@ -1,5 +1,5 @@
 import * as atoms from '../constants/atom';
-import { useAtomDevtools } from 'jotai/devtools';
+import { useAtomDevtools } from '../utils/jotai';
 
 if (process.env.NODE_ENV !== 'production') {
   Object.entries(atoms).forEach(([key, a]) => {
