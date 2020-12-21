@@ -19,7 +19,6 @@ export function Unstable_MarkdownShortcutPlugin() {
       if (!currentBlockId) return;
       getBlock({ id: currentBlockId }).then((block) => {
         if (e.key === ' ' && isContentEditable(e.target)) {
-          console.log(e.target.innerHTML);
           const mdast = fromMarkdown(e.target.innerHTML) as Parent;
           const currentBlockMdast =
             blockMap[block.type]?.block?.mdast;

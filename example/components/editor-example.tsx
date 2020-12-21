@@ -13,7 +13,7 @@ import {
 import {
   ChangeDetectPlugin,
   EditorWidthPlugin,
-  // HexxDevTool,
+  HexxDevTool,
   HistoryPlugin,
   LocalStoragePlugin,
   SelectionPlugin,
@@ -94,7 +94,7 @@ const EditorExample = (props: EditorProps) => {
         <HistoryPlugin />
         <EditorWidthPlugin />
         <SelectionPlugin />
-        {/* <HexxDevTool /> */}
+        <HexxDevTool />
         <Unstable_MarkdownShortcutPlugin />
         {/* <FileDropPlugin /> */}
         <LinkifyItPlugin linkifyIt={linkify} />
