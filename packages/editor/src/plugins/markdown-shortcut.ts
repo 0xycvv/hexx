@@ -1,17 +1,16 @@
 import toDOM from 'hast-util-to-dom';
 import { Parent } from 'mdast';
-import fromMarkdown from 'mdast-util-from-markdown';
 import toHast from 'mdast-util-to-hast';
 import { v4 } from 'uuid';
 import { useEditor, useEventListener } from '../hooks';
 import { useBlockMdast } from '../parser/markdown/use-block-mdast';
 import { isContentEditable } from '../utils/is';
 import { usePlugin } from './plugin';
-
-export function MarkdownShortcutPlugin() {
+import fromMarkdown from 'mdast-util-from-markdown';
+export function Unstable_MarkdownShortcutPlugin() {
   const { wrapperRef, activeBlock } = usePlugin();
   const { allMdastConfig } = useBlockMdast();
-  const { replaceBlockWithId, blockMap, getBlock } = useEditor();
+  const { replaceBlockById, blockMap, getBlock } = useEditor();
   const currentBlockId = activeBlock?.id;
 
   useEventListener(
@@ -32,7 +31,7 @@ export function MarkdownShortcutPlugin() {
             const firstMdast = mdast.children[0];
             const mdastConfig = allMdastConfig[firstMdast.type];
             if (mdastConfig) {
-              replaceBlockWithId({
+              replaceBlockById({
                 id: currentBlockId,
                 block: {
                   type: mdastConfig.blockType,

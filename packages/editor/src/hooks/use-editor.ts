@@ -32,7 +32,7 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
   family.scope = _hexxScope;
   // @ts-ignore
   const [block, updateBlockIdMap] = useAtom<BlockType<T>>(family);
-  const setIds = useUpdateAtom(blockIdListAtom);
+  const setIds = useAtom(blockIdListAtom);
 
   const remove = () => {
     blockMapFamily.remove(id);
@@ -53,7 +53,7 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
     [blockIndex],
   );
 
-  const registerWithIndex = useCallback(
+  const registerByIndex = useCallback(
     (index: number) =>
       useCallback((ref) => {
         register(ref, index);
@@ -65,7 +65,7 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
     block,
     remove,
     update: updateBlockIdMap,
-    registerWithIndex,
+    registerByIndex,
     register,
   };
 }
@@ -89,10 +89,10 @@ export function useEditor() {
   const hoverBlock = useAtomValue(hoverBlockAtom);
   const blockMap = useAtomValue(blockMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
+  const defaultBlock = useAtomValue(editorDefaultBlockAtom);
 
   const setIdList = useUpdateAtom(blockIdListAtom);
   const setIdMap = useUpdateAtom(blocksIdMapAtom);
-
   const lastHoverBlock = usePreviousExistValue(hoverBlock);
 
   const selectBlock = (id?: string) => {
@@ -171,19 +171,19 @@ export function useEditor() {
     [],
   );
 
-  const replaceBlockWithId = useCallback(
+  const replaceBlockById = useCallback(
     ({ id, block }: { id: string; block: BlockType }) => {
       setIdList((s) => s.map((s) => (s === id ? block.id : s)));
       setIdMap((s) => ({
         ...s,
         [block.id]: block,
       }));
-      // blockMapFamily.remove(id);
+      blockMapFamily.remove(id);
     },
     [],
   );
 
-  const updateBlockDataWithId = useCallback(
+  const updateBlockDataById = useCallback(
     ({ id, data }: { id: string; data: any }) => {
       setIdMap((s) => ({
         ...s,
@@ -196,16 +196,16 @@ export function useEditor() {
     [],
   );
 
-  const removeBlockWithId = useCallback(({ id }: { id: string }) => {
+  const removeBlockById = useCallback(({ id }: { id: string }) => {
     setIdList((s) => s.filter((s) => s !== id));
-    // blockMapFamily(id);
+    blockMapFamily.remove(id);
   }, []);
 
   const batchRemoveBlocks = useCallback(
     ({ ids }: { ids: string[] }) => {
       const filterIds = (s) => !ids.includes(s);
       setIdList((s) => s.filter(filterIds));
-      // blockMapFamily.setShouldRemove(filterIds);
+      blockMapFamily.setShouldRemove(filterIds);
     },
     [],
   );
@@ -215,18 +215,24 @@ export function useEditor() {
       index,
       block,
       newBlock,
+      id
     }: {
+      id: string,
       index: number;
-      block: any;
+      block: any | null;
       newBlock: any;
     }) => {
       insertBlock({ index: index + 1, block: newBlock });
-      updateBlockDataWithId({
-        id: block.id,
-        data: block.data,
-      });
+      if (block) {
+        updateBlockDataById({
+          id: block.id,
+          data: block.data,
+        });
+      } else {
+        removeBlockById({ id });
+      }
     },
-    [updateBlockDataWithId, insertBlock],
+    [updateBlockDataById, removeBlockById, insertBlock],
   );
 
   const clear = useAtomCallback(
@@ -247,15 +253,16 @@ export function useEditor() {
     insertBlock,
     insertBlockAfter,
     splitBlock,
-    updateBlockDataWithId,
-    replaceBlockWithId,
+    updateBlockDataById,
+    replaceBlockById,
     setIdMap,
     batchRemoveBlocks,
-    removeBlockWithId,
+    removeBlockById,
     batchInsertBlocks,
     clear,
     getBlock,
     // data
+    defaultBlock,
     blockSelect,
     blockMap,
     hoverBlock,

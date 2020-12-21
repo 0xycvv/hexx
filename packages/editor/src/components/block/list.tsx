@@ -2,10 +2,11 @@ import * as React from 'react';
 import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
-import { useBlock } from '../../hooks/use-editor';
+import { useBlock, useEditor } from '../../hooks/use-editor';
 import { css, styled } from '@hexx/theme';
 import {
   findContentEditable,
+  focusBlockByIndex,
   lastCursor,
 } from '../../utils/find-blocks';
 import { extractFragmentFromPosition } from '../../utils/ranges';
@@ -28,6 +29,18 @@ const _ListBlock = React.memo(function ({
   ] = React.useState<number>(0);
 
   const { update, block } = useBlock(id, index);
+  const { defaultBlock, insertBlockAfter } = useEditor();
+
+  const handleEmptyListItem = (i: number) => {
+    const items = removeItemAtIndex(block.data.items, i);
+    update({
+      ...block,
+      data: {
+        ...block.data,
+        items: [...items],
+      },
+    });
+  };
 
   let listItems = React.Children.toArray(
     block.data.items.map((item, i) => (
@@ -37,16 +50,6 @@ const _ListBlock = React.memo(function ({
         blockIndex={index}
         placeholder={config?.placeholder}
         onFocus={() => setActiveListItemIndex(i)}
-        onEmpty={() => {
-          const items = removeItemAtIndex(block.data.items, i);
-          update({
-            ...block,
-            data: {
-              ...block.data,
-              items,
-            },
-          });
-        }}
         onChange={(value) => {
           let items = block.data.items;
           items = replaceItemAtIndex(block.data.items, i, value);
@@ -64,11 +67,23 @@ const _ListBlock = React.memo(function ({
   );
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!e.shiftKey && e.key === 'Enter') {
+      let items = block.data.items;
+      if (!block.data.items[activeListItemIndex]) {
+        handleEmptyListItem(activeListItemIndex);
+        insertBlockAfter({
+          id,
+          block: defaultBlock,
+        });
+        setTimeout(() => {
+          focusBlockByIndex(index + 1);
+        }, 0);
+        e.stopPropagation();
+        e.preventDefault();
+      }
       if (!!block.data.items[activeListItemIndex]) {
         const fragments = extractFragmentFromPosition();
         if (!fragments) return;
         const { current, next } = fragments;
-        let items = block.data.items;
         items = replaceItemAtIndex(
           items,
           activeListItemIndex,
@@ -90,24 +105,19 @@ const _ListBlock = React.memo(function ({
         e.preventDefault();
       }
     } else if (e.key === BackspaceKey) {
-      console.log(block.data.items);
-      // if (!block.data.items[activeListItemIndex]) {
-      //   update({
-      //     ...block.data,
-      //     items: removeItemAtIndex(
-      //       block.data.items,
-      //       activeListItemIndex,
-      //     ),
-      //   });
-      // }
+      if (!block.data.items[activeListItemIndex]) {
+        handleEmptyListItem(activeListItemIndex);
+      }
     }
   };
 
   React.useEffect(() => {
     requestAnimationFrame(() => {
-      // @ts-ignore
-      findContentEditable(ref.current)?.focus();
-      lastCursor();
+      if (block.data.items.length > 0) {
+        // @ts-ignore
+        findContentEditable(ref.current)?.focus();
+        lastCursor();
+      }
     });
   }, [block.data.items.length]);
 
@@ -129,30 +139,24 @@ const _ListBlock = React.memo(function ({
 function ListItem(props: {
   data: string;
   onChange: (value: string) => void;
-  onEmpty: () => void;
   onFocus: () => void;
   placeholder?: string;
   index: number;
   blockId: string;
   blockIndex: number;
 }) {
-  const { registerWithIndex } = useBlock(
+  const { registerByIndex } = useBlock(
     props.blockId,
     props.blockIndex,
   );
   return (
     <li className={css(listStyle.item)}>
       <Editable
-        ref={registerWithIndex(props.index)}
+        ref={registerByIndex(props.index)}
         placeholder={props.placeholder}
         onFocus={props.onFocus}
         onChange={(e) => {
           props.onChange(e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === BackspaceKey && props.data === '') {
-            props.onEmpty();
-          }
         }}
         html={props.data}
       />

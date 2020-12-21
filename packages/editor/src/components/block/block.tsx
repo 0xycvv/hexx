@@ -74,8 +74,7 @@ function useBlockWrapper({
   id: string;
   index: number;
 }) {
-  const { removeBlockWithId, splitBlock } = useEditor();
-  const [blocksMap] = useAtom(blockMapAtom);
+  const { removeBlockById, splitBlock, blockMap } = useEditor();
   const [editorId] = useAtom(editorIdAtom);
   const [hoverBlockId, setHoverBlockId] = useAtom(hoverBlockAtom);
   const [isEditorSelectAll, setIsEditorSelectAll] = useAtom(
@@ -90,7 +89,7 @@ function useBlockWrapper({
   const isHoverFamily = isHoveringFamily(id);
   isHoverFamily.scope = _hexxScope;
   const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
-  const currentBlock = block && blocksMap[block.type];
+  const currentBlock = block && blockMap[block.type];
   const isBlockSelect = blockSelect.includes(block.id);
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -128,6 +127,7 @@ function useBlockWrapper({
       const { current, next } = fragment;
       splitBlock({
         index,
+        id,
         block: {
           ...block,
           data: {
@@ -165,7 +165,7 @@ function useBlockWrapper({
           isBlockSelect) &&
         index !== 0
       ) {
-        removeBlockWithId({ id: block.id });
+        removeBlockById({ id: block.id });
         setBlockSelect([]);
         requestAnimationFrame(() => {
           const previousBlock = findBlockByIndex(index - 1);

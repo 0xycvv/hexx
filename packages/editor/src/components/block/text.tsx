@@ -32,14 +32,13 @@ function _TextBlock({ index, id }: BlockProps) {
       textAlign: block.data.alignment || 'left',
     },
     onChange: (evt) => {
-      update({ data: { text: evt.target.value }});
-      // update((s) => ({
-      //   ...s,
-      //   [id]: {
-      //     ...s[id],
-      //     data: { ...s[id].data, text: evt.target.value },
-      //   },
-      // }));
+      update((s) => ({
+        ...s,
+        [id]: {
+          ...s[id],
+          data: { ...s[id].data, text: evt.target.value },
+        },
+      }));
     },
   };
 
