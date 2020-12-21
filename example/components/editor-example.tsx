@@ -18,7 +18,7 @@ import {
   LocalStoragePlugin,
   SelectionPlugin,
   LinkifyItPlugin,
-  Unstable_MarkdownShortcutPlugin,
+  // Unstable_MarkdownShortcutPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
 import { ElementRef, useCallback, useRef } from 'react';
@@ -95,7 +95,7 @@ const EditorExample = (props: EditorProps) => {
         <EditorWidthPlugin />
         <SelectionPlugin />
         <HexxDevTool />
-        <Unstable_MarkdownShortcutPlugin />
+        {/* <Unstable_MarkdownShortcutPlugin /> */}
         {/* <FileDropPlugin /> */}
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>

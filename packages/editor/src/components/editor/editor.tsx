@@ -202,7 +202,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    getData: () => blockIdList.map((bId) => blockIdMap[bId]),
+    getData: () => blockIdList.map((bId) => blockIdMap[bId]).filter(Boolean),
     focus: () => findLastBlock()?.editable?.focus(),
     getEditor: () => editor,
     undo: undo,

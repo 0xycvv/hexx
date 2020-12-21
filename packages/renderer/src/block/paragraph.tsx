@@ -14,14 +14,6 @@ export const paragraphStyle: StitchesStyleObject = {
     lineHeight: '24px',
     fontSize: '16px',
     outline: 'none',
-    code: {
-      background: 'rgba(1, 72, 209, 0.1)',
-      color: '#0148D1',
-      padding: '1px 6px',
-      borderRadius: 6,
-      margin: '0 1px',
-      fontFamily: 'inherit',
-    },
     mark: {
       background: 'rgba(228, 178, 2, 0.18)',
       padding: '3px 0',

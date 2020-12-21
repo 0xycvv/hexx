@@ -1,11 +1,11 @@
-import { css } from '@hexx/theme';
+import { css, StitchesCssProp } from '@hexx/theme';
 import { forwardRef } from 'react';
 import {
   ContentEditable,
   ContentEditableProps,
 } from '../contenteditable';
 
-const styles = css({
+const styles = {
   maxWidth: '100%',
   width: '100%',
   whiteSpace: 'pre-wrap',
@@ -26,15 +26,25 @@ const styles = css({
   '&[placeholder]:not(:focus)::before': {
     content: `""`,
   },
-});
-export const Editable = forwardRef<any, ContentEditableProps>(
-  ({ html = '',...props }, ref) => (
+} as const;
+
+export const Editable = forwardRef<
+  any,
+  ContentEditableProps & {
+    css?: StitchesCssProp;
+  }
+>(({ html = '', css: overrideCss, ...props }, ref) => {
+  const combineStyles = css({ ...styles, ...(overrideCss as any) });
+
+  return (
     <ContentEditable
       {...props}
       html={html}
       placeholder={props.placeholder || 'Type something...'}
-      className={`e-editable ${props.className || ''} ${styles}`}
+      className={`e-editable ${
+        props.className || ''
+      } ${combineStyles}`}
       ref={ref as any}
     />
-  ),
-);
+  );
+});

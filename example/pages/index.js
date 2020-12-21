@@ -37,15 +37,6 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Hexx Editor</title>
-        {/* <script
-          type="module"
-          dangerouslySetInnerHTML={{
-            __html: `
-            import prismjs from 'https://cdn.skypack.dev/prismjs';
-            prismjs.highlightAll()
-          `,
-          }}
-        /> */}
       </Head>
       <Header>
         <Logo href="https://github.com/ericyip/hexx">
@@ -61,19 +52,24 @@ export default function Home() {
             {
               id: '9c7ccd4f-b8ae-458e-8763-6cc20f5b8e98',
               type: 'header',
-              data: { text: 'Getting Started', level: 2 },
+              data: {
+                text: 'Getting Started',
+                level: 2,
+              },
             },
             {
               id: 'c4be1814-af8d-4557-8300-f719c7451270',
               type: 'paragraph',
-              data: { text: '<p>install package</p>' },
+              data: {
+                text: '<p>install package</p>',
+              },
             },
             {
               id: 'e157b677-9cb6-45be-a205-caae4e61962b',
               type: 'code',
               data: {
                 value:
-                  'npm install @hexx/editor\n# or\nyarn add @hexx/editor',
+                  'npm install @hexx/editor \n# or\nyarn add @hexx/editor',
                 lang: null,
               },
             },
@@ -91,18 +87,29 @@ export default function Home() {
               type: 'code',
               data: {
                 value:
-                  'import { Editor } from \'@hexx/editor\';\nimport {\n  BlockMap,\n  PlusButton,\n  TuneButton,\n} from \'@hexx/editor/components\';\n<editor {...props}="" blockmap="{BlockMap}"><plusbutton>\n&lt;Editor blockMap={BlockMap}&gt;\n  &lt;PlusButton /&gt;\n  &lt;TuneButton /&gt;\n  &lt;InlineTool&gt;\n    &lt;InlineMarker /&gt;\n    &lt;InlineCode /&gt;\n    &lt;InlineLink /&gt;\n  &lt;/InlineTool&gt;\n&lt;/Editor&gt;</plusbutton></editor><br>',
-                lang: null,
+                  'import { Editor } from \'@hexx/editor\';\nimport {\n  BlockMap, // default block mapping\n  <span style="font-size: 16px;">// preset</span>\n  PlusButton,\n  TuneButton,\n  InlineTool,\n  // additional inline tool\n  InlineCode,\n  InlineMarker,\n  InlineLink\n} from \'@hexx/editor/components\';\n<editor {...props}="" blockmap="{BlockMap}"><plusbutton>\n&lt;Editor blockMap={BlockMap}&gt;\n  &lt;PlusButton /&gt;\n  &lt;TuneButton /&gt;\n  &lt;InlineTool&gt;\n    &lt;InlineMarker /&gt;\n    &lt;InlineCode /&gt;\n    &lt;InlineLink /&gt;\n  &lt;/InlineTool&gt;\n&lt;/Editor&gt;</plusbutton></editor><br>',
+                lang: 'javascript',
               },
             },
             {
               type: 'paragraph',
-              data: { text: '<p><span class=\"\"><a href=\"https://github.com/ericyip/hexx\">github</a></span></p>' },
+              data: {
+                text: '',
+              },
               id: '0e8c1e0c-1178-47fd-ae39-d03513643199',
             },
           ]}
         />
       </main>
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: `
+            import prismjs from 'https://cdn.skypack.dev/prismjs';
+            prismjs.highlightAll()
+          `,
+        }}
+      />
     </div>
   );
 }

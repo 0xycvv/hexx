@@ -5,11 +5,11 @@ import {
   applyBlock,
   BlockProps,
 } from '@hexx/editor';
-import { css } from '@hexx/theme';
 import { Editable } from '@hexx/editor/components';
 import * as React from 'react';
 import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
+import { css } from '@hexx/theme';
 
 const _CodeBlock = React.memo(function _CodeBlock({
   id,
@@ -28,23 +28,30 @@ const _CodeBlock = React.memo(function _CodeBlock({
     : 'language-';
 
   return (
-    <pre className={css(codeBlockStyle)}>
-      <code className={codeClassName}>
-        <Editable
-          placeholder={'<code-block></code-block>'}
-          onChange={(evt) => {
-            update({
-              ...block,
-              data: {
-                ...block.data,
-                value: evt.target.value,
-              },
-            });
-          }}
-          ref={composeRef(ref, register)}
-          html={block.data.value}
-        />
-      </code>
+    <pre className={`${codeClassName} ${css(codeBlockStyle)}`}>
+      <Editable
+        css={{
+          whiteSpace: 'pre',
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.stopPropagation();
+          }
+        }}
+        tagName="code"
+        placeholder={'<code-block></code-block>'}
+        onChange={(evt) => {
+          update({
+            ...block,
+            data: {
+              ...block.data,
+              value: evt.target.value,
+            },
+          });
+        }}
+        ref={composeRef(ref, register)}
+        html={block.data.value}
+      />
     </pre>
   );
 });

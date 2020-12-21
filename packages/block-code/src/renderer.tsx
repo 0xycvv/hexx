@@ -10,10 +10,11 @@ export type TCodeBlock = {
 };
 
 export const codeBlockStyle: StitchesCssProp = {
-  backgroundColor: '#DAE5F4',
-  color: '#0148D1',
+  fontFamily: 'monospace',
   padding: '24px 32px',
   borderRadius: '4px',
+  whiteSpace: 'pre',
+  overflow: 'scroll'
 };
 
 export const CodeBlockRenderer = ({
