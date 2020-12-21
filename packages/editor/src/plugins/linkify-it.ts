@@ -45,6 +45,8 @@ export function LinkifyItPlugin(props: {
             range.setStart(text, lastMatch.index);
             range.setEnd(text, lastMatch.lastIndex);
             createRangeLink(range, lastMatch.url);
+            document.execCommand('selectAll', false);
+            document.getSelection()?.collapseToEnd();
           }
         }
       }
