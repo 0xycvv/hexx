@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils.cjs';
+import { atomFamily } from 'jotai/utils';
 import { SetStateAction } from 'react';
 import { BlockType, BlockComponent } from '../utils/blocks';
 import { debounce } from '../utils/debounce';

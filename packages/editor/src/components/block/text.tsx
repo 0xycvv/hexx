@@ -32,7 +32,13 @@ function _TextBlock({ index, id }: BlockProps) {
       textAlign: block.data.alignment || 'left',
     },
     onChange: (evt) => {
-      update({ data: { text: evt.target.value }});
+      update((s) => ({
+        ...s,
+        [id]: {
+          ...s[id],
+          data: { ...s[id].data, text: evt.target.value },
+        },
+      }));
     },
   };
 
@@ -47,47 +53,48 @@ function _TextBlock({ index, id }: BlockProps) {
 }
 
 export const TextBlock = applyBlock<Paragraph['data'], {}>(
-  memo(_TextBlock)
-  , {
-  type: 'paragraph',
-  icon: {
-    text: 'Text',
-    svg: TextIcon,
-  },
-  defaultValue: {
-    text: '',
-  },
-  mdast: {
+  memo(_TextBlock),
+  {
     type: 'paragraph',
-    in: (content: mdast.Paragraph, toHTML) => ({
-      text: toHTML(content).outerHTML,
-    }),
+    icon: {
+      text: 'Text',
+      svg: TextIcon,
+    },
+    defaultValue: {
+      text: '',
+    },
+    mdast: {
+      type: 'paragraph',
+      in: (content: mdast.Paragraph, toHTML) => ({
+        text: toHTML(content).outerHTML,
+      }),
+    },
+    tune: [
+      {
+        icon: {
+          text: 'Left',
+          svg: AlignLeft,
+          isActive: (data) => data.alignment === 'left',
+        },
+        updater: (data) => ({ ...data, alignment: 'left' }),
+      },
+      {
+        icon: {
+          text: 'Center',
+          svg: AlignCenter,
+          isActive: (data) => data.alignment === 'center',
+        },
+        updater: (data) => ({ ...data, alignment: 'center' }),
+      },
+      {
+        icon: {
+          text: 'Right',
+          svg: AlignRight,
+          isActive: (data) => data.alignment === 'right',
+        },
+        updater: (data) => ({ ...data, alignment: 'right' }),
+      },
+    ],
+    isEmpty: (data) => !data.text?.trim(),
   },
-  tune: [
-    {
-      icon: {
-        text: 'Left',
-        svg: AlignLeft,
-        isActive: (data) => data.alignment === 'left',
-      },
-      updater: (data) => ({ ...data, alignment: 'left' }),
-    },
-    {
-      icon: {
-        text: 'Center',
-        svg: AlignCenter,
-        isActive: (data) => data.alignment === 'center',
-      },
-      updater: (data) => ({ ...data, alignment: 'center' }),
-    },
-    {
-      icon: {
-        text: 'Right',
-        svg: AlignRight,
-        isActive: (data) => data.alignment === 'right',
-      },
-      updater: (data) => ({ ...data, alignment: 'right' }),
-    },
-  ],
-  isEmpty: (data) => !data.text?.trim(),
-});
+);

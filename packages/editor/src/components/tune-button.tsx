@@ -72,10 +72,10 @@ export const TuneButton = forwardRef(
       hoverBlock,
       lastHoverBlock,
       blockMap,
-      updateBlockDataWithId,
+      updateBlockDataById,
       selectBlock,
       blockSelect,
-      removeBlockWithId,
+      removeBlockById,
     } = useEditor();
 
     useEffect(() => {
@@ -131,7 +131,7 @@ export const TuneButton = forwardRef(
                     }
                     onClick={(e) => {
                       if (!lastHoverBlock?.id) return;
-                      updateBlockDataWithId({
+                      updateBlockDataById({
                         id: lastHoverBlock.id,
                         data: tune.updater(currentBlockData?.data),
                       });
@@ -145,7 +145,7 @@ export const TuneButton = forwardRef(
               <svg
                 onClick={() => {
                   if (!lastHoverBlock?.id) return;
-                  removeBlockWithId({ id: lastHoverBlock.id });
+                  removeBlockById({ id: lastHoverBlock.id });
                   selectBlock();
                   popper.setActive(false);
                 }}

@@ -8,14 +8,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@hexx/block-basic-image": "^0.6.7",
+    "@hexx/block-code": "^0.6.7",
     "@hexx/editor": "^0.6.7",
     "@hexx/renderer": "^0.6.7",
     "@hexx/theme": "^0.6.7",
-    "@hexx/block-code": "^0.6.7",
-    "@hexx/block-basic-image": "^0.6.7",
     "@preconstruct/next": "^2.0.0",
+    "linkify-it": "^3.0.2",
     "next": "10.0.3",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "tlds": "^1.216.0"
   }
 }

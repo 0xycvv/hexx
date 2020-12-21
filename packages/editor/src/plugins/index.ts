@@ -7,3 +7,5 @@ export * from './change-detect';
 export * from './file-drop';
 export * from './local-storage';
 export * from './editor-width';
+export * from './linkify-it';
+export * from './markdown-shortcut';

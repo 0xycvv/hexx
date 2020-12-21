@@ -1,5 +1,6 @@
 import { ReactNode, NamedExoticComponent } from 'react';
 import { StitchesCssProp } from '@hexx/theme';
+import { BlockContent, PhrasingContent } from 'mdast';
 
 export type BlockType<T = any> = {
   id: string;
@@ -16,6 +17,10 @@ interface BlockConfig<Data, Config> {
   };
   defaultValue: Partial<Data>;
   isEmpty?: (d: Data) => boolean;
+  mdast?: {
+    type: BlockContent['type'] | `${BlockContent['type']}.${PhrasingContent['type']}}`,
+    in?: (content: BlockContent | PhrasingContent | any, toHTML: (child: BlockContent['children']) => HTMLElement) => Data
+  },
   tune?: Array<{
     icon: {
       text: string;
