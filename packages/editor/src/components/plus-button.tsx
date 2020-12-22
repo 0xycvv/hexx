@@ -91,8 +91,11 @@ function useTabMenu(
       if (e.key === 'Tab' && !e.shiftKey) {
         if (id) {
           getBlock({ id })
-            .then((data) => {
-              const isEmpty = isBlockEmpty(blockMap[data.type], data);
+            .then((block) => {
+              const isEmpty = isBlockEmpty(
+                blockMap[block.type],
+                block.data,
+              );
               if (isEmpty) {
                 onActive();
               }

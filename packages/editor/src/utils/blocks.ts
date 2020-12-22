@@ -18,9 +18,14 @@ interface BlockConfig<Data, Config> {
   defaultValue: Partial<Data>;
   isEmpty?: (d: Data) => boolean;
   mdast?: {
-    type: BlockContent['type'] | `${BlockContent['type']}.${PhrasingContent['type']}`,
-    in?: (content: BlockContent | PhrasingContent | any, toHTML: (child: BlockContent['children']) => HTMLElement) => Data
-  },
+    type:
+      | BlockContent['type']
+      | `${BlockContent['type']}.${PhrasingContent['type']}`;
+    in?: (
+      content: BlockContent | PhrasingContent | any,
+      toHTML: (child: BlockContent['children']) => HTMLElement,
+    ) => Data;
+  };
   tune?: Array<{
     icon: {
       text: string;
@@ -77,8 +82,7 @@ export function isBlockEmpty(
   block?: BlockComponent<any, any>,
   data?: any,
 ) {
-  return (
-    typeof block?.block.isEmpty === 'function' &&
-    block?.block.isEmpty(data)
-  );
+  return typeof block?.block.isEmpty === 'function'
+    ? block?.block.isEmpty(data)
+    : false;
 }

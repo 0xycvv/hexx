@@ -1,9 +1,10 @@
-import * as mdast from 'mdast';
-import { css } from '@hexx/theme';
 import type { Paragraph } from '@hexx/renderer';
+import { css } from '@hexx/theme';
+import * as mdast from 'mdast';
 import { memo, useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
 import {
@@ -12,7 +13,6 @@ import {
   AlignRight,
   text as TextIcon,
 } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
 
 function _TextBlock({ index, id }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -95,6 +95,9 @@ export const TextBlock = applyBlock<Paragraph['data'], {}>(
         updater: (data) => ({ ...data, alignment: 'right' }),
       },
     ],
-    isEmpty: (data) => !data.text?.trim(),
+    isEmpty: (data) =>
+      !data.text?.trim() ||
+      // quick fix for safari
+      data.text === '<br>',
   },
 );

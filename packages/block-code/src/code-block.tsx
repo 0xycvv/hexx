@@ -28,11 +28,13 @@ const _CodeBlock = React.memo(function _CodeBlock({
     : 'language-';
 
   return (
-    <pre className={`${codeClassName} ${css(codeBlockStyle)}`}>
+    <pre className={`${css(codeBlockStyle)} ${codeClassName}`}>
       <Editable
         css={{
+          display: 'block',
           whiteSpace: 'pre',
         }}
+        className={codeClassName}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.stopPropagation();

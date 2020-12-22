@@ -40,7 +40,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
     const inputSelectionRef = useRef<SelectionJsType>();
 
     useEffect(() => {
-      import('./selection').then(s => {
+      import('./selection').then((s) => {
         const SelectionJs = s.default;
         selectionRef.current = new SelectionJs({
           class: 'selection',
@@ -84,8 +84,10 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
         })
           .on('beforestart', ({ oe }) => {
             if (uiState.isDragging || uiState.isSorting) return false;
-            if (oe.target instanceof HTMLDivElement) {
-              if (oe.target.classList.contains('hexx-block-overlay')) {
+            if (oe.target instanceof HTMLElement) {
+              if (
+                oe.target.classList.contains('hexx-block-overlay')
+              ) {
                 return false;
               }
               const isEditable =
@@ -95,7 +97,9 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
               }
               return false;
               // @ts-ignore
-            } else if (oe.target.parentElement instanceof HTMLElement) {
+            } else if (
+              oe.target.parentElement instanceof HTMLElement
+            ) {
               const isEditable =
                 // @ts-ignore
                 oe.target.parentElement.getAttribute(
@@ -124,14 +128,14 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
               setUIState((s) => ({ ...s, isDragging: false }));
             });
           });
-      })
+      });
     }, []);
 
     useEffect(() => {
       // if (!props.enableInputCrossSelection) {
       //   return;
       // }
-      import('./selection').then(s => {
+      import('./selection').then((s) => {
         const SelectionJs = s.default;
         inputSelectionRef.current = new SelectionJs({
           class: 'selection-2',
@@ -177,14 +181,16 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           .on('beforestart', ({ oe }) => {
             if (uiState.isDragging || uiState.isSorting) return false;
             if (oe.target instanceof HTMLDivElement) {
-              if (oe.target.classList.contains('hexx-block-overlay')) {
+              if (
+                oe.target.classList.contains('hexx-block-overlay')
+              ) {
                 return false;
               }
               const isEditable =
                 oe.target.getAttribute('contenteditable') === 'true';
               if (isEditable) {
                 setBlockSelect([]);
-              //   return true;
+                //   return true;
               }
               // return false;
             }
@@ -208,7 +214,7 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
               setUIState((s) => ({ ...s, isDragging: false }));
             });
           });
-      })
+      });
     }, [props.enableInputCrossSelection]);
 
     useEffect(() => {

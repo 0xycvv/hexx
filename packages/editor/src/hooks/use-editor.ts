@@ -75,8 +75,8 @@ export function useIdMap() {
 }
 
 export function useGetBlockCallback() {
-  return useAtomCallback(
-    useCallback((get, set, arg: { id: string }) => {
+  return useAtomCallback<BlockType, { id: string }>(
+    useCallback((get, set, arg) => {
       const block = get(blocksIdMapAtom)[arg.id];
 
       return block;
@@ -215,9 +215,9 @@ export function useEditor() {
       index,
       block,
       newBlock,
-      id
+      id,
     }: {
-      id: string,
+      id: string;
       index: number;
       block: any | null;
       newBlock: any;
