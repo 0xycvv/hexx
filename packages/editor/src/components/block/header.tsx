@@ -6,7 +6,7 @@ import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
-import { header as HeaderSvg } from '../icons';
+import { header as HeaderSvg, h1, h2, h3 } from '../icons';
 import { applyBlock, BlockProps } from '../../utils/blocks';
 
 const Heading = styled(Editable, headerStyle);
@@ -69,4 +69,30 @@ export const HeaderBlock = applyBlock<
     level: 3,
   },
   isEmpty: (d) => !d.text?.trim(),
+  tune: [
+    {
+      icon: {
+        text: 'H1',
+        svg: h1,
+        isActive: (data) => data.level === 1,
+      },
+      updater: (data) => ({ ...data, level: 1 }),
+    },
+    {
+      icon: {
+        text: 'H2',
+        svg: h2,
+        isActive: (data) => data.level === 2,
+      },
+      updater: (data) => ({ ...data, level: 2 }),
+    },
+    {
+      icon: {
+        text: 'H3',
+        svg: h3,
+        isActive: (data) => data.level === 3,
+      },
+      updater: (data) => ({ ...data, level: 3 }),
+    },
+  ],
 });

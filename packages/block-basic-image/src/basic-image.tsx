@@ -1,10 +1,10 @@
 import { applyBlock, BlockProps, useBlock } from '@hexx/editor';
 import { PlaceholderButton } from '@hexx/editor/components';
-import { AddImage as SvgAddImage } from '@hexx/editor/components/icons';
 import { memo } from 'react';
 import { Image } from 'mdast';
 import { css } from '@hexx/theme';
 import { AspectRatioImage } from './renderer';
+import { SvgImage } from './svg-image';
 
 interface Config {
   onInput: (files: File[] | FileList) => Promise<string>;
@@ -67,7 +67,7 @@ export const BasicImageBlock = applyBlock<any, Config>(
   {
     type: 'basic-image',
     icon: {
-      svg: SvgAddImage,
+      svg: SvgImage,
       text: 'Image',
     },
     config: {
@@ -83,7 +83,7 @@ export const BasicImageBlock = applyBlock<any, Config>(
     },
     isEmpty: (d) => !d.file?.url,
     mdast: {
-      type: 'image',
+      type: 'html.image',
       in: (content: Image) => ({
         url: content.url,
       }),

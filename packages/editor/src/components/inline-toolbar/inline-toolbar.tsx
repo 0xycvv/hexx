@@ -7,10 +7,8 @@ import Italic from '../icons/italic';
 import Underlined from '../icons/underlined';
 import { PortalPopper } from '../popper/portal-popper';
 import { useReactPopper } from '../popper/use-react-popper';
-import { InlineCode } from './code';
 import { useDefaultInlineTool, UseInlineToolConfig } from './hooks';
 import { InlineLink } from './link/link';
-import { InlineMarker } from './marker';
 
 const Wrapper = styled('div', {
   display: 'grid',

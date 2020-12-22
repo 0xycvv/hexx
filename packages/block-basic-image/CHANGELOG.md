@@ -1,5 +1,15 @@
 # @hexx/block-basic-image
 
+## 0.6.10
+
+### Patch Changes
+
+- - Update Icon
+  - Add menu prop on plus button
+  - add config on editor focus method
+- Updated dependencies [undefined]
+  - @hexx/editor@0.6.10
+
 ## 0.6.9
 
 ### Patch Changes

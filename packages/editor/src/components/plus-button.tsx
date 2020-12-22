@@ -1,9 +1,9 @@
 import { StitchesProps, styled } from '@hexx/theme';
-import { createElement, Fragment, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useEditor, useEventListener } from '../hooks';
 import { usePlugin } from '../plugins';
 import { isBlockEmpty } from '../utils/blocks';
-import { BlockMenu } from './block-menu';
+import { BlockMenu, BlockMenuItem } from './block-menu';
 import { PortalPopper } from './popper/portal-popper';
 import {
   useReactPopper,
@@ -67,6 +67,7 @@ interface PlusButtonProps {
   menuPopper?: UseReactPopperProps;
   iconProps?: StitchesProps<typeof Plus>;
   menuProps?: StitchesProps<typeof AddMenu>;
+  menu?: BlockMenuItem[];
 }
 
 function useTabMenu(
@@ -178,7 +179,10 @@ export function PlusButton(props: PlusButtonProps) {
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
         <AddMenu {...props.menuProps}>
-          <BlockMenu onAdd={() => menuPopper.setActive(false)} />
+          <BlockMenu
+            menu={props.menu}
+            onAdd={() => menuPopper.setActive(false)}
+          />
         </AddMenu>
       </PortalPopper>
     </>

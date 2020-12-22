@@ -1,8 +1,13 @@
-import { createElement, Fragment } from 'react';
+import { createElement, Fragment, useMemo } from 'react';
 import { useEditor } from '../hooks';
 import { isBlockEmpty } from '../utils/blocks';
 
-export function BlockMenu(props: { onAdd?: () => void }) {
+export type BlockMenuItem = { type: string; config?: any } | string;
+
+export function BlockMenu(props: {
+  onAdd?: () => void;
+  menu?: BlockMenuItem[];
+}) {
   const {
     blockMap,
     lastHoverBlock,
@@ -40,10 +45,30 @@ export function BlockMenu(props: { onAdd?: () => void }) {
     });
   };
 
+  const menuList = useMemo(() => {
+    if (props.menu) {
+      return props.menu.map((item) =>
+        typeof item === 'string'
+          ? ([item, blockMap[item]] as const)
+          : ([
+              item.type,
+              {
+                ...blockMap[item.type],
+                block: {
+                  ...blockMap[item.type].block,
+                  ...item.config,
+                },
+              },
+            ] as const),
+      );
+    }
+    return Object.entries(blockMap);
+  }, [props.menu, blockMap]);
+
   return (
     <>
-      {Object.entries(blockMap).map(([key, blockType]) => (
-        <Fragment key={key}>
+      {menuList.map(([key, blockType], index) => (
+        <Fragment key={`${key}-${index}`}>
           {createElement(blockType.block.icon.svg, {
             title: blockType.block.icon.text,
             tabIndex: 0,

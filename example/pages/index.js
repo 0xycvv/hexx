@@ -106,7 +106,9 @@ export default function Home() {
         dangerouslySetInnerHTML={{
           __html: `
             import prismjs from 'https://cdn.skypack.dev/prismjs';
-            prismjs.highlightAll()
+            window.onload = function() {
+              prismjs.highlightAll()
+            }
           `,
         }}
       />

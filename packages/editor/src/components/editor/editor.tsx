@@ -41,6 +41,7 @@ import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
 import { BlockType } from '../../utils/blocks';
 import {
+  findBlockByIndex,
   findLastBlock,
   focusLastBlock,
   lastCursor,
@@ -93,7 +94,10 @@ const Wrapper = styled('div', {
 interface HexxHandler {
   getData: () => BlockType[];
   getEditor: () => UseEditorReturn;
-  focus: () => void;
+  focus: (config?: {
+    index?: number;
+    preventScroll?: boolean;
+  }) => void;
   undo: () => void;
 }
 
@@ -202,8 +206,22 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    getData: () => blockIdList.map((bId) => blockIdMap[bId]).filter(Boolean),
-    focus: () => findLastBlock()?.editable?.focus(),
+    getData: () =>
+      blockIdList.map((bId) => blockIdMap[bId]).filter(Boolean),
+    focus: (
+      { index, preventScroll } = {
+        index: undefined,
+        preventScroll: false,
+      },
+    ) => {
+      if (typeof index === 'number') {
+        findBlockByIndex(index, true)?.editable?.focus({
+          preventScroll,
+        });
+      } else {
+        findLastBlock()?.editable?.focus({ preventScroll });
+      }
+    },
     getEditor: () => editor,
     undo: undo,
     redo: redo,

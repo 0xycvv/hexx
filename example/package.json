@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,9 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "@hexx/block-basic-image": "^0.6.9",
-    "@hexx/block-code": "^0.6.9",
-    "@hexx/editor": "^0.6.9",
+    "@hexx/block-basic-image": "^0.6.10",
+    "@hexx/block-code": "^0.6.10",
+    "@hexx/editor": "^0.6.10",
     "@hexx/renderer": "^0.6.9",
     "@hexx/theme": "^0.6.9",
     "@preconstruct/next": "^2.0.0",

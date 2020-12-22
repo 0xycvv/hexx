@@ -1,5 +1,17 @@
 # example
 
+## 0.5.7
+
+### Patch Changes
+
+- - Update Icon
+  - Add menu prop on plus button
+  - add config on editor focus method
+- Updated dependencies [undefined]
+  - @hexx/block-basic-image@0.6.10
+  - @hexx/block-code@0.6.10
+  - @hexx/editor@0.6.10
+
 ## 0.5.6
 
 ### Patch Changes
