@@ -34,7 +34,7 @@ const _BasicImageBlock = memo<BlockProps<Config>>(
           e.stopPropagation();
         }}
       >
-        <SvgAddImage />
+        <SvgImage />
         <span>Add an image</span>
         <input
           hidden

@@ -9,6 +9,7 @@ export type Delimiter = {
 export const dividerStyles: StitchesStyleObject = {
   lineHeight: '1.6em',
   width: '100%',
+  height: 'auto',
   textAlign: 'center',
   margin: 'unset',
   borderStyle: 'none',
