@@ -1,4 +1,4 @@
-import { EditableMap } from '../hooks/use-editor';
+import { EditableWeakMap } from '../hooks/use-editor';
 import { getSelectionRange } from './ranges';
 
 function isBrowser() {
@@ -6,35 +6,45 @@ function isBrowser() {
 }
 
 function focusContentEditableWithOffset(
-  currentEl: HTMLDivElement | HTMLElement | Element,
-  offset: number,
+  currentActiveEl?: HTMLDivElement | HTMLElement | Element | null,
+  offset: number = 0,
 ) {
-  if (!currentEl) {
+  if (!currentActiveEl) {
     return;
   }
-  // @ts-ignore
-  const blockInfo = EditableMap.get(currentEl);
-  if (blockInfo && blockInfo.blockIndex + offset >= 0) {
-    if (blockInfo.index === 0) {
+  const editableWeakData = EditableWeakMap.get(currentActiveEl);
+  console.log(EditableWeakMap);
+  if (editableWeakData && editableWeakData.blockIndex + offset >= 0) {
+    console.log(offset);
+    // first contenteditable
+    if (editableWeakData.index === 0) {
+      // find next contenteditable if existed
       const offsetBlock = findBlockByIndex(
-        blockInfo.blockIndex + offset,
+        editableWeakData.blockIndex + offset,
       );
       if (offsetBlock?.editable) {
-        focusWithLastCursor(offsetBlock.editable, offset > 0);
+        focusWithLastCursor(offsetBlock.editable, offset <= 0);
       } else {
         focusContentEditableWithOffset(
-          findPreviousContentEditable(blockInfo.blockIndex, offset),
+          findPreviousContentEditable(
+            editableWeakData.blockIndex,
+            offset,
+          ),
           0,
         );
       }
     } else {
-      const currentBlockDiv = findBlockById(blockInfo.id);
-      const nodeList = currentBlockDiv.querySelectorAll(
+      const currentBlockDiv = findBlockById(editableWeakData.id);
+      const nodeList = currentBlockDiv?.querySelectorAll(
         '[contenteditable]',
       );
-      if (nodeList.length > 0 && nodeList[blockInfo.index + offset]) {
+      if (
+        nodeList &&
+        nodeList?.length > 0 &&
+        nodeList?.[editableWeakData.index + offset]
+      ) {
         focusWithLastCursor(
-          nodeList[blockInfo.index + offset] as HTMLDivElement,
+          nodeList[editableWeakData.index + offset] as HTMLDivElement,
           offset > 0,
         );
       } else {
@@ -49,7 +59,7 @@ function focusContentEditableWithOffset(
 
 function findPreviousContentEditable(
   blockIndex: number,
-  offset?: number,
+  offset: number = 0,
 ) {
   const result = findBlockByIndex(blockIndex + offset);
   if (!result) {
@@ -66,15 +76,19 @@ export function focusContentEditable(
   query: 'up' | 'down' | 'current',
 ) {
   const isActiveElementEditable =
-    document.activeElement.getAttribute('contenteditable') === 'true';
+    document.activeElement?.getAttribute('contenteditable') ===
+    'true';
   switch (query) {
     case 'current':
       if (isActiveElementEditable) {
         focusWithLastCursor(document.activeElement as HTMLDivElement);
       } else {
-        focusWithLastCursor(
-          document.activeElement.closest('[contenteditable]'),
+        const closetContentEditable = document.activeElement?.closest(
+          '[contenteditable]',
         );
+        if (closetContentEditable) {
+          focusWithLastCursor(closetContentEditable);
+        }
       }
       break;
     case 'up':
@@ -156,14 +170,17 @@ export function focusLastBlock() {
 }
 
 function focusWithLastCursor(
-  el: HTMLElement,
+  el: HTMLElement | Element,
   shouldFocusLast: boolean = true,
 ) {
-  el?.focus();
-  if (shouldFocusLast) {
-    requestAnimationFrame(() => {
-      lastCursor();
-    });
+  if (el instanceof HTMLElement) {
+    el?.focus();
+
+    if (shouldFocusLast) {
+      requestAnimationFrame(() => {
+        lastCursor();
+      });
+    }
   }
 }
 
@@ -176,17 +193,6 @@ export function lastCursor() {
     document.execCommand('selectAll', false);
     document.getSelection()?.collapseToEnd();
   }
-}
-
-export function focusWithCursor(el: Node, cursorIndex: number) {
-  var range = document.createRange();
-  var sel = window.getSelection();
-
-  range.setStart(el, cursorIndex);
-  range.collapse(true);
-
-  sel.removeAllRanges();
-  sel.addRange(range);
 }
 
 export function surround(
@@ -203,7 +209,7 @@ export function surround(
   }
   try {
     range.surroundContents(newNode);
-    document.execCommand('formatBlock', false, 'p');
+    document.execCommand('insertText', false, '');
   } catch (e) {
     console.log(e);
   }

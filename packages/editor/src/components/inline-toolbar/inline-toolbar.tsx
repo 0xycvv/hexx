@@ -145,7 +145,7 @@ export function InlineToolBarPreset({
   );
 }
 
-export function InlineTool({ children }: { children?: ReactNode }) {
+export function InlineTool({ children  }: { children?: ReactNode }) {
   const popper = useReactPopper({
     placement: 'bottom-start',
     modifiers: [

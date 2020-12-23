@@ -1,0 +1,1 @@
+export const CLIPBOARD_DATA_FORMAT = 'text/_hexx_v0';

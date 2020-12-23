@@ -8,12 +8,7 @@
     "@hexx/theme": "*",
     "react": "16.x || 17.x"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-typescript": "^7.12.7"
-  },
+  "devDependencies": {},
   "dependencies": {
     "react-html-parser": "^2.0.2"
   }

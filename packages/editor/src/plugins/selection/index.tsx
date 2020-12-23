@@ -30,6 +30,7 @@ const globalStyles = css.global({
 
 interface SelectionPluginProps {
   enableInputCrossSelection?: boolean;
+  classNameFilter?: string[];
 }
 
 export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
@@ -96,8 +97,8 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
                 return true;
               }
               return false;
-              // @ts-ignore
             } else if (
+              // @ts-ignore
               oe.target.parentElement instanceof HTMLElement
             ) {
               const isEditable =

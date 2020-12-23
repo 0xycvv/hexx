@@ -10,6 +10,8 @@ import { useBlockMdast } from '../parser/markdown/use-block-mdast';
 import { usePlugin } from './plugin';
 import fromMarkdown from 'mdast-util-from-markdown';
 import { AllMdastConfig } from '../parser/types';
+import { CLIPBOARD_DATA_FORMAT } from '../constants';
+import { v4 } from 'uuid';
 
 export function PastHtmlPlugin() {
   const {
@@ -26,8 +28,20 @@ export function PastHtmlPlugin() {
     (e) => {
       const html = e.clipboardData?.getData('text/html');
       const text = e.clipboardData?.getData('text/plain');
+      const hexx = e.clipboardData?.getData(CLIPBOARD_DATA_FORMAT);
       const index = idList.findIndex((id) => id === activeBlock?.id);
-      if (html) {
+      console.log(hexx);
+      if (hexx) {
+        batchInsertBlocks({
+          index,
+          blocks: JSON.parse(hexx).map((block) => ({
+            ...block,
+            id: v4(),
+          })),
+        });
+      e.preventDefault();
+      } else if (html) {
+        console.log("?????");
         const mdastParent = htmlToMdast(html);
         try {
           pushAllResultToBlock(

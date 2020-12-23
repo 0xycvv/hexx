@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 import {
   blockIdListAtom,
@@ -13,13 +13,13 @@ import {
   _hexxScope,
 } from '../constants/atom';
 import { BlockType } from '../utils/blocks';
-import { insert, insertArray } from '../utils/insert';
+import { insert, insertArray } from '../utils/array';
 import { useAtomCallback, useUpdateAtom } from '../utils/jotai';
 import { normalize } from '../utils/normalize';
 import { usePreviousExistValue } from './use-previous-exist-value';
 
-export const EditableMap = new WeakMap<
-  HTMLDivElement,
+export const EditableWeakMap = new WeakMap<
+  HTMLDivElement | HTMLElement | Element,
   {
     blockIndex: number;
     index: number;
@@ -32,7 +32,8 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
   family.scope = _hexxScope;
   // @ts-ignore
   const [block, updateBlockIdMap] = useAtom<BlockType<T>>(family);
-  const setIds = useAtom(blockIdListAtom);
+  const [, setIds] = useAtom(blockIdListAtom);
+  const registeredRef = useRef<Array<any>>();
 
   const remove = () => {
     blockMapFamily.remove(id);
@@ -47,7 +48,8 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
         );
       }
       if (ref) {
-        EditableMap.set(ref, { index, id, blockIndex });
+        EditableWeakMap.set(ref, { index, id, blockIndex });
+        registeredRef.current?.push(ref);
       }
     },
     [blockIndex],
@@ -60,6 +62,17 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
       }, []),
     [register],
   );
+
+  useEffect(() => {
+    return () => {
+      const registeredList = registeredRef.current;
+      if (registeredList && registeredList.length > 0) {
+        for (const registered of registeredList) {
+          EditableWeakMap.delete(registered);
+        }
+      }
+    };
+  }, []);
 
   return {
     block,

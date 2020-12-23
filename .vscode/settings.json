@@ -4,6 +4,7 @@
     "Hexx",
     "Linkify",
     "Mdast",
+    "contenteditable",
     "tlds"
   ]
 }

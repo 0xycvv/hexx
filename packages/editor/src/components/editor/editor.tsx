@@ -15,6 +15,7 @@ import {
   SortEndHandler,
 } from 'react-sortable-hoc';
 import { v4 } from 'uuid';
+import { CLIPBOARD_DATA_FORMAT } from '../../constants';
 import {
   blockIdListAtom,
   blockMapAtom,
@@ -104,9 +105,12 @@ interface HexxHandler {
 function useBlockSelectCopy() {
   const {
     wrapperRef,
-    ids: [, setIdList],
+    ids: [ids, setIdList],
     blockSelect: [blockSelect],
+    selectAll: [isSelectAll],
+    editor,
   } = usePlugin();
+  const [blockIdMap] = useAtom(blocksIdMapAtom);
 
   const handleClipboardEvent = (e: ClipboardEvent) => {
     if (blockSelect.length > 0) {
@@ -116,10 +120,14 @@ function useBlockSelectCopy() {
   };
 
   const setData = (e: ClipboardEvent) => {
-    const selectedBlockNodeList = blockSelect
+    const blocksToClip = isSelectAll ? ids : blockSelect;
+    const selectedBlockNodeList = blocksToClip
       .map((bId) =>
         document.querySelector(`[data-block-id='${bId}']`),
       )
+      .filter(Boolean);
+    const hexxCopy = blocksToClip
+      .map((id) => blockIdMap[id])
       .filter(Boolean);
     const text = selectedBlockNodeList
       .map((s) => s?.textContent)
@@ -132,6 +140,10 @@ function useBlockSelectCopy() {
       frag.innerHTML = innerHTML!;
       html.appendChild(frag);
     }
+    e.clipboardData?.setData(
+      CLIPBOARD_DATA_FORMAT,
+      JSON.stringify(hexxCopy),
+    );
     e.clipboardData?.setData('text/plain', text);
     e.clipboardData?.setData('text/html', html.innerHTML);
   };
@@ -143,6 +155,10 @@ function useBlockSelectCopy() {
       if (blockSelect.length > 0) {
         setData(e);
         setIdList((s) => s.filter((id) => !blockSelect.includes(id)));
+        e.preventDefault();
+      } else if (isSelectAll) {
+        setData(e);
+        setIdList([]);
         e.preventDefault();
       }
     },

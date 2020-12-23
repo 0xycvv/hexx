@@ -1,5 +1,5 @@
 import { useEventListener } from '../hooks';
-import { isContentEditable } from '../utils/is';
+import { isContentEditableDiv } from '../utils/is';
 import { usePlugin } from './plugin';
 import { createRangeLink } from '../utils/find-blocks';
 import { useRef } from 'react';
@@ -34,7 +34,7 @@ export function LinkifyItPlugin(props: {
   useEventListener(
     'keyup',
     (e) => {
-      if (e.key === ' ' && isContentEditable(e.target)) {
+      if (e.key === ' ' && isContentEditableDiv(e.target)) {
         const text = findLastText(e.target.lastChild);
         if (text?.textContent) {
           const match = linkifyRef.current.match(text.textContent);
