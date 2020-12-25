@@ -1,6 +1,6 @@
 {
   "name": "@hexx/editor",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "main": "dist/hexx-editor.cjs.js",
   "module": "dist/hexx-editor.esm.js",
   "preconstruct": {
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@enkidevs/remark-stringify": "^8.0.0",
-    "@hexx/renderer": "^0.6.9",
+    "@hexx/renderer": "^0.6.11",
     "@hexx/theme": "^0.6.9",
     "@popperjs/core": "^2.6.0",
     "hast-util-to-dom": "^2.0.6",

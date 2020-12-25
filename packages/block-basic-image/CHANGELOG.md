@@ -1,5 +1,15 @@
 # @hexx/block-basic-image
 
+## 0.6.11
+
+### Patch Changes
+
+- f2470e0: Copy in block
+- Updated dependencies [0fc3696]
+- Updated dependencies [f2470e0]
+- Updated dependencies [d40e393]
+  - @hexx/editor@0.6.11
+
 ## 0.6.10
 
 ### Patch Changes

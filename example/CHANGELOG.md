@@ -1,5 +1,19 @@
 # example
 
+## 0.5.8
+
+### Patch Changes
+
+- 0fc3696: basic markdown shortcut
+- d40e393: Fix block is empty checking
+- Updated dependencies [0fc3696]
+- Updated dependencies [f2470e0]
+- Updated dependencies [d40e393]
+  - @hexx/block-code@0.6.11
+  - @hexx/editor@0.6.11
+  - @hexx/block-basic-image@0.6.11
+  - @hexx/renderer@0.6.11
+
 ## 0.5.7
 
 ### Patch Changes

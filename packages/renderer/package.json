@@ -1,6 +1,6 @@
 {
   "name": "@hexx/renderer",
-  "version": "0.6.9",
+  "version": "0.6.11",
   "main": "dist/hexx-renderer.cjs.js",
   "module": "dist/hexx-renderer.esm.js",
   "peerDependencies": {

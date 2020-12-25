@@ -1,5 +1,11 @@
 # @hexx/renderer
 
+## 0.6.11
+
+### Patch Changes
+
+- f2470e0: Copy in block
+
 ## 0.6.9
 
 ### Patch Changes

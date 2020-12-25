@@ -1,5 +1,17 @@
 # @hexx/block-code
 
+## 0.6.11
+
+### Patch Changes
+
+- 0fc3696: basic markdown shortcut
+- f2470e0: Copy in block
+- d40e393: Fix block is empty checking
+- Updated dependencies [0fc3696]
+- Updated dependencies [f2470e0]
+- Updated dependencies [d40e393]
+  - @hexx/editor@0.6.11
+
 ## 0.6.10
 
 ### Patch Changes
