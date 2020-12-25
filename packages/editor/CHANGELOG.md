@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.6.12
+
+### Patch Changes
+
+- remove unused packages
+
 ## 0.6.11
 
 ### Patch Changes

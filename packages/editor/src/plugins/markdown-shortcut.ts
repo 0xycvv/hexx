@@ -122,15 +122,14 @@ export function Unstable_MarkdownShortcutPlugin() {
                   ) {
                     const cursor = document.createElement('span');
                     cursor.insertAdjacentText('beforeend', ' ');
-                    cursor.addEventListener('input', (e) => {
-                      console.log(e.target);
-                    });
                     range.commonAncestorContainer.parentElement.insertAdjacentElement(
                       'afterend',
                       cursor,
                     );
                     const selection = getSelection();
                     range.setStart(cursor, 1);
+                    console.log(selection, range);
+                    selection?.removeAllRanges();
                     selection?.addRange(range);
                   }
                 }
