@@ -13,9 +13,7 @@ function focusContentEditableWithOffset(
     return;
   }
   const editableWeakData = EditableWeakMap.get(currentActiveEl);
-  console.log(EditableWeakMap);
   if (editableWeakData && editableWeakData.blockIndex + offset >= 0) {
-    console.log(offset);
     // first contenteditable
     if (editableWeakData.index === 0) {
       // find next contenteditable if existed

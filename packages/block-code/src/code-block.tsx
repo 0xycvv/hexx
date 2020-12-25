@@ -39,6 +39,10 @@ const _CodeBlock = React.memo(function _CodeBlock({
           if (e.key === 'Enter' && !e.shiftKey) {
             e.stopPropagation();
           }
+          if (e.key === 'Tab') {
+            document.execCommand('insertText', false, '  ');
+            e.preventDefault();
+          }
         }}
         tagName="code"
         placeholder={'<code-block></code-block>'}
