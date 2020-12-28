@@ -92,7 +92,8 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
                 return false;
               }
               const isEditable =
-                oe.target.getAttribute('contenteditable') === 'true';
+                oe.target.getAttribute('contenteditable') ===
+                  'true' || oe.target.tagName === 'TEXTAREA';
               if (!isEditable) {
                 return true;
               }
@@ -188,7 +189,8 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
                 return false;
               }
               const isEditable =
-                oe.target.getAttribute('contenteditable') === 'true';
+                oe.target.getAttribute('contenteditable') ===
+                  'true' || oe.target.tagName === 'TEXTAREA';
               if (isEditable) {
                 setBlockSelect([]);
                 //   return true;
