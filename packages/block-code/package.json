@@ -1,6 +1,6 @@
 {
   "name": "@hexx/block-code",
-  "version": "0.6.11",
+  "version": "0.6.13",
   "main": "dist/hexx-block-code.cjs.js",
   "module": "dist/hexx-block-code.esm.js",
   "peerDependencies": {

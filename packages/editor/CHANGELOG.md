@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.6.13
+
+### Patch Changes
+
+- fc53d95: add markdown parser
+
 ## 0.6.12
 
 ### Patch Changes

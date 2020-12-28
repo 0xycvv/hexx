@@ -1,5 +1,13 @@
 # @hexx/block-code
 
+## 0.6.13
+
+### Patch Changes
+
+- fc53d95: add markdown parser
+- Updated dependencies [fc53d95]
+  - @hexx/editor@0.6.13
+
 ## 0.6.11
 
 ### Patch Changes
