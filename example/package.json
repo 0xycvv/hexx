@@ -14,10 +14,14 @@
     "@hexx/renderer": "^0.6.11",
     "@hexx/theme": "^0.6.9",
     "@preconstruct/next": "^2.0.0",
+    "jsdom": "^16.4.0",
     "linkify-it": "^3.0.2",
     "next": "10.0.3",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "tlds": "^1.216.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^16.2.5"
   }
 }

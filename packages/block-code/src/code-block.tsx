@@ -4,19 +4,35 @@ import {
   useBlock,
   applyBlock,
   BlockProps,
+  useEditable,
 } from '@hexx/editor';
-import { Editable } from '@hexx/editor/components';
 import * as React from 'react';
 import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
-import { css } from '@hexx/theme';
+import { css, styled } from '@hexx/theme';
+
+const CodeEditable = styled('code', {
+  display: 'block',
+  whiteSpace: 'pre',
+});
 
 const _CodeBlock = React.memo(function _CodeBlock({
   id,
   index,
-}: BlockProps) {
+  config,
+}: BlockProps<{ placeholder?: string }>) {
   const { update, register, block } = useBlock(id, index);
   const ref = React.useRef<HTMLDivElement>(null);
+
+  useEditable(ref, (html) => {
+    update({
+      ...block,
+      data: {
+        ...block.data,
+        value: html,
+      },
+    });
+  });
 
   React.useEffect(() => {
     ref.current?.focus();
@@ -29,12 +45,11 @@ const _CodeBlock = React.memo(function _CodeBlock({
 
   return (
     <pre className={`${css(codeBlockStyle)} ${codeClassName}`}>
-      <Editable
-        css={{
-          display: 'block',
-          whiteSpace: 'pre',
-        }}
+      <CodeEditable
         className={codeClassName}
+        contentEditable
+        ref={composeRef(ref, register)}
+        suppressContentEditableWarning
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.stopPropagation();
@@ -44,39 +59,32 @@ const _CodeBlock = React.memo(function _CodeBlock({
             e.preventDefault();
           }
         }}
-        tagName="code"
-        placeholder={'<code-block></code-block>'}
-        onChange={(evt) => {
-          update({
-            ...block,
-            data: {
-              ...block.data,
-              value: evt.target.value,
-            },
-          });
-        }}
-        ref={composeRef(ref, register)}
-        html={block.data.value}
-      />
+        placeholder={config?.placeholder || 'Code...'}
+      >
+        {block.data.value}
+      </CodeEditable>
     </pre>
   );
 });
 
-export const CodeBlock = applyBlock<TCodeBlock['data'], {}>(
-  _CodeBlock,
-  {
-    type: 'code',
-    isEmpty: (d) => !d.value?.trim(),
-    icon: {
-      text: 'Code Block',
-      svg: SvgCode,
-    },
-    mdast: {
-      type: 'code',
-      in: ({ lang, value }) => ({ value, lang }),
-    },
-    defaultValue: {
-      value: '',
-    },
+export const CodeBlock = applyBlock<
+  TCodeBlock['data'],
+  { placeholder: string }
+>(_CodeBlock, {
+  type: 'code',
+  isEmpty: (d) => !d.value?.trim(),
+  icon: {
+    text: 'Code Block',
+    svg: SvgCode,
   },
-);
+  mdast: {
+    type: 'code',
+    in: ({ lang, value }) => ({ value, lang }),
+  },
+  config: {
+    placeholder: 'Code...',
+  },
+  defaultValue: {
+    value: '',
+  },
+});

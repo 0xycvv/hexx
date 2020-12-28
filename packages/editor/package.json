@@ -47,6 +47,7 @@
     "rehype-remark": "^8.0.0",
     "remark-parse": "^9.0.0",
     "unified": "^9.2.0",
+    "use-editable": "^1.2.0",
     "uuid": "^8.3.2"
   },
   "size-limit": [

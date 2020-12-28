@@ -1,5 +1,4 @@
-import { css, StitchesCssProp } from '@hexx/theme';
-import ReactHtmlParser from 'react-html-parser';
+import { StitchesCssProp, StitchesProps, styled } from '@hexx/theme';
 
 export type TCodeBlock = {
   type: 'code';
@@ -14,17 +13,24 @@ export const codeBlockStyle: StitchesCssProp = {
   padding: '24px 32px',
   borderRadius: '4px',
   whiteSpace: 'pre',
-  overflow: 'scroll'
+  overflow: 'scroll',
 };
+
+const Pre = styled('pre', codeBlockStyle);
+const Code = styled('code', {});
 
 export const CodeBlockRenderer = ({
   data,
+  ...props
 }: {
   data: TCodeBlock['data'];
-}) => {
+} & StitchesProps<typeof Pre>) => {
+  const codeClassName = data.lang
+    ? `language-${data.lang}`
+    : 'language-';
   return (
-    <pre className={css(codeBlockStyle)}>
-      <code>{ReactHtmlParser(data.value)}</code>
-    </pre>
+    <Pre {...props}>
+      <Code className={codeClassName}>{data.value}</Code>
+    </Pre>
   );
 };

@@ -1,5 +1,3 @@
-Hexx Editor
-
 ## Getting Started
 
 install package
@@ -15,12 +13,18 @@ yarn add @hexx/editor
 ```jsx
 import { Editor } from '@hexx/editor';
 import {
-  BlockMap,
+  BlockMap, // default block mapping
+  // preset
   PlusButton,
   TuneButton,
+  InlineTool,
+  // additional inline tool
+  InlineCode,
+  InlineMarker,
+  InlineLink
 } from '@hexx/editor/components';
 
-<Editor {...props} blockMap={BlockMap}>
+<Editor blockMap={BlockMap}>
   <PlusButton />
   <TuneButton />
   <InlineTool>
@@ -28,5 +32,5 @@ import {
     <InlineCode />
     <InlineLink />
   </InlineTool>
-</Editor>;
+</Editor>
 ```

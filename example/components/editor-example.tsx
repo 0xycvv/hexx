@@ -1,8 +1,5 @@
-import { BasicImageBlock } from '@hexx/block-basic-image';
-import { CodeBlock } from '@hexx/block-code';
 import { Editor, EditorProps } from '@hexx/editor';
 import {
-  BlockMap,
   InlineCode,
   InlineLink,
   InlineMarker,
@@ -15,27 +12,24 @@ import {
   EditorWidthPlugin,
   HexxDevTool,
   HistoryPlugin,
+  LinkifyItPlugin,
   LocalStoragePlugin,
   SelectionPlugin,
-  LinkifyItPlugin,
   Unstable_MarkdownShortcutPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
-import { ElementRef, useCallback, useRef } from 'react';
-import tlds from 'tlds';
+import { blockMap } from 'lib/block-map';
 import Linkify from 'linkify-it';
+import { ElementRef, useCallback, useRef, useState } from 'react';
+import tlds from 'tlds';
+import { DataViewer } from './data-viewer';
 
 const linkify = Linkify();
 
 linkify.tlds(tlds);
 
-const blockMap = {
-  ...BlockMap,
-  code: CodeBlock,
-  'basic-image': BasicImageBlock,
-};
-
-const EditorExample = (props: EditorProps) => {
+const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
+  const [showDataViewer, setShowDataViewer] = useState(false);
   const editorRef = useRef<ElementRef<typeof Editor>>();
   const localSaverRef = useRef<
     ElementRef<typeof LocalStoragePlugin>
@@ -57,10 +51,10 @@ const EditorExample = (props: EditorProps) => {
           right: 24,
           bottom: 24,
           cursor: 'pointer',
+          zIndex: 1,
         })}
         onClick={() => {
-          // localSaverRef.current.save();
-          console.log(editorRef.current.getData());
+          setShowDataViewer(true);
         }}
       >
         <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
@@ -110,6 +104,12 @@ const EditorExample = (props: EditorProps) => {
           }}
         />
       </Editor>
+      {showDataViewer && (
+        <DataViewer
+          editor={editorRef.current}
+          onClose={() => setShowDataViewer(false)}
+        />
+      )}
     </>
   );
 };

@@ -1,17 +1,12 @@
-import toDOM from 'hast-util-to-dom';
 import { Parent } from 'mdast';
-import toHast from 'mdast-util-to-hast';
+import fromMarkdown from 'mdast-util-from-markdown';
+import { v4 } from 'uuid';
+import { CLIPBOARD_DATA_FORMAT } from '../constants';
 import { useEventListener } from '../hooks';
-import {
-  htmlToMdast,
-  isAvailableBlockContent,
-} from '../parser/html/parser';
+import { htmlToMdast } from '../parser/html/parser';
+import { mdastToData } from '../parser/markdown/parser';
 import { useBlockMdast } from '../parser/markdown/use-block-mdast';
 import { usePlugin } from './plugin';
-import fromMarkdown from 'mdast-util-from-markdown';
-import { AllMdastConfig } from '../parser/types';
-import { CLIPBOARD_DATA_FORMAT } from '../constants';
-import { v4 } from 'uuid';
 
 export function PastHtmlPlugin() {
   const {
@@ -30,7 +25,6 @@ export function PastHtmlPlugin() {
       const text = e.clipboardData?.getData('text/plain');
       const hexx = e.clipboardData?.getData(CLIPBOARD_DATA_FORMAT);
       const index = idList.findIndex((id) => id === activeBlock?.id);
-      console.log(hexx);
       if (hexx) {
         batchInsertBlocks({
           index,
@@ -39,18 +33,15 @@ export function PastHtmlPlugin() {
             id: v4(),
           })),
         });
-      e.preventDefault();
+        e.preventDefault();
       } else if (html) {
-        console.log("?????");
         const mdastParent = htmlToMdast(html);
         try {
-          pushAllResultToBlock(
-            e,
-            mdastParent,
-            allMdastConfig,
-            batchInsertBlocks,
-            index,
-          );
+          const results = mdastToData(allMdastConfig, mdastParent);
+          if (results.length > 0) {
+            batchInsertBlocks({ blocks: results, index });
+            e.preventDefault();
+          }
         } catch (error) {
           console.error('[hexx] error when pasting html', error);
         }
@@ -63,13 +54,11 @@ export function PastHtmlPlugin() {
           return;
         }
         try {
-          pushAllResultToBlock(
-            e,
-            mdast,
-            allMdastConfig,
-            batchInsertBlocks,
-            index,
-          );
+          const results = mdastToData(allMdastConfig, mdast);
+          if (results.length > 0) {
+            batchInsertBlocks({ blocks: results, index });
+            e.preventDefault();
+          }
         } catch (error) {
           console.error('[hexx] error when pasting markdown', error);
         }
@@ -78,30 +67,4 @@ export function PastHtmlPlugin() {
     wrapperRef,
   );
   return null;
-}
-
-function pushAllResultToBlock(
-  e: ClipboardEvent,
-  parent: Parent,
-  allMdastConfig: AllMdastConfig,
-  batch: any,
-  index?: number,
-) {
-  let results: any[] = [];
-  for (const children of parent.children) {
-    if (isAvailableBlockContent(children, allMdastConfig)) {
-      const mdastConfig = allMdastConfig[children.type];
-      results.push({
-        type: mdastConfig.blockType,
-        data:
-          typeof mdastConfig.in === 'function'
-            ? mdastConfig.in(children, (c) => toDOM(toHast(c)))
-            : {},
-      });
-    }
-  }
-  if (results.length > 0) {
-    batch({ blocks: results, index });
-    e.preventDefault();
-  }
 }
