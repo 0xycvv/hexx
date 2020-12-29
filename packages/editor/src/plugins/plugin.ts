@@ -1,8 +1,10 @@
 import { useAtom } from 'jotai';
+import { useUpdateAtom } from 'jotai/utils';
 import {
   activeBlockIdAtom,
   blockIdListAtom,
   blockSelectAtom,
+  dropBlockAtom,
   editorDefaultBlockAtom,
   editorWrapperAtom,
   isEditorSelectAllAtom,
@@ -19,6 +21,7 @@ export function usePlugin() {
   const blockSelect = useAtom(blockSelectAtom);
   const editor = useEditor();
   const ids = useAtom(blockIdListAtom);
+  const drop = useAtom(dropBlockAtom);
 
   return {
     wrapperRef,
@@ -29,5 +32,6 @@ export function usePlugin() {
     selectAll,
     ids,
     blockSelect,
+    drop,
   };
 }

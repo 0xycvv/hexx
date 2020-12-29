@@ -15,9 +15,10 @@ import {
   LinkifyItPlugin,
   LocalStoragePlugin,
   SelectionPlugin,
-  // Unstable_FileDropPlugin,
+  Unstable_FileDropPlugin,
   Unstable_MarkdownShortcutPlugin,
 } from '@hexx/editor/plugins';
+import { BasicImageBlock } from '@hexx/block-basic-image';
 import { css } from '@hexx/theme';
 import { blockMap } from 'lib/block-map';
 import Linkify from 'linkify-it';
@@ -91,7 +92,20 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         <SelectionPlugin />
         <HexxDevTool />
         <Unstable_MarkdownShortcutPlugin />
-        {/* <Unstable_FileDropPlugin /> */}
+        <Unstable_FileDropPlugin
+          resolve={async (files) => {
+            if (files[0] && files[0].type.includes('image')) {
+              return {
+                type: BasicImageBlock.block.type,
+                data: {
+                  url: await BasicImageBlock.block.config.onInput(
+                    files,
+                  ),
+                },
+              };
+            }
+          }}
+        />
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>
           <InlineMarker />

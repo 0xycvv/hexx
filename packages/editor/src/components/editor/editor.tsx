@@ -280,8 +280,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             sortingItemKey: blockIdList[index],
           }));
         }}
+        onSortStart={(_, event) => event.preventDefault()}
         useDragHandle
-        pressDelay={10}
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
         blockIdList={blockIdList.filter((id) => {

@@ -1,54 +1,35 @@
+import { BlockData } from '@hexx/renderer/src/types';
 import { useEventListener } from '../hooks';
 import { usePlugin } from './plugin';
-import { debounce } from '../utils/debounce';
-import { ReactNode, useState } from 'react';
-import { styled } from '@hexx/theme';
-import { Rect } from '@popperjs/core';
-
-const DropIndicator = styled('div', {
-  width: '100%',
-  height: 2,
-  backgroundColor: '$highlight',
-  position: 'absolute',
-});
 
 export function Unstable_FileDropPlugin(props: {
-  children?: () => JSX.Element;
+  resolve: (
+    file: File[] | FileList,
+  ) => BlockData | undefined | Promise<BlockData | undefined>;
 }) {
-  const { wrapperRef } = usePlugin();
-  const [pos, setPos] = useState<Rect | null>(null);
+  const {
+    wrapperRef,
+    drop: [dropId, setDropId],
+    editor,
+  } = usePlugin();
+  const { insertBlockAfter } = editor;
 
-  const dragOver = debounce(
-    (e) => {
-      console.log('dragover');
-      const elements = document.elementsFromPoint(
-        e.clientX,
-        e.clientY,
+  const dragOver = (e) => {
+    const elements = document.elementsFromPoint(e.clientX, e.clientY);
+    const closestBlock = elements.find((element) => {
+      return (
+        element instanceof HTMLElement && 'blockId' in element.dataset
       );
-      const closestBlock = elements.find((element) => {
-        return (
-          element instanceof HTMLElement &&
-          'blockId' in element.dataset
-        );
-      });
-      if (
-        closestBlock instanceof HTMLElement &&
-        'blockId' in closestBlock.dataset
-      ) {
-        const {
-          x,
-          y,
-          width,
-          height,
-        } = closestBlock.getBoundingClientRect();
-        setPos({ x, y, width, height });
-      }
-      e.preventDefault();
-      e.stopPropagation();
-    },
-    50,
-    true,
-  );
+    });
+    if (
+      closestBlock instanceof HTMLElement &&
+      'blockId' in closestBlock.dataset
+    ) {
+      setDropId(closestBlock.dataset.blockId!);
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  };
 
   useEventListener('dragover', dragOver, wrapperRef);
   useEventListener(
@@ -61,29 +42,26 @@ export function Unstable_FileDropPlugin(props: {
   );
   useEventListener(
     'drop',
-    (e) => {
+    async (e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (dropId && e.dataTransfer?.files) {
+        const resolvedBlock = await props.resolve(
+          e.dataTransfer?.files,
+        );
+        if (resolvedBlock) {
+          insertBlockAfter({
+            id: dropId,
+            block: resolvedBlock,
+          });
+        }
+        setDropId(null);
+        e.preventDefault();
+        e.stopPropagation();
+      }
     },
     wrapperRef,
   );
 
-  if (!pos) {
-    return null;
-  }
-
-  if (typeof props.children === 'function') {
-    return props.children();
-  }
-
-  return (
-    <DropIndicator
-      style={{
-        top: pos?.y - pos?.height,
-        left: pos?.x,
-        right: pos?.width,
-      }}
-      className="drop-indicator"
-    />
-  );
+  return null;
 }

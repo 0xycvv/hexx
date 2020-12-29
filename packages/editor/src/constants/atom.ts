@@ -73,6 +73,9 @@ export const hoverBlockAtom = atom<{
 } | null>(null);
 hoverBlockAtom.scope = _hexxScope;
 
+export const dropBlockAtom = atom<string | null>(null);
+dropBlockAtom.scope = _hexxScope;
+
 export const isHoveringFamily = atomFamily(
   (id: string) => (get) => get(hoverBlockAtom)?.id === id,
   (id) => (
