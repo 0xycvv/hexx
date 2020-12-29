@@ -12,7 +12,7 @@ const DropIndicator = styled('div', {
   position: 'absolute',
 });
 
-export function FileDropPlugin(props: {
+export function Unstable_FileDropPlugin(props: {
   children?: () => JSX.Element;
 }) {
   const { wrapperRef } = usePlugin();
@@ -21,14 +21,19 @@ export function FileDropPlugin(props: {
   const dragOver = debounce(
     (e) => {
       console.log('dragover');
-      const closestBlock =
-        document
-          .elementFromPoint(e.clientX, e.clientY)
-          ?.closest('[data-block-id]') ||
-        document.elementFromPoint(e.clientX, e.clientY);
+      const elements = document.elementsFromPoint(
+        e.clientX,
+        e.clientY,
+      );
+      const closestBlock = elements.find((element) => {
+        return (
+          element instanceof HTMLElement &&
+          'blockId' in element.dataset
+        );
+      });
       if (
         closestBlock instanceof HTMLElement &&
-        closestBlock?.dataset?.blockId
+        'blockId' in closestBlock.dataset
       ) {
         const {
           x,
@@ -49,7 +54,6 @@ export function FileDropPlugin(props: {
   useEventListener(
     'dragstart',
     (e) => {
-      console.log('dragstart');
       e.preventDefault();
       e.stopPropagation();
     },
@@ -58,7 +62,6 @@ export function FileDropPlugin(props: {
   useEventListener(
     'drop',
     (e) => {
-      console.log('drop');
       e.preventDefault();
       e.stopPropagation();
     },

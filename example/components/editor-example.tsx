@@ -15,6 +15,7 @@ import {
   LinkifyItPlugin,
   LocalStoragePlugin,
   SelectionPlugin,
+  // Unstable_FileDropPlugin,
   Unstable_MarkdownShortcutPlugin,
 } from '@hexx/editor/plugins';
 import { css } from '@hexx/theme';
@@ -90,7 +91,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         <SelectionPlugin />
         <HexxDevTool />
         <Unstable_MarkdownShortcutPlugin />
-        {/* <FileDropPlugin /> */}
+        {/* <Unstable_FileDropPlugin /> */}
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>
           <InlineMarker />

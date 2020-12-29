@@ -41,7 +41,7 @@ export const Editable = forwardRef<
       {...props}
       html={html}
       placeholder={props.placeholder || 'Type something...'}
-      className={`e-editable ${
+      className={`hexx-editable ${
         props.className || ''
       } ${combineStyles}`}
       ref={ref as any}

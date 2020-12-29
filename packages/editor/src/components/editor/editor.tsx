@@ -263,6 +263,11 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           setBlockSelect([]);
         }
       }}
+      onClick={(e) => {
+        if (e.target instanceof HTMLAnchorElement) {
+          window.open(e.target.href, '_blank', 'noopener noreferrer');
+        }
+      }}
     >
       <NewBlockOverlayPlugin />
       <PastHtmlPlugin />

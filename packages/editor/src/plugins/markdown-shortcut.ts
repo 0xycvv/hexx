@@ -32,18 +32,20 @@ const isWholeBlock = (content: Content): content is WholeBlock =>
 const bold = {
   match: /[\*\_]{2}([^\*\_]+)[\*\_]{2}/g,
   replace: '<b>$1</b>',
+  offset: -5,
 };
 const italic = {
   match: /[\*\_]{1}([^\*\_]+)[\*\_]{1}/g,
-  // TODO: improve this
   notStartWith: '**',
   replace: '<i>$1</i>',
+  offset: -3,
 };
 
 const code = {
   match: /[\`]{1}([^\*\_]+)[\`]{1}/g,
   notStartWith: '```',
   replace: '<code>$1</code>',
+  offset: -3,
 };
 
 const replaceInlineMarkdown = (
@@ -52,7 +54,7 @@ const replaceInlineMarkdown = (
   replace: string,
 ) => str.replace(match, replace);
 
-// it's a very rough markdown parser
+// it's a very rough version of markdown parser for editor
 export function Unstable_MarkdownShortcutPlugin() {
   const { wrapperRef } = usePlugin();
   const { allMdastConfig } = useBlockMdast();
@@ -93,14 +95,16 @@ export function Unstable_MarkdownShortcutPlugin() {
             }
           }
         }
+        // inline markdown
         if (e.key === '*' || e.key === '_' || e.key === '`') {
           const selection = window.getSelection();
           let html = e.target.innerHTML;
 
           if (selection) {
             for (const inlineMD of [bold, italic, code]) {
+              const matched = html.match(inlineMD.match);
               if (
-                html.match(inlineMD.match) &&
+                matched &&
                 ('notStartWith' in inlineMD
                   ? !html.includes(
                       // @ts-ignore
@@ -108,7 +112,10 @@ export function Unstable_MarkdownShortcutPlugin() {
                     )
                   : true)
               ) {
-                const restore = saveCaretPosition(e.target);
+                const restore = saveCaretPosition(
+                  e.target,
+                  inlineMD.offset,
+                );
                 e.target.innerHTML = replaceInlineMarkdown(
                   html,
                   inlineMD.match,
@@ -128,7 +135,6 @@ export function Unstable_MarkdownShortcutPlugin() {
                     );
                     const selection = getSelection();
                     range.setStart(cursor, 1);
-                    console.log(selection, range);
                     selection?.removeAllRanges();
                     selection?.addRange(range);
                   }
@@ -144,7 +150,10 @@ export function Unstable_MarkdownShortcutPlugin() {
 
   return null;
 }
-function saveCaretPosition(context): () => Range | undefined {
+function saveCaretPosition(
+  context: Node,
+  offset = 0,
+): () => Range | undefined {
   var selection = window.getSelection();
   if (!selection) {
     return () => {
@@ -153,7 +162,7 @@ function saveCaretPosition(context): () => Range | undefined {
   }
   var range = selection.getRangeAt(0);
   range.setStart(context, 0);
-  var len = range.toString().length;
+  var len = range.toString().length + offset;
 
   return function restore() {
     if (!selection) return;

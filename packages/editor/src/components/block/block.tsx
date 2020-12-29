@@ -157,7 +157,18 @@ function useBlockWrapper({
       return;
     }
     if (e.key === BackspaceKey) {
-      // TODO: handle if caret on start
+      const range = getSelectionRange();
+      if (range?.collapse && range.startOffset === 0) {
+        requestAnimationFrame(() => {
+          const previousBlock = findBlockByIndex(index - 1);
+          if (!previousBlock) {
+            focusLastBlock();
+          } else {
+            previousBlock.editable?.focus();
+          }
+          lastCursor();
+        });
+      }
       if (
         ((typeof currentBlock.block.isEmpty === 'function' &&
           currentBlock.block.isEmpty(block.data)) ||
