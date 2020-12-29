@@ -1,5 +1,15 @@
 # example
 
+## 0.5.10
+
+### Patch Changes
+
+- 92598ca: file drop plugin
+- 92598ca: fix cursor when delete at start
+- Updated dependencies [92598ca]
+- Updated dependencies [92598ca]
+  - @hexx/editor@0.6.14
+
 ## 0.5.9
 
 ### Patch Changes

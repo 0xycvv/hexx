@@ -1,5 +1,12 @@
 # @hexx/editor
 
+## 0.6.14
+
+### Patch Changes
+
+- 92598ca: file drop plugin
+- 92598ca: fix cursor when delete at start
+
 ## 0.6.13
 
 ### Patch Changes
