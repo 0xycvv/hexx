@@ -9,7 +9,10 @@ import {
   focusBlockByIndex,
   lastCursor,
 } from '../../utils/find-blocks';
-import { extractFragmentFromPosition } from '../../utils/ranges';
+import {
+  extractFragmentFromPosition,
+  getSelectionRange,
+} from '../../utils/ranges';
 import { Editable } from '../editable';
 import { list as ListSvg, IcNumList } from '../icons';
 import { applyBlock, BlockProps } from '../../utils/blocks';
@@ -105,8 +108,29 @@ const _ListBlock = React.memo(function ({
         e.preventDefault();
       }
     } else if (e.key === BackspaceKey) {
-      if (!block.data.items[activeListItemIndex]) {
+      if (
+        !block.data.items[activeListItemIndex] ||
+        block.data.items[activeListItemIndex] === '<br>'
+      ) {
         handleEmptyListItem(activeListItemIndex);
+        return;
+      }
+      const range = getSelectionRange();
+      if (range?.collapse && range.startOffset === 0) {
+        const liEditableList = ref.current?.querySelectorAll(
+          'li [contenteditable]',
+        );
+        const previousListItem =
+          liEditableList && liEditableList[activeListItemIndex - 1];
+        if (
+          previousListItem &&
+          previousListItem instanceof HTMLDivElement
+        ) {
+          previousListItem.focus();
+          lastCursor();
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }
     }
   };

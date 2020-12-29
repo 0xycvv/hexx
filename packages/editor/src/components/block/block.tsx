@@ -9,9 +9,9 @@ import {
 } from 'react';
 import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import {
-  blockMapAtom,
   blockMapFamily,
   blockSelectAtom,
+  dropBlockAtom,
   editorIdAtom,
   hoverBlockAtom,
   isEditorSelectAllAtom,
@@ -53,6 +53,27 @@ const RightIndicator = styled('div', {
   zIndex: 9,
 });
 
+const BottomIndicator = styled('div', {
+  height: 0,
+  width: '100%',
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
+  left: 0,
+  zIndex: 9,
+  variants: {
+    drop: {
+      active: {
+        background: 'rgba(46, 170, 220, 0.5)',
+        left: 0,
+        right: 0,
+        bottom: '-4px',
+        height: 4,
+      },
+    },
+  },
+});
+
 const SelectOverlay = styled('div', {
   position: 'absolute',
   userSelect: 'none',
@@ -91,6 +112,9 @@ function useBlockWrapper({
   const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
   const currentBlock = block && blockMap[block.type];
   const isBlockSelect = blockSelect.includes(block.id);
+  const [drop] = useAtom(dropBlockAtom);
+
+  const isDropping = drop === id;
 
   const onKeyDown = (e: KeyboardEvent) => {
     setHoverBlockId(null);
@@ -157,7 +181,18 @@ function useBlockWrapper({
       return;
     }
     if (e.key === BackspaceKey) {
-      // TODO: handle if caret on start
+      const range = getSelectionRange();
+      if (range?.collapse && range.startOffset === 0) {
+        requestAnimationFrame(() => {
+          const previousBlock = findBlockByIndex(index - 1);
+          if (!previousBlock) {
+            focusLastBlock();
+          } else {
+            previousBlock.editable?.focus();
+          }
+          lastCursor();
+        });
+      }
       if (
         ((typeof currentBlock.block.isEmpty === 'function' &&
           currentBlock.block.isEmpty(block.data)) ||
@@ -229,6 +264,7 @@ function useBlockWrapper({
     setIsBlockSelect: (value: boolean) => {
       setBlockSelect(value ? [block.id] : []);
     },
+    isDropping,
   };
 }
 
@@ -240,6 +276,7 @@ const SortableItem = SortableElement(
     selectInputRef,
     id,
     i,
+    isDropping,
   }) => {
     return (
       <div className="hexx-block">
@@ -252,6 +289,10 @@ const SortableItem = SortableElement(
         {(isBlockSelect || isEditorSelectAll) && (
           <SortableOverlay selectInputRef={selectInputRef} />
         )}
+        <BottomIndicator
+          className="hexx-bottom-indicator"
+          drop={isDropping && 'active'}
+        />
         <RightIndicator className="hexx-right-indicator" />
       </div>
     );
@@ -267,6 +308,7 @@ export function Block({ id, index, css }: BlockProps) {
     isEditorSelectAll,
     blockComponent,
     ref,
+    isDropping,
   } = useBlockWrapper({
     id,
     index,
@@ -286,6 +328,7 @@ export function Block({ id, index, css }: BlockProps) {
         blockComponent={blockComponent}
         index={index}
         i={index}
+        isDropping={isDropping}
       />
     </Wrapper>
   );
