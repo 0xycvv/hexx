@@ -111,7 +111,7 @@ function useBlockWrapper({
   isHoverFamily.scope = _hexxScope;
   const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
   const currentBlock = block && blockMap[block.type];
-  const isBlockSelect = blockSelect.includes(block.id);
+  const isBlockSelect = blockSelect.has(block.id);
   const [drop] = useAtom(dropBlockAtom);
 
   const isDropping = drop === id;
@@ -201,7 +201,7 @@ function useBlockWrapper({
         index !== 0
       ) {
         removeBlockById({ id: block.id });
-        setBlockSelect([]);
+        setBlockSelect(new Set());
         requestAnimationFrame(() => {
           const previousBlock = findBlockByIndex(index - 1);
           if (!previousBlock) {
@@ -244,7 +244,6 @@ function useBlockWrapper({
       'data-block-id': block.id,
       className: 'hexx-block-wrapper',
       onKeyDown,
-      onFocus: setHoverId,
       onBlur: () => {
         setHoverBlockId(null);
       },
@@ -253,7 +252,7 @@ function useBlockWrapper({
         if (!ref.current) return;
         const editable = findContentEditable(ref.current);
         if (!editable) {
-          setBlockSelect([block.id]);
+          setBlockSelect(new Set(block.id));
           e.stopPropagation();
         }
         setHoverId();
@@ -262,7 +261,7 @@ function useBlockWrapper({
     isBlockSelect,
     isEditorSelectAll,
     setIsBlockSelect: (value: boolean) => {
-      setBlockSelect(value ? [block.id] : []);
+      setBlockSelect(value ? new Set([block.id]) : new Set());
     },
     isDropping,
   };

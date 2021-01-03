@@ -29,7 +29,7 @@ export function NewBlockOverlayPlugin(props: {
 
   const handleClick = () => {
     if (
-      blockSelect.length > 0 &&
+      blockSelect.size > 0 &&
       !uiState.isDragging &&
       !uiState.isSorting
     ) {

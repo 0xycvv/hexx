@@ -93,7 +93,7 @@ export const TuneButton = forwardRef(
     }, [hoverBlock]);
 
     const isSelecting =
-      lastHoverBlock && blockSelect.includes(lastHoverBlock?.id);
+      lastHoverBlock && blockSelect.has(lastHoverBlock?.id);
     const currentBlockData = !!lastHoverBlock?.id
       ? idMap[lastHoverBlock.id]
       : null;

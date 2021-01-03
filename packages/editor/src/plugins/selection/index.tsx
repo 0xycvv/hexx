@@ -56,9 +56,11 @@ export const SelectionPlugin = () => {
       },
       onElementUnselect: (node?: HTMLElement) => {
         if (node?.dataset.blockId) {
-          setBlockSelect((s) =>
-            s.filter((s) => s !== node.dataset.blockId),
-          );
+          setBlockSelect((s) => {
+            const set = new Set(s);
+            set.delete(node.dataset.blockId!);
+            return set;
+          });
         }
       },
       onDragStartBegin: (e: MouseEvent) => {
@@ -84,10 +86,11 @@ export const SelectionPlugin = () => {
       },
       onElementSelect: (node?: HTMLElement) => {
         if (node?.dataset.blockId) {
-          setBlockSelect((s) => [
-            ...s,
-            node.dataset.blockId as string,
-          ]);
+          setBlockSelect((s) => {
+            const set = new Set(s);
+            set.add(node.dataset.blockId!);
+            return set;
+          });
         }
       },
     });
@@ -122,9 +125,11 @@ export const SelectionPlugin = () => {
       },
       onElementUnselect: (node?: HTMLElement) => {
         if (node?.dataset.blockId) {
-          setBlockSelect((s) =>
-            s.filter((s) => s !== node.dataset.blockId),
-          );
+          setBlockSelect((s) => {
+            const set = new Set(s);
+            set.delete(node.dataset.blockId!);
+            return set;
+          });
         }
       },
       onElementSelect: (node?: HTMLElement) => {
@@ -134,10 +139,13 @@ export const SelectionPlugin = () => {
         }
         const nodes = ds.getSelection();
         if (node?.dataset.blockId) {
-          setBlockSelect((s) => [
-            ...s,
-            ...nodes?.map((n) => n.dataset.blockId as string),
-          ]);
+          setBlockSelect((s) => {
+            const set = new Set([
+              ...s,
+              ...nodes.map((n) => n.dataset.blockId),
+            ]);
+            return set;
+          });
         }
       },
     });
@@ -145,7 +153,7 @@ export const SelectionPlugin = () => {
   }, []);
 
   useEffect(() => {
-    if (blockSelect.length === 0) {
+    if (blockSelect.size === 0) {
       const selectionHTML = selectionRef.current?.getSelection();
       if (selectionHTML && selectionHTML.length > 0) {
         selectionRef.current?.clearSelection();
