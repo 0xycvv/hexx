@@ -64,7 +64,7 @@ export function EditorRenderer({
   }
   const content = React.Children.toArray(
     blocks.map((block) => {
-      let Renderer = blockMap[block.type];
+      let Renderer = blockMap[block?.type];
       if (!Renderer) {
         return null;
       }

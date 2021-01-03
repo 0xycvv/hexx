@@ -37,6 +37,7 @@
     "@hexx/renderer": "^0.6.11",
     "@hexx/theme": "^0.6.9",
     "@popperjs/core": "^2.6.0",
+    "dragselect": "^1.15.1",
     "hast-util-to-dom": "^2.0.6",
     "hast-util-to-mdast": "^7.1.3",
     "jotai": "^0.12.1",

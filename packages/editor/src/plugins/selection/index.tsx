@@ -1,21 +1,22 @@
 import { css } from '@hexx/theme';
+import DragSelect from 'dragselect';
 import { atom, useAtom } from 'jotai';
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import { useEffect, useRef } from 'react';
 import {
   blockSelectAtom,
   uiStateAtom,
   _hexxScope,
 } from '../../constants/atom';
-import type SelectionJsType from './selection';
 
 const blockIdSelectionAtom = atom<string[]>([]);
 
 blockIdSelectionAtom.scope = _hexxScope;
+
+const isContentEditable = (element: HTMLElement) =>
+  element.getAttribute('contenteditable') === 'true' ||
+  element.getAttribute('contenteditable') === 'plaintext-only' ||
+  element.tagName === 'TEXTAREA' ||
+  element.parentElement?.getAttribute('contenteditable') === 'true';
 
 const globalStyles = css.global({
   '.selection': {
@@ -28,217 +29,135 @@ const globalStyles = css.global({
   },
 });
 
-interface SelectionPluginProps {
-  enableInputCrossSelection?: boolean;
-  classNameFilter?: string[];
-}
+export const SelectionPlugin = () => {
+  const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
+  const [uiState, setUIState] = useAtom(uiStateAtom);
+  const selectionRef = useRef<any>();
+  const inputSelectionRef = useRef<any>();
 
-export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
-  (props, ref) => {
-    const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
-    const [uiState, setUIState] = useAtom(uiStateAtom);
-    const selectionRef = useRef<SelectionJsType>();
-    const inputSelectionRef = useRef<SelectionJsType>();
-
-    useEffect(() => {
-      import('./selection').then((s) => {
-        const SelectionJs = s.default;
-        selectionRef.current = new SelectionJs({
-          class: 'selection',
-          // px, how many pixels the point should move before starting the selection (combined distance).
-          // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
-          startThreshold: 50,
-
-          // Disable the selection functionality for touch devices
-          disableTouch: true,
-          singleClick: false,
-
-          // On which point an element should be selected.
-          // Available modes are cover (cover the entire element), center (touch the center) or
-          // the default mode is touch (just touching it).
-          mode: 'touch',
-
-          // Behaviour on single-click
-          // Available modes are 'native' (element was mouse-event target) or
-          // 'touch' (element got touched)
-          tapMode: 'native',
-
-          // Query selectors from elements which can be selected
-          selectables: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements from where a selection can be start
-          startareas: ['.hexx'],
-
-          // Query selectors for elements which will be used as boundaries for the selection
-          boundaries: ['html'],
-
-          // Query selector or dom node to set up container for selection-area-element
-          selectionAreaContainer: 'body',
-
-          // On scrollable areas the number on px per frame is devided by this amount.
-          // Default is 10 to provide a enjoyable scroll experience.
-          scrollSpeedDivider: 10,
-
-          // Browsers handle mouse-wheel events differently, this number will be used as
-          // numerator to calculate the mount of px while scrolling manually: manualScrollSpeed / scrollSpeedDivider
-          manualScrollSpeed: 750,
-        })
-          .on('beforestart', ({ oe }) => {
-            if (uiState.isDragging || uiState.isSorting) return false;
-            if (oe.target instanceof HTMLElement) {
-              if (
-                oe.target.classList.contains('hexx-block-overlay')
-              ) {
-                return false;
-              }
-              const isEditable =
-                oe.target.getAttribute('contenteditable') ===
-                  'true' || oe.target.tagName === 'TEXTAREA';
-              if (!isEditable) {
-                return true;
-              }
-              return false;
-            } else if (
-              // @ts-ignore
-              oe.target.parentElement instanceof HTMLElement
-            ) {
-              const isEditable =
-                // @ts-ignore
-                oe.target.parentElement.getAttribute(
-                  'contenteditable',
-                ) === 'true';
-              return !isEditable;
-            }
-            // @ts-ignore
-            return oe.target.tagName !== 'INPUT';
-          })
-          .on('move', ({ selected }) => {
-            const selectedBlockId = selected.map(
-              (s) =>
-                // @ts-ignore
-                s.dataset.blockId,
-            );
-            setBlockSelect(selectedBlockId);
-          })
-          .on('start', () => {
-            setUIState((s) => ({ ...s, isDragging: true }));
-          })
-          .on('stop', ({ inst }) => {
-            // Remember selection in case the user wants to add smth in the next one
-            // inst.keepSelection();
-            requestAnimationFrame(() => {
-              setUIState((s) => ({ ...s, isDragging: false }));
-            });
-          });
-      });
-    }, []);
-
-    useEffect(() => {
-      // if (!props.enableInputCrossSelection) {
-      //   return;
-      // }
-      import('./selection').then((s) => {
-        const SelectionJs = s.default;
-        inputSelectionRef.current = new SelectionJs({
-          class: 'selection-2',
-          singleClick: false,
-          // px, how many pixels the point should move before starting the selection (combined distance).
-          // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
-          startThreshold: 100,
-
-          // Disable the selection functionality for touch devices
-          disableTouch: true,
-
-          // On which point an element should be selected.
-          // Available modes are cover (cover the entire element), center (touch the center) or
-          // the default mode is touch (just touching it).
-          mode: 'touch',
-          firstItemMode: 'outside',
-
-          // Behaviour on single-click
-          // Available modes are 'native' (element was mouse-event target) or
-          // 'touch' (element got touched)
-          tapMode: 'touch',
-
-          // Query selectors from elements which can be selected
-          selectables: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements from where a selection can be start
-          startareas: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements which will be used as boundaries for the selection
-          boundaries: ['html'],
-
-          // Query selector or dom node to set up container for selection-area-element
-          selectionAreaContainer: 'body',
-
-          // On scrollable areas the number on px per frame is devided by this amount.
-          // Default is 10 to provide a enjoyable scroll experience.
-          scrollSpeedDivider: 10,
-
-          // Browsers handle mouse-wheel events differently, this number will be used as
-          // numerator to calculate the mount of px while scrolling manually: manualScrollSpeed / scrollSpeedDivider
-          manualScrollSpeed: 750,
-        })
-          .on('beforestart', ({ oe }) => {
-            if (uiState.isDragging || uiState.isSorting) return false;
-            if (oe.target instanceof HTMLDivElement) {
-              if (
-                oe.target.classList.contains('hexx-block-overlay')
-              ) {
-                return false;
-              }
-              const isEditable =
-                oe.target.getAttribute('contenteditable') ===
-                  'true' || oe.target.tagName === 'TEXTAREA';
-              if (isEditable) {
-                setBlockSelect([]);
-                //   return true;
-              }
-              // return false;
-            }
-            return true;
-          })
-          .on('move', ({ selected }) => {
-            const selectedBlockId = selected.map(
-              (s) =>
-                // @ts-ignore
-                s.dataset.blockId,
-            );
-            setBlockSelect(selectedBlockId);
-          })
-          .on('start', () => {
-            setUIState((s) => ({ ...s, isDragging: true }));
-          })
-          .on('stop', ({ inst }) => {
-            // Remember selection in case the user wants to add smth in the next one
-            // inst.keepSelection();
-            requestAnimationFrame(() => {
-              setUIState((s) => ({ ...s, isDragging: false }));
-            });
-          });
-      });
-    }, [props.enableInputCrossSelection]);
-
-    useEffect(() => {
-      if (blockSelect.length === 0) {
-        const selectionHTML = selectionRef.current?.getSelection();
-        if (selectionHTML && selectionHTML.length > 0) {
-          selectionRef.current?.clearSelection();
+  useEffect(() => {
+    const ds = new DragSelect({
+      customStyles: true,
+      selectables: document.getElementsByClassName(
+        'hexx-block-wrapper',
+      ),
+      selectorClass: 'selection',
+      onDragStart: () => {
+        ds.addSelectables(
+          document.getElementsByClassName('hexx-block-wrapper'),
+        );
+        setUIState((s) => ({ ...s, isDragging: true }));
+      },
+      onDragMove: (e: MouseEvent) => {
+        e.preventDefault();
+      },
+      callback: () => {
+        setUIState((s) => ({ ...s, isDragging: false }));
+      },
+      onElementUnselect: (node?: HTMLElement) => {
+        if (node?.dataset.blockId) {
+          setBlockSelect((s) =>
+            s.filter((s) => s !== node.dataset.blockId),
+          );
         }
-        const inputSelection = inputSelectionRef.current?.getSelection();
-        if (inputSelection && inputSelection.length > 0) {
-          inputSelectionRef.current?.clearSelection();
+      },
+      onDragStartBegin: (e: MouseEvent) => {
+        if (uiState.isDragging) {
+          ds.break();
         }
+        if (e.target instanceof HTMLElement) {
+          if (e.target.classList.contains('hexx-block-overlay')) {
+            ds.break();
+          }
+          const isEditable =
+            e.target.getAttribute('contenteditable') === 'true' ||
+            e.target.getAttribute('contenteditable') ===
+              'plaintext-only' ||
+            e.target.tagName === 'TEXTAREA' ||
+            e.target.parentElement?.getAttribute(
+              'contenteditable',
+            ) === 'true';
+          if (isEditable) {
+            ds.break();
+          }
+        }
+      },
+      onElementSelect: (node?: HTMLElement) => {
+        if (node?.dataset.blockId) {
+          setBlockSelect((s) => [
+            ...s,
+            node.dataset.blockId as string,
+          ]);
+        }
+      },
+    });
+    selectionRef.current = ds;
+  }, []);
+
+  useEffect(() => {
+    const ds = new DragSelect({
+      customStyles: true,
+      selectables: document.getElementsByClassName(
+        'hexx-block-wrapper',
+      ),
+      selectorClass: 'selection-2',
+      onDragStartBegin: () => {
+        if (uiState.isDragging) {
+          ds.break();
+        }
+      },
+      onDragStart: (e) => {
+        if (!isContentEditable(e.target)) {
+          ds.stop();
+        } else {
+          ds.start();
+        }
+        ds.addSelectables(
+          document.getElementsByClassName('hexx-block-wrapper'),
+        );
+        setUIState((s) => ({ ...s, isDragging: true }));
+      },
+      callback: () => {
+        setUIState((s) => ({ ...s, isDragging: false }));
+      },
+      onElementUnselect: (node?: HTMLElement) => {
+        if (node?.dataset.blockId) {
+          setBlockSelect((s) =>
+            s.filter((s) => s !== node.dataset.blockId),
+          );
+        }
+      },
+      onElementSelect: (node?: HTMLElement) => {
+        const { x, y } = ds.getCursorPositionDifference();
+        if (Math.abs(y) < 50) {
+          return;
+        }
+        const nodes = ds.getSelection();
+        if (node?.dataset.blockId) {
+          setBlockSelect((s) => [
+            ...s,
+            ...nodes?.map((n) => n.dataset.blockId as string),
+          ]);
+        }
+      },
+    });
+    inputSelectionRef.current = ds;
+  }, []);
+
+  useEffect(() => {
+    if (blockSelect.length === 0) {
+      const selectionHTML = selectionRef.current?.getSelection();
+      if (selectionHTML && selectionHTML.length > 0) {
+        selectionRef.current?.clearSelection();
       }
-    }, [blockSelect]);
+      const inputSelection = inputSelectionRef.current?.getSelection();
+      if (inputSelection && inputSelection.length > 0) {
+        inputSelectionRef.current?.clearSelection();
+      }
+    }
+  }, [blockSelect]);
 
-    useImperativeHandle(ref, () => ({
-      selection: () => selectionRef.current,
-    }));
+  globalStyles();
 
-    globalStyles();
-
-    return null;
-  },
-);
+  return null;
+};
