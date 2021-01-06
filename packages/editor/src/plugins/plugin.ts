@@ -1,5 +1,4 @@
 import { useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
 import {
   activeBlockIdAtom,
   blockIdListAtom,
