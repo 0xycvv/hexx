@@ -1,5 +1,17 @@
 # example
 
+## 0.5.11
+
+### Patch Changes
+
+- f5d9dec: update jotai
+- f5d9dec: fix drag multiple block order
+- Updated dependencies [f5d9dec]
+- Updated dependencies [f5d9dec]
+- Updated dependencies [f5d9dec]
+  - @hexx/editor@0.6.15
+  - @hexx/renderer@0.6.15
+
 ## 0.5.10
 
 ### Patch Changes

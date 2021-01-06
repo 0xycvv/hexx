@@ -1,5 +1,17 @@
 # @hexx/editor
 
+## 0.6.15
+
+### Patch Changes
+
+- f5d9dec: update jotai
+- f5d9dec: Switch to drag select
+- f5d9dec: fix drag multiple block order
+- Updated dependencies [f5d9dec]
+- Updated dependencies [f5d9dec]
+- Updated dependencies [f5d9dec]
+  - @hexx/renderer@0.6.15
+
 ## 0.6.14
 
 ### Patch Changes
