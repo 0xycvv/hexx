@@ -113,11 +113,11 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
           <InlineLink />
         </InlineTool>
         <LocalStoragePlugin ref={localSaverRef} />
-        <ChangeDetectPlugin
+        {/* <ChangeDetectPlugin
           onChange={() => {
             console.log('change');
           }}
-        />
+        /> */}
       </Editor>
       {showDataViewer && (
         <DataViewer

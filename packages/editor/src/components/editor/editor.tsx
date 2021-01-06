@@ -113,14 +113,14 @@ function useBlockSelectCopy() {
   const [blockIdMap] = useAtom(blocksIdMapAtom);
 
   const handleClipboardEvent = (e: ClipboardEvent) => {
-    if (blockSelect.length > 0) {
+    if (blockSelect.size > 0) {
       setData(e);
       e.preventDefault();
     }
   };
 
   const setData = (e: ClipboardEvent) => {
-    const blocksToClip = isSelectAll ? ids : blockSelect;
+    const blocksToClip = isSelectAll ? ids : [...blockSelect];
     const selectedBlockNodeList = blocksToClip
       .map((bId) =>
         document.querySelector(`[data-block-id='${bId}']`),
@@ -152,9 +152,9 @@ function useBlockSelectCopy() {
   useEventListener(
     'cut',
     (e) => {
-      if (blockSelect.length > 0) {
+      if (blockSelect.size > 0) {
         setData(e);
-        setIdList((s) => s.filter((id) => !blockSelect.includes(id)));
+        setIdList((s) => s.filter((id) => !blockSelect.has(id)));
         e.preventDefault();
       } else if (isSelectAll) {
         setData(e);
@@ -198,13 +198,14 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     newIndex,
     oldIndex,
   }) => {
-    if (blockSelect.length > 1) {
-      const items = blockIdList.filter(
-        (v) => !blockSelect.includes(v),
-      );
+    if (blockSelect.size > 1) {
+      const dragBlock = [...blockSelect].sort((a, b) => {
+        return blockIdList.indexOf(a) - blockIdList.indexOf(b);
+      });
+      const items = blockIdList.filter((v) => !blockSelect.has(v));
       const newBlocks = [
         ...items.slice(0, newIndex),
-        ...blockSelect,
+        ...dragBlock,
         ...items.slice(newIndex, items.length),
       ];
       setBlockIdList(newBlocks);
@@ -258,9 +259,9 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             focusLastBlock();
             lastCursor();
           });
-        } else if (e.key === BackspaceKey && blockSelect.length > 0) {
-          batchRemoveBlocks({ ids: blockSelect });
-          setBlockSelect([]);
+        } else if (e.key === BackspaceKey && blockSelect.size > 0) {
+          batchRemoveBlocks({ ids: [...blockSelect] });
+          setBlockSelect(new Set([]));
         }
       }}
       onClick={(e) => {
@@ -291,7 +292,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           }
 
           // Hide the other items that are selected
-          if (uiState.isSorting && blockSelect.includes(id)) {
+          if (uiState.isSorting && blockSelect.has(id)) {
             return false;
           }
 

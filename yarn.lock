@@ -3666,6 +3666,11 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
+dragselect@^1.15.1:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/dragselect/-/dragselect-1.15.1.tgz#3b532172af80211b8c3712e0e66e09a2c07adbe2"
+  integrity sha512-2U57z6flnl5tJKHOMqMTgasIVDMWlo0357LYsRPzaSHfcG6ZygLPijJC4JAYCJ85ycjEV9m1N2HlxAduz8yl2g==
+
 duplexer@^0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.2.tgz#3abe43aef3835f8ae077d136ddce0f276b0400e6"
@@ -5320,12 +5325,12 @@ jest-worker@^26.3.0:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jotai@^0.12.1:
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/jotai/-/jotai-0.12.1.tgz#fe4a87defb3a9d4ede7bebd2d3b61d11cf732f0e"
-  integrity sha512-qxTdSqjN39pLcsodfrTlE8sm8dJwhahcfGm/o1Oo4Yr7+S0oj10rFJpeXJHyvro48AC+4N6rmTi+5GNbKE5hDA==
+jotai@^0.12.2:
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-0.12.3.tgz#33de803a9c3491f6c84e9e9316918b1a12f573e9"
+  integrity sha512-BO4JyI0xvttj/mNiCH41KMlLuH9xThkAQk7shIbQ8D9zSZTHkC2fYM2JNTMP0YPDC1YVPMGctK3rgpXbn9NPSQ==
   dependencies:
-    use-context-selector "1.3.4"
+    use-context-selector "1.3.5"
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -5717,17 +5722,6 @@ mdast-util-from-markdown@0.8.2:
     micromark "~2.10.0"
     parse-entities "^2.0.0"
 
-mdast-util-from-markdown@^0.8.0:
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/mdast-util-from-markdown/-/mdast-util-from-markdown-0.8.4.tgz#2882100c1b9fc967d3f83806802f303666682d32"
-  integrity sha512-jj891B5pV2r63n2kBTFh8cRI2uR9LQHsXG1zSDqfhXkIlDzrTcIlbB5+5aaYEkl8vOPIOPLf8VT7Ere1wWTMdw==
-  dependencies:
-    "@types/mdast" "^3.0.0"
-    mdast-util-to-string "^2.0.0"
-    micromark "~2.11.0"
-    parse-entities "^2.0.0"
-    unist-util-stringify-position "^2.0.0"
-
 mdast-util-phrasing@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/mdast-util-phrasing/-/mdast-util-phrasing-2.0.0.tgz#57e61f2be908be9f5fce54fcc2fa593687986267"
@@ -5853,14 +5847,6 @@ micromark@~2.10.0:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/micromark/-/micromark-2.10.1.tgz#cd73f54e0656f10e633073db26b663a221a442a7"
   integrity sha512-fUuVF8sC1X7wsCS29SYQ2ZfIZYbTymp0EYr6sab3idFjigFFjGa5UwoniPlV9tAgntjuapW1t9U+S0yDYeGKHQ==
-  dependencies:
-    debug "^4.0.0"
-    parse-entities "^2.0.0"
-
-micromark@~2.11.0:
-  version "2.11.2"
-  resolved "https://registry.yarnpkg.com/micromark/-/micromark-2.11.2.tgz#e8b6a05f54697d2d3d27fc89600c6bc40dd05f35"
-  integrity sha512-IXuP76p2uj8uMg4FQc1cRE7lPCLsfAXuEfdjtdO55VRiFO1asrCSQ5g43NmPqFtRwzEnEhafRVzn2jg0UiKArQ==
   dependencies:
     debug "^4.0.0"
     parse-entities "^2.0.0"
@@ -7607,13 +7593,6 @@ rehype-remark@^8.0.0:
   dependencies:
     hast-util-to-mdast "^7.0.0"
 
-remark-parse@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/remark-parse/-/remark-parse-9.0.0.tgz#4d20a299665880e4f4af5d90b7c7b8a935853640"
-  integrity sha512-geKatMwSzEXKHuzBNU1z676sGcDcFoChMK38TgdHJNAYfFtsfHDQG7MoJAjs6sgYMqyLduCYWDIWZIxiPeafEw==
-  dependencies:
-    mdast-util-from-markdown "^0.8.0"
-
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
@@ -9031,10 +9010,10 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-context-selector@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-1.3.4.tgz#918dde11a8303485e9046c95713936424f04da8e"
-  integrity sha512-grPPE71izEavAv39WF1r1QPZ6Ya41rnjTeLQGMP5yz3VShGQKMDThKXMRUdrDE71pOoaD4pvhFTsDbTjBqxdWg==
+use-context-selector@1.3.5:
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-1.3.5.tgz#ae1acc14fd504d93c42cbebd4636bf282480aea4"
+  integrity sha512-pYHLEuY3VzboKmHVpT2AABUbzhgKvKUVr7HpDtsRZ9BOJo0dF2U/AS2IEySl6cEKL5RFZP99Fp825dl0SBeqHA==
 
 use-editable@^1.2.0:
   version "1.2.0"

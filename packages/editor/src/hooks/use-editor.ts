@@ -109,7 +109,7 @@ export function useEditor() {
   const lastHoverBlock = usePreviousExistValue(hoverBlock);
 
   const selectBlock = (id?: string) => {
-    setBlockSelect(id ? [id] : []);
+    setBlockSelect(id ? new Set([id]) : new Set([]));
   };
 
   const getBlock = useGetBlockCallback();

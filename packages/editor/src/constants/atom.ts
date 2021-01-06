@@ -53,7 +53,7 @@ activeBlockIdAtom.scope = _hexxScope;
 export const isEditorSelectAllAtom = atom<boolean>(false);
 isEditorSelectAllAtom.scope = _hexxScope;
 
-export const blockSelectAtom = atom<string[]>([]);
+export const blockSelectAtom = atom<Set<string>>(new Set<string>());
 
 blockSelectAtom.scope = _hexxScope;
 
