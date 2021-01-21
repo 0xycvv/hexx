@@ -207,7 +207,6 @@ export function surround(
   }
   try {
     range.surroundContents(newNode);
-    document.execCommand('insertText', false, '');
   } catch (e) {
     console.log(e);
   }

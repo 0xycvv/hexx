@@ -93,5 +93,5 @@ const Overlay = styled('div', {
 });
 const PopperLayer = styled('div', {
   willChange: 'transform',
-  zIndex: 1,
+  zIndex: 2,
 });

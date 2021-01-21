@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { getSelectionRange } from '../../utils/ranges';
 import { useEventListener } from '../../hooks/use-event-listener';
 import { useLatestRef } from '../../hooks/use-latest-ref';
@@ -83,7 +83,10 @@ export function useInlineTool({
     isActive,
     setIsActive,
     getProps: {
-      onClick: (e) => {
+      onClick: (e?: MouseEvent) => {
+        console.log('??');
+        e?.preventDefault();
+        e?.stopPropagation();
         onToggle(!isActive);
       },
       color: isActive ? ('active' as const) : ('inactive' as const),
