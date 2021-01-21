@@ -1,5 +1,11 @@
 # @hexx/editor
 
+## 0.6.16
+
+### Patch Changes
+
+- c8449e2: revert drag select
+
 ## 0.6.15
 
 ### Patch Changes

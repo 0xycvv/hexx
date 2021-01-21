@@ -1,5 +1,13 @@
 # example
 
+## 0.5.12
+
+### Patch Changes
+
+- c8449e2: revert drag select
+- Updated dependencies [c8449e2]
+  - @hexx/editor@0.6.16
+
 ## 0.5.11
 
 ### Patch Changes
