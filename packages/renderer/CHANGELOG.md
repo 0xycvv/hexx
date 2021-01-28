@@ -1,5 +1,11 @@
 # @hexx/renderer
 
+## 0.6.17
+
+### Patch Changes
+
+- 5ce0bf5: update jotai and renderer
+
 ## 0.6.15
 
 ### Patch Changes
