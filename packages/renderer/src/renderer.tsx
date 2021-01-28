@@ -1,5 +1,5 @@
+import { StitchesProps, styled } from '@hexx/theme';
 import * as React from 'react';
-import { css, StitchesStyleObject } from '@hexx/theme';
 import { BlockData } from './types';
 
 interface EditorRendererProps {
@@ -8,56 +8,59 @@ interface EditorRendererProps {
     [x: string]: any;
   };
   maxWidth?: string;
+  wrapper?: StitchesProps<typeof Wrapper>;
+  blockWrapper?: StitchesProps<typeof BlockWrapper>;
 }
 
-const styles: StitchesStyleObject = {
-  wrapper: {
-    position: 'relative',
-    WebkitBoxSizing: 'border-box',
-    boxSizing: 'border-box',
-    zIndex: 1,
-    'div:first-of-type': {
-      marginTop: 0,
-    },
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 700,
-    },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 700,
-    },
-    h3: {
-      fontSize: '1.5rem',
-      fontWeight: 700,
-    },
-    h4: {
-      fontSize: '1.25rem',
-      fontWeight: 700,
-    },
-    h5: {
-      fontSize: '1rem',
-      fontWeight: 700,
-    },
-    h6: {
-      fontSize: '0.875rem',
-      fontWeight: 700,
-    },
+const Wrapper = styled('div', {
+  position: 'relative',
+  WebkitBoxSizing: 'border-box',
+  boxSizing: 'border-box',
+  zIndex: 1,
+  'div:first-of-type': {
+    marginTop: 0,
   },
-  block: {
-    position: 'relative',
-    paddingTop: 16,
-    paddingBottom: 16,
-    padding: '.4em 0',
-    margin: '0 auto',
-    maxWidth: 650,
+  h1: {
+    fontSize: '2.5rem',
+    fontWeight: 700,
   },
-} as const;
+  h2: {
+    fontSize: '2rem',
+    fontWeight: 700,
+  },
+  h3: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+  },
+  h4: {
+    fontSize: '1.25rem',
+    fontWeight: 700,
+  },
+  h5: {
+    fontSize: '1rem',
+    fontWeight: 700,
+  },
+  h6: {
+    fontSize: '0.875rem',
+    fontWeight: 700,
+  },
+});
+
+const BlockWrapper = styled('div', {
+  position: 'relative',
+  paddingTop: 16,
+  paddingBottom: 16,
+  padding: '.4em 0',
+  margin: '0 auto',
+  maxWidth: 650,
+});
 
 export function EditorRenderer({
   blocks,
   blockMap,
   maxWidth = '720px',
+  blockWrapper,
+  wrapper,
 }: EditorRendererProps) {
   if (!Array.isArray(blocks)) {
     return null;
@@ -73,17 +76,18 @@ export function EditorRenderer({
       }
       const hasStretched =
         'stretched' in block.data && !!(block.data as any).stretched;
+
       return (
-        <div
+        <BlockWrapper
           style={{
             maxWidth: hasStretched ? 'none' : maxWidth,
           }}
-          className={css(styles.block)}
+          {...blockWrapper}
         >
           <Renderer data={block.data} />
-        </div>
+        </BlockWrapper>
       );
     }),
   );
-  return <div className={css(styles.wrapper)}>{content}</div>;
+  return <Wrapper {...wrapper}>{content}</Wrapper>;
 }

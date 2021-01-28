@@ -17,7 +17,7 @@
     "start": "yarn workspace example start"
   },
   "devDependencies": {
-    "@preconstruct/cli": "^2.0.1",
+    "@preconstruct/cli": "^2.0.2",
     "@svgr/cli": "^5.5.0",
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.0",
@@ -31,7 +31,7 @@
     ]
   },
   "dependencies": {
-    "@changesets/cli": "^2.13.1",
+    "@changesets/cli": "^2.14.0",
     "prettier": "^2.2.1"
   }
 }
