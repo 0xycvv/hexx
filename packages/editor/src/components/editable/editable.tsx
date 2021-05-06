@@ -43,7 +43,7 @@ export const Editable = forwardRef<
       placeholder={props.placeholder || 'Type something...'}
       className={`hexx-editable ${
         props.className || ''
-      } ${combineStyles}`}
+      } ${combineStyles()}`}
       ref={ref as any}
     />
   );

@@ -84,7 +84,6 @@ export function useInlineTool({
     setIsActive,
     getProps: {
       onClick: (e?: MouseEvent) => {
-        console.log('??');
         e?.preventDefault();
         e?.stopPropagation();
         onToggle(!isActive);

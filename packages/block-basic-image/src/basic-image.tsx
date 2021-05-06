@@ -54,7 +54,7 @@ const _BasicImageBlock = memo<BlockProps<Config>>(
             right: 0,
             bottom: 0,
             left: 0,
-          })}
+          })()}
           htmlFor={id}
         ></label>
       </PlaceholderButton>

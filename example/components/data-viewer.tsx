@@ -33,7 +33,7 @@ export function DataViewer(props: {
         background: 'white',
         overflow: 'scroll',
         zIndex: 999,
-      })}
+      })()}
     >
       <div
         className={css({
@@ -41,7 +41,7 @@ export function DataViewer(props: {
           top: '24px',
           right: '24px',
           cursor: 'pointer',
-        })}
+        })()}
         onClick={props.onClose}
       >
         Close

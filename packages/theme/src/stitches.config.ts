@@ -1,5 +1,5 @@
 import {
-  createStyled,
+  createCss,
   TCssProp,
   StitchesProps,
   TCssWithBreakpoints,
@@ -7,15 +7,15 @@ import {
 
 const config = {
   prefix: 'hexx',
-  tokens: {
+  theme: {
     colors: {
-      $text: '#000000',
-      $bg: 'white',
-      $gray200: '#E6E8E9',
-      $gray500: '#9B9FA4',
-      $link: '#0278E4',
-      $success: '#2BC3A8',
-      $highlight: '#E4B202',
+      text: '#000000',
+      bg: 'white',
+      gray200: '#E6E8E9',
+      gray500: '#9B9FA4',
+      link: '#0278E4',
+      success: '#2BC3A8',
+      highlight: '#E4B202',
     },
     space: {
       $1: '4px',
@@ -26,9 +26,11 @@ const config = {
       $6: '24px',
     },
   },
-} as const;
+};
 
-export const { css, styled } = createStyled(config);
+export const { css, styled, global, getCssString } = createCss(
+  config,
+);
 
 export type { StitchesProps };
 

@@ -54,7 +54,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
           bottom: 24,
           cursor: 'pointer',
           zIndex: 1,
-        })}
+        })()}
         onClick={() => {
           setShowDataViewer(true);
         }}

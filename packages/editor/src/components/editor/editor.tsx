@@ -342,7 +342,7 @@ const SortableBlockList = SortableContainer(
     <div
       className={css({
         width: '100%',
-      })}
+      })()}
     >
       {blockIdList.map(
         (bId, i) =>
