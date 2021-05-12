@@ -34,14 +34,16 @@ export const listStyle: StitchesStyleObject = {
 export const ListRenderer = ({ data }: { data: List['data'] }) => {
   let listItems = React.Children.toArray(
     data.items.map((item) => (
-      <li className={css(listStyle.item)}>{ReactHtmlParser(item)}</li>
+      <li className={css(listStyle.item)()}>
+        {ReactHtmlParser(item)}
+      </li>
     )),
   );
   if (data.style === 'ordered') {
-    return <ol className={css(listStyle.ol)}>{listItems}</ol>;
+    return <ol className={css(listStyle.ol)()}>{listItems}</ol>;
   }
   if (data.style === 'unordered') {
-    return <ul className={css(listStyle.ul)}>{listItems}</ul>;
+    return <ul className={css(listStyle.ul)()}>{listItems}</ul>;
   }
   return null;
 };

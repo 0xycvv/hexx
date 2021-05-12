@@ -24,5 +24,5 @@ export const dividerStyles: StitchesStyleObject = {
 };
 
 export const DelimiterRenderer = () => {
-  return <hr role="separator" className={css(dividerStyles)} />;
+  return <hr role="separator" className={css(dividerStyles)()} />;
 };
