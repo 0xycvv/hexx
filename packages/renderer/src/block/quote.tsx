@@ -42,8 +42,8 @@ export const quoteStyle: StitchesStyleObject = {
 
 export const QuoteRenderer = ({ data }: { data: Quote['data'] }) => {
   return (
-    <blockquote className={css(quoteStyle.wrapper)}>
-      <div className={css(quoteStyle.text)}>
+    <blockquote className={css(quoteStyle.wrapper)()}>
+      <div className={css(quoteStyle.text)()}>
         {ReactHtmlParser(data.text)}
       </div>
     </blockquote>

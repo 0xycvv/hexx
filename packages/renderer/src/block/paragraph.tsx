@@ -32,7 +32,7 @@ export const ParagraphRenderer = ({
 }) => {
   return (
     <p
-      className={css(paragraphStyle)}
+      className={css(paragraphStyle)()}
       style={{ textAlign: data.alignment || 'left' }}
     >
       {ReactHtmlParser(data.text)}

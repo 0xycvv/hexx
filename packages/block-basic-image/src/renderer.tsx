@@ -1,4 +1,4 @@
-import { css } from '@hexx/theme';
+import { css, styled } from '@hexx/theme';
 import { useEffect, useState } from 'react';
 
 export type BasicImage = {
@@ -21,6 +21,20 @@ export const BasicImageRenderer = ({
   return <AspectRatioImage data={data} />;
 };
 
+const Wrapper = styled('div', {
+  display: 'flex',
+  height: 0,
+  position: 'relative',
+});
+
+const Img = styled('img', {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+});
+
 export function AspectRatioImage({
   data,
 }: {
@@ -34,7 +48,7 @@ export function AspectRatioImage({
     if (!data.url) return;
     const img = new Image();
     img.src = data.url;
-    img.onload = function() {
+    img.onload = function () {
       setWidth(img.naturalWidth);
       setHeight(img.naturalHeight);
     };
@@ -46,29 +60,13 @@ export function AspectRatioImage({
   const aspectRatio = height! / width!;
 
   return (
-    <div
-      className={css({
-        display: 'flex',
-        height: 0,
-        position: 'relative',
-      })}
+    <Wrapper
       style={{
         width: '100%',
         paddingTop: `calc(${aspectRatio} * 100%)`,
       }}
     >
-      <img
-        src={data.url}
-        width={'100%'}
-        className={css({
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        })}
-        alt="gallery"
-      />
-    </div>
+      <Img src={data.url} width={'100%'} alt="gallery" />
+    </Wrapper>
   );
 }

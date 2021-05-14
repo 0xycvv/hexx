@@ -44,7 +44,7 @@ const _CodeBlock = React.memo(function _CodeBlock({
     : 'language-';
 
   return (
-    <pre className={`${css(codeBlockStyle)} ${codeClassName}`}>
+    <pre className={`${css(codeBlockStyle)()} ${codeClassName}`}>
       <CodeEditable
         className={codeClassName}
         contentEditable

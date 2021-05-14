@@ -1,4 +1,4 @@
-import { css } from '@hexx/theme';
+import { global } from '@hexx/theme';
 import { atom, useAtom } from 'jotai';
 import {
   forwardRef,
@@ -17,7 +17,7 @@ const blockIdSelectionAtom = atom<string[]>([]);
 
 blockIdSelectionAtom.scope = _hexxScope;
 
-const globalStyles = css.global({
+const globalStyles = global({
   '.selection': {
     background: 'rgba(46, 115, 252, 0.11)',
     borderRadius: '0.1em',
