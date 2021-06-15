@@ -22,7 +22,6 @@ export function BlockMenu(props: {
       data: blockType.defaultValue,
     };
     if (isBlockEmpty(blockMap[block.type], block.data)) {
-      console.log(`${props.blockAtom}`);
       setBlock((s) => ({ ...s, ...blockToAdd }));
     } else {
       insertBlockAfter({

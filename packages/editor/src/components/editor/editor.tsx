@@ -1,7 +1,11 @@
 import { paragraphStyle } from '@hexx/renderer';
 import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
-import { splitAtom, useAtomCallback, useUpdateAtom } from 'jotai/utils';
+import {
+  splitAtom,
+  useAtomCallback,
+  useUpdateAtom,
+} from 'jotai/utils';
 import {
   forwardRef,
   MutableRefObject,
@@ -19,6 +23,7 @@ import {
 import { v4 } from 'uuid';
 import { CLIPBOARD_DATA_FORMAT } from '../../constants';
 import {
+  BlockAtom,
   blockMapAtom,
   blocksAtom,
   blocksDataAtom,
@@ -35,6 +40,7 @@ import {
   undo,
   _hexxScope,
 } from '../../constants/atom';
+import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
@@ -45,6 +51,8 @@ import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
   findLastBlock,
+  focusLastBlock,
+  lastCursor,
 } from '../../utils/find-blocks';
 import { BlockV2 } from '../block/block';
 import { TextBlock } from '../block/text';
@@ -171,6 +179,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     isEditorSelectAllAtom,
   );
 
+  const [blocks, setBlocks] = useAtom(blocksAtom);
+
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
   const editor = useEditor();
   const { insertBlock, clear, batchRemoveBlocks } = editor;
@@ -195,23 +205,23 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     newIndex,
     oldIndex,
   }) => {
-    // if (blockSelect.size > 1) {
-    //   const dragBlock = [...blockSelect].sort((a, b) => {
-    //     return blockIdList.indexOf(a) - blockIdList.indexOf(b);
-    //   });
-    //   const items = blockIdList.filter((v) => !blockSelect.has(v));
-    //   const newBlocks = [
-    //     ...items.slice(0, newIndex),
-    //     ...dragBlock,
-    //     ...items.slice(newIndex, items.length),
-    //   ];
-    //   setBlockIdList(newBlocks);
-    // } else {
-    //   const newBlocks = [...blockIdList];
-    //   const dragBlock = newBlocks.splice(oldIndex, 1);
-    //   newBlocks.splice(newIndex, 0, dragBlock[0]);
-    //   setBlockIdList(newBlocks);
-    // }
+    if (blockSelect.size > 1) {
+      const dragBlock = [...blockSelect].sort((a, b) => {
+        return blocks.indexOf(a) - blocks.indexOf(b);
+      });
+      const items = blocks.filter((v) => !blockSelect.has(v));
+      const newBlocks = [
+        ...items.slice(0, newIndex),
+        ...dragBlock,
+        ...items.slice(newIndex, items.length),
+      ];
+      setBlocks(newBlocks);
+    } else {
+      const newBlocks = [...blocks];
+      const dragBlock = newBlocks.splice(oldIndex, 1);
+      newBlocks.splice(newIndex, 0, dragBlock[0]);
+      setBlocks(newBlocks);
+    }
     setUIState((s) => ({
       ...s,
       isSorting: false,
@@ -247,14 +257,20 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     redo: redo,
   }));
 
+  const wrapperRef = useRef<HTMLDivElement>();
+
   const composeRef = (node) => {
-    console.log('?????');
-    setWrapperRef(node);
-    // ref = node;
+    wrapperRef.current = node;
     if (props.wrapperRef) {
       props.wrapperRef.current = node;
     }
   };
+
+  useEffect(() => {
+    if (wrapperRef.current) {
+      setWrapperRef(wrapperRef.current);
+    }
+  }, []);
 
   return (
     <Wrapper
@@ -262,17 +278,17 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       ref={composeRef}
       className={`hexx ${css(paragraphStyle)()}`}
       onKeyDown={(e) => {
-        // if (e.key === BackspaceKey && isSelectAll) {
-        //   clear();
-        //   setIsSelectAll(false);
-        //   requestAnimationFrame(() => {
-        //     focusLastBlock();
-        //     lastCursor();
-        //   });
-        // } else if (e.key === BackspaceKey && blockSelect.size > 0) {
-        //   batchRemoveBlocks({ ids: [...blockSelect] });
-        //   setBlockSelect(new Set([]));
-        // }
+        if (e.key === BackspaceKey && isSelectAll) {
+          clear();
+          setIsSelectAll(false);
+          requestAnimationFrame(() => {
+            focusLastBlock();
+            lastCursor();
+          });
+        } else if (e.key === BackspaceKey && blockSelect.size > 0) {
+          batchRemoveBlocks([...blockSelect]);
+          setBlockSelect(new Set([]));
+        }
       }}
       onClick={(e) => {
         if (e.target instanceof HTMLAnchorElement) {
@@ -280,36 +296,35 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         }
       }}
     >
-      {/* <NewBlockOverlayPlugin /> */}
+      <NewBlockOverlayPlugin />
       {/* <PastHtmlPlugin /> */}
-      {/* {props.children} */}
+      {props.children}
       <SortableBlockList
         updateBeforeSortStart={({ index }) => {
-          // setUIState((s) => ({
-          //   ...s,
-          //   isSorting: true,
-          //   sortingItemKey: blockIdList[index],
-          // }));
+          setUIState((s) => ({
+            ...s,
+            isSorting: true,
+            sortingItemKey: blocks[index],
+          }));
         }}
         onSortStart={(_, event) => event.preventDefault()}
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
-        // blockIdList={blockIdList.filter((id) => {
-        //   // Do not hide the ghost of the element currently being sorted
-        //   if (uiState.sortingItemKey === id) {
-        //     return true;
-        //   }
+        blocks={blocks.filter((block) => {
+          // Do not hide the ghost of the element currently being sorted
+          if (uiState.sortingItemKey === block) {
+            return true;
+          }
 
-        //   // Hide the other items that are selected
-        //   if (uiState.isSorting && blockSelect.has(id)) {
-        //     return false;
-        //   }
+          // Hide the other items that are selected
+          if (uiState.isSorting && blockSelect.has(block)) {
+            return false;
+          }
 
-        //   // Do not hide any other items
-        //   return true;
-        // })}
-        // blockIdMap={blockIdMap}
+          // Do not hide any other items
+          return true;
+        })}
       />
       {!props.autoFocus && <AutoFocusInput />}
     </Wrapper>
@@ -340,8 +355,7 @@ function AutoFocusInput() {
 }
 
 const SortableBlockList = SortableContainer(
-  ({ blockCss }: { blockCss: any }) => {
-    const [blocks] = useAtom(blocksAtom);
+  ({ blockCss, blocks }: { blockCss: any; blocks: BlockAtom[] }) => {
     return (
       <div
         className={css({

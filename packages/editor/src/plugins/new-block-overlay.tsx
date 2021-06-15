@@ -2,13 +2,8 @@ import { styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
 import { useAtomCallback } from 'jotai/utils';
 import { ReactNode, useCallback } from 'react';
-import {
-  $lastBlockAtom,
-  blocksAtom,
-  blocksDataAtom,
-  _hexxScope,
-} from '../constants/atom';
-import { focusLastBlock } from '../utils/find-blocks';
+import { $lastBlockAtom, _hexxScope } from '../constants/atom';
+import { findLastBlock } from '../utils/find-blocks';
 import { usePlugin } from './plugin';
 
 const NewBlockOverlay = styled('div', {
@@ -59,27 +54,19 @@ export function NewBlockOverlayPlugin(props: {
             }
             const blockType = blockMap[lastBlockType.type];
 
-            console.log(
-              blockType.block,
-              blockType &&
-                blockType.block &&
-                typeof blockType.block.isEmpty === 'function' &&
-                blockType.block.isEmpty(lastBlockType.data),
-            );
-
             if (
               blockType &&
               blockType.block &&
               typeof blockType.block.isEmpty === 'function' &&
               blockType.block.isEmpty(lastBlockType.data)
             ) {
-              focusLastBlock(true);
-              // TODO:
-              // if (lastBlock?.editable) {
-              //   lastBlock?.editable?.focus();
-              // } else {
-              //   insertBlock({ block: defaultBlock });
-              // }
+              const lastBlock = findLastBlock();
+              if (lastBlock?.editable) {
+                lastBlock.editable.focus();
+                // focusWithLastCursor(lastBlock.editable, true);
+              } else {
+                insertBlock({ block: defaultBlock });
+              }
             } else {
               insertBlock({ block: defaultBlock });
             }

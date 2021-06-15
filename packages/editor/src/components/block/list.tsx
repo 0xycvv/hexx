@@ -16,6 +16,7 @@ import {
 import { Editable } from '../editable';
 import { list as ListSvg, IcNumList } from '../icons';
 import { applyBlock, BlockProps } from '../../utils/blocks';
+import { BlockAtom } from '../../constants/atom';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
@@ -48,6 +49,7 @@ const _ListBlock = React.memo(function ({
     block.data.items.map((item, i) => (
       <ListItem
         index={i}
+        blockAtom={blockAtom}
         blockId={block.id}
         blockIndex={index}
         placeholder={config?.placeholder}
@@ -73,7 +75,7 @@ const _ListBlock = React.memo(function ({
       if (!block.data.items[activeListItemIndex]) {
         handleEmptyListItem(activeListItemIndex);
         insertBlockAfter({
-          id,
+          atom: blockAtom,
           block: defaultBlock,
         });
         setTimeout(() => {
@@ -167,14 +169,15 @@ function ListItem(props: {
   index: number;
   blockId: string;
   blockIndex: number;
+  blockAtom: BlockAtom;
 }) {
-  // const { registerByIndex } = useBlock(
-  //   props.blockId,
-  //   props.blockIndex,
-  // );
-  return null;
+  const { registerByIndex } = useBlock(
+    props.blockAtom,
+    props.blockIndex,
+  );
+
   return (
-    <li className={css(listStyle.item)}>
+    <li className={css(listStyle.item)()}>
       <Editable
         ref={registerByIndex(props.index)}
         placeholder={props.placeholder}

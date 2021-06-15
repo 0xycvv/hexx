@@ -75,7 +75,6 @@ editorIdAtom.scope = _hexxScope;
 export const editorWrapperAtom = atom<HTMLElement | null>(null);
 editorWrapperAtom.scope = _hexxScope;
 
-// TODO: put it to state
 export const editorDefaultBlockAtom = atom<
   Pick<BlockType<any>, 'type' | 'data'>
 >({
@@ -90,7 +89,7 @@ editorDefaultBlockAtom.scope = _hexxScope;
 type UIState = {
   isDragging: boolean;
   isSorting: boolean;
-  sortingItemKey?: string;
+  sortingItemKey?: BlockAtom;
   [x: string]: any;
 };
 

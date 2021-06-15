@@ -182,7 +182,7 @@ export function focusLastBlock(shouldFocusLast = false) {
   }
 }
 
-function focusWithLastCursor(
+export function focusWithLastCursor(
   el: HTMLElement | Element,
   shouldFocusLast: boolean = true,
 ) {
