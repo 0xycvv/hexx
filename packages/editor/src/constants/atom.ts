@@ -16,7 +16,29 @@ export const createAtom: typeof atom = (...arg) => {
   return createdAtom;
 };
 
-export const blocksAtom = atom<BlockAtom[]>([]);
+export const _blocksAtom = atom<BlockAtom[]>([]);
+_blocksAtom.scope = _hexxScope;
+
+export const blocksAtom = atom(
+  (get) => get(_blocksAtom),
+  (get, set, arg: SetStateAction<BlockAtom<any>[]>) => {
+    const oldValue = get(_blocksAtom);
+    set(_blocksAtom, arg);
+    const newValue = get(_blocksAtom);
+    updateHistory({
+      label: `${JSON.stringify(oldValue)} -> ${JSON.stringify(
+        newValue,
+      )}`,
+      undo: () => {
+        set(_blocksAtom, oldValue);
+      },
+      redo: () => {
+        set(_blocksAtom, newValue);
+      },
+    });
+  },
+);
+
 blocksAtom.debugLabel = 'BlockData';
 blocksAtom.scope = _hexxScope;
 
@@ -135,8 +157,6 @@ blockMapAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
 _blockIdListAtom.scope = _hexxScope;
-export const _blocksIdMapAtom = atom<Record<string, BlockType>>({});
-_blocksIdMapAtom.scope = _hexxScope;
 
 export const dropBlockAtom = atom<string | null>(null);
 dropBlockAtom.scope = _hexxScope;
@@ -173,42 +193,10 @@ function updateHistory(data) {
   if (history.length > MAX_HISTORY_COUNT) {
     history.shift();
   }
-  canUpdate = true;
 }
 
 const debounceUpdateHistory = debounce(updateHistory, 200, false);
-let firstOldValue: Record<string, any> | null = null;
-let canUpdate = false;
 
-export const blocksIdMapAtom = atom(
-  (get) => get(_blocksIdMapAtom),
-  (get, set, arg: SetStateAction<Record<string, any>>) => {
-    const oldValue = get(_blocksIdMapAtom);
-    if (canUpdate) {
-      firstOldValue = oldValue;
-      canUpdate = false;
-    }
-    if (!oldValue) {
-      return;
-    }
-    set(_blocksIdMapAtom, arg);
-    const newValue = get(_blocksIdMapAtom);
-    const old = { ...firstOldValue };
-    if (!firstOldValue) {
-      return;
-    }
-    debounceUpdateHistory({
-      label: `${JSON.stringify(old)} -> ${JSON.stringify(newValue)}`,
-      undo: () => {
-        set(_blocksIdMapAtom, old);
-      },
-      redo: () => {
-        set(_blocksIdMapAtom, newValue);
-      },
-    });
-  },
-);
-blocksIdMapAtom.scope = _hexxScope;
 
 export const blockIdListAtom = atom(
   (get) => get(_blockIdListAtom),

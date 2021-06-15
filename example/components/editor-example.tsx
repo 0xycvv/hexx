@@ -86,11 +86,16 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
       >
         <PlusButton />
         <TuneButton />
-        {/* <PlusButton />
-        <HistoryPlugin />
         <EditorWidthPlugin />
-        <SelectionPlugin /> */}
+        <HistoryPlugin />
+        {/* <SelectionPlugin /> */}
         <HexxDevTool />
+        <LinkifyItPlugin linkifyIt={linkify} />
+        <InlineTool>
+          <InlineMarker />
+          <InlineCode />
+          <InlineLink />
+        </InlineTool>
         {/* <Unstable_MarkdownShortcutPlugin />
         <Unstable_FileDropPlugin
           resolve={async (files) => {
@@ -106,13 +111,9 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
             }
           }}
         />
-        <LinkifyItPlugin linkifyIt={linkify} />
-        <InlineTool>
-          <InlineMarker />
-          <InlineCode />
-          <InlineLink />
-        </InlineTool>
-        <LocalStoragePlugin ref={localSaverRef} /> */}
+
+         */}
+        <LocalStoragePlugin ref={localSaverRef} />
         {/* <ChangeDetectPlugin
           onChange={() => {
             console.log('change');

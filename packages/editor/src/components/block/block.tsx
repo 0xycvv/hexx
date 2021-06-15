@@ -236,6 +236,7 @@ function useBlockWrapperV2({
       onKeyDown,
       onBlur: () => {
         setHoverBlock(null);
+        setBlockSelect(new Set());
       },
       onMouseEnter: setHover,
       onClick: (e) => {

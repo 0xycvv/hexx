@@ -39,12 +39,12 @@ interface BlockConfig<Data, Config> {
   [x: string]: any;
 }
 
-export interface BlockProps<C = {}> {
+export interface BlockProps<C = {}, D = any> {
   id: string;
   index: number;
   config?: C;
   children?: ReactNode;
-  blockAtom: PrimitiveAtom<BlockType<any>>;
+  blockAtom: PrimitiveAtom<BlockType<D>>;
   css?: StitchesCssProp;
 }
 

@@ -4,6 +4,7 @@ import { List, listStyle } from '@hexx/renderer';
 import { BackspaceKey } from '../../constants/key';
 import { useBlock, useEditor } from '../../hooks/use-editor';
 import { css, styled } from '@hexx/theme';
+import composeRefs from '../../hooks/use-compose-ref';
 import {
   findContentEditable,
   focusBlockByIndex,
@@ -26,7 +27,7 @@ const _ListBlock = React.memo(function ({
   id,
   config,
   blockAtom,
-}: BlockProps<{ placeholder: string }>) {
+}: BlockProps<{ placeholder: string }, List['data']>) {
   const ref = React.useRef<HTMLElement>(null);
   const [activeListItemIndex, setActiveListItemIndex] =
     React.useState<number>(0);
@@ -78,9 +79,9 @@ const _ListBlock = React.memo(function ({
           atom: blockAtom,
           block: defaultBlock,
         });
-        setTimeout(() => {
-          focusBlockByIndex(index + 1);
-        }, 0);
+        // setTimeout(() => {
+        //   focusBlockByIndex(index + 1);
+        // }, 0);
         e.stopPropagation();
         e.preventDefault();
       }
@@ -136,16 +137,6 @@ const _ListBlock = React.memo(function ({
     }
   };
 
-  React.useEffect(() => {
-    requestAnimationFrame(() => {
-      if (block.data.items.length > 0) {
-        // @ts-ignore
-        findContentEditable(ref.current)?.focus();
-        lastCursor();
-      }
-    });
-  }, [block.data.items.length]);
-
   return (
     <Ul
       onKeyDown={handleKeyDown}
@@ -176,10 +167,16 @@ function ListItem(props: {
     props.blockIndex,
   );
 
+  const ref = React.useRef<HTMLLIElement>(null);
+
+  React.useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
   return (
     <li className={css(listStyle.item)()}>
       <Editable
-        ref={registerByIndex(props.index)}
+        ref={composeRefs(registerByIndex(props.index), ref)}
         placeholder={props.placeholder}
         onFocus={props.onFocus}
         onChange={(e) => {

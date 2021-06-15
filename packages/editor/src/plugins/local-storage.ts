@@ -1,8 +1,11 @@
 import { atom, useAtom } from 'jotai';
+import { splitAtom } from 'jotai/utils';
 import { forwardRef, useImperativeHandle } from 'react';
 import {
+  blocksDataAtom,
+  createAtom,
   _blockIdListAtom,
-  _blocksIdMapAtom,
+  _blocksAtom,
   _hexxScope,
 } from '../constants/atom';
 
@@ -12,18 +15,17 @@ const serializeAtom = atom<
   | { type: 'deserialize'; value: string }
 >(null, (get, set, action) => {
   if (action.type === 'serialize') {
-    const ids = get(_blockIdListAtom);
-    const map = get(_blocksIdMapAtom);
-    const obj = {
-      ids,
-      map,
-    };
-    action.callback(JSON.stringify(obj));
+    const blocks = get(blocksDataAtom);
+    action.callback(JSON.stringify(blocks));
   } else if (action.type === 'deserialize') {
     const obj = JSON.parse(action.value);
-    // needs error handling and type checking
-    set(_blockIdListAtom, obj.ids);
-    set(_blocksIdMapAtom, obj.map);
+    if (obj) {
+      // needs error handling and type checking
+      const dataAtom = createAtom(obj || []);
+      const data = splitAtom(dataAtom);
+      // @ts-ignore
+      set(_blocksAtom, data);
+    }
   }
 });
 serializeAtom.scope = _hexxScope;

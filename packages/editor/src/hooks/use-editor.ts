@@ -24,8 +24,8 @@ export const EditableWeakMap = new WeakMap<
   }
 >();
 
-export function useBlock<T = any>(
-  blockAtom: PrimitiveAtom<BlockType<any>>,
+export function useBlock<T = unknown>(
+  blockAtom: PrimitiveAtom<BlockType<T>>,
   blockIndex: number,
 ) {
   const [block, setBlock] = useAtom(blockAtom);

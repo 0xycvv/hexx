@@ -28,7 +28,6 @@ import {
   blocksAtom,
   blocksDataAtom,
   blockSelectAtom,
-  blocksIdMapAtom,
   createAtom,
   editorDefaultBlockAtom,
   editorIdAtom,
@@ -38,6 +37,7 @@ import {
   selectDataAtom,
   uiStateAtom,
   undo,
+  _blocksAtom,
   _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
@@ -173,7 +173,6 @@ const test = createAtom('');
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [uiState, setUIState] = useAtom(uiStateAtom);
-  const [blockIdMap] = useAtom(blocksIdMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
     isEditorSelectAllAtom,
@@ -397,7 +396,7 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
             [editorDefaultBlockAtom, defaultBlock],
             [editorIdAtom, v4()],
             [blockMapAtom, props.blockMap],
-            [blocksAtom, initData],
+            [_blocksAtom, initData],
           ] as const
         }
       >
