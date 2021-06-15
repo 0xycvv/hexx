@@ -1,14 +1,16 @@
 import { paragraphStyle } from '@hexx/renderer';
 import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
+import { splitAtom, useAtomCallback, useUpdateAtom } from 'jotai/utils';
 import {
   forwardRef,
   MutableRefObject,
   ReactNode,
+  useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
-  useState,
 } from 'react';
 import {
   SortableContainer,
@@ -17,38 +19,34 @@ import {
 import { v4 } from 'uuid';
 import { CLIPBOARD_DATA_FORMAT } from '../../constants';
 import {
-  blockIdListAtom,
   blockMapAtom,
+  blocksAtom,
+  blocksDataAtom,
   blockSelectAtom,
   blocksIdMapAtom,
+  createAtom,
   editorDefaultBlockAtom,
   editorIdAtom,
   editorWrapperAtom,
   isEditorSelectAllAtom,
   redo,
+  selectDataAtom,
   uiStateAtom,
   undo,
-  _blockIdListAtom,
-  _blocksIdMapAtom,
   _hexxScope,
 } from '../../constants/atom';
-import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
-import { PastHtmlPlugin } from '../../plugins/paste';
 import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
   findLastBlock,
-  focusLastBlock,
-  lastCursor,
 } from '../../utils/find-blocks';
-import { normalize } from '../../utils/normalize';
-import { Block } from '../block/block';
+import { BlockV2 } from '../block/block';
 import { TextBlock } from '../block/text';
 
 export interface EditorProps extends HexxProps {
@@ -93,7 +91,7 @@ const Wrapper = styled('div', {
 });
 
 interface HexxHandler {
-  getData: () => BlockType[];
+  getData: () => Promise<BlockType[]>;
   getEditor: () => UseEditorReturn;
   focus: (config?: {
     index?: number;
@@ -105,12 +103,13 @@ interface HexxHandler {
 function useBlockSelectCopy() {
   const {
     wrapperRef,
-    ids: [ids, setIdList],
     blockSelect: [blockSelect],
     selectAll: [isSelectAll],
-    editor,
   } = usePlugin();
-  const [blockIdMap] = useAtom(blocksIdMapAtom);
+
+  const [, setBlocks] = useAtom(blocksAtom);
+  const [blocksData] = useAtom(blocksDataAtom);
+  const [selectData] = useAtom(selectDataAtom);
 
   const handleClipboardEvent = (e: ClipboardEvent) => {
     if (blockSelect.size > 0) {
@@ -120,15 +119,11 @@ function useBlockSelectCopy() {
   };
 
   const setData = (e: ClipboardEvent) => {
-    const blocksToClip = isSelectAll ? ids : [...blockSelect];
+    const blocksToClip = isSelectAll ? blocksData : [...selectData];
     const selectedBlockNodeList = blocksToClip
-      .map((bId) =>
-        document.querySelector(`[data-block-id='${bId}']`),
-      )
+      .map((b) => document.querySelector(`[data-block-id='${b.id}']`))
       .filter(Boolean);
-    const hexxCopy = blocksToClip
-      .map((id) => blockIdMap[id])
-      .filter(Boolean);
+
     const text = selectedBlockNodeList
       .map((s) => s?.textContent)
       .join('\n\n');
@@ -142,7 +137,7 @@ function useBlockSelectCopy() {
     }
     e.clipboardData?.setData(
       CLIPBOARD_DATA_FORMAT,
-      JSON.stringify(hexxCopy),
+      JSON.stringify(blocksToClip),
     );
     e.clipboardData?.setData('text/plain', text);
     e.clipboardData?.setData('text/html', html.innerHTML);
@@ -154,11 +149,11 @@ function useBlockSelectCopy() {
     (e) => {
       if (blockSelect.size > 0) {
         setData(e);
-        setIdList((s) => s.filter((id) => !blockSelect.has(id)));
+        setBlocks((s) => s.filter((b) => !blockSelect.has(b)));
         e.preventDefault();
       } else if (isSelectAll) {
         setData(e);
-        setIdList([]);
+        setBlocks([]);
         e.preventDefault();
       }
     },
@@ -166,26 +161,28 @@ function useBlockSelectCopy() {
   );
 }
 
+const test = createAtom('');
+
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [uiState, setUIState] = useAtom(uiStateAtom);
-  const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
   const [blockIdMap] = useAtom(blocksIdMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
     isEditorSelectAllAtom,
   );
+
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
   const editor = useEditor();
   const { insertBlock, clear, batchRemoveBlocks } = editor;
 
-  useEffect(() => {
-    if (
-      blockIdList.length === 0 ||
-      Object.keys(blockIdMap).length === 0
-    ) {
-      insertBlock({ block: props.defaultBlock, index: 0 });
-    }
-  }, [blockIdList, blockIdMap]);
+  // useEffect(() => {
+  //   if (
+  //     blockIdList.length === 0 ||
+  //     Object.keys(blockIdMap).length === 0
+  //   ) {
+  //     insertBlock({ block: props.defaultBlock, index: 0 });
+  //   }
+  // }, [blockIdList, blockIdMap]);
 
   useEffect(() => {
     props.onLoad?.();
@@ -198,23 +195,23 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     newIndex,
     oldIndex,
   }) => {
-    if (blockSelect.size > 1) {
-      const dragBlock = [...blockSelect].sort((a, b) => {
-        return blockIdList.indexOf(a) - blockIdList.indexOf(b);
-      });
-      const items = blockIdList.filter((v) => !blockSelect.has(v));
-      const newBlocks = [
-        ...items.slice(0, newIndex),
-        ...dragBlock,
-        ...items.slice(newIndex, items.length),
-      ];
-      setBlockIdList(newBlocks);
-    } else {
-      const newBlocks = [...blockIdList];
-      const dragBlock = newBlocks.splice(oldIndex, 1);
-      newBlocks.splice(newIndex, 0, dragBlock[0]);
-      setBlockIdList(newBlocks);
-    }
+    // if (blockSelect.size > 1) {
+    //   const dragBlock = [...blockSelect].sort((a, b) => {
+    //     return blockIdList.indexOf(a) - blockIdList.indexOf(b);
+    //   });
+    //   const items = blockIdList.filter((v) => !blockSelect.has(v));
+    //   const newBlocks = [
+    //     ...items.slice(0, newIndex),
+    //     ...dragBlock,
+    //     ...items.slice(newIndex, items.length),
+    //   ];
+    //   setBlockIdList(newBlocks);
+    // } else {
+    //   const newBlocks = [...blockIdList];
+    //   const dragBlock = newBlocks.splice(oldIndex, 1);
+    //   newBlocks.splice(newIndex, 0, dragBlock[0]);
+    //   setBlockIdList(newBlocks);
+    // }
     setUIState((s) => ({
       ...s,
       isSorting: false,
@@ -222,9 +219,15 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }));
   };
 
+  const getData = useAtomCallback(
+    useCallback((get) => {
+      return get(blocksDataAtom);
+    }, []),
+    _hexxScope,
+  );
+
   useImperativeHandle(ref, () => ({
-    getData: () =>
-      blockIdList.map((bId) => blockIdMap[bId]).filter(Boolean),
+    getData,
     focus: (
       { index, preventScroll } = {
         index: undefined,
@@ -244,25 +247,32 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     redo: redo,
   }));
 
+  const composeRef = (node) => {
+    console.log('?????');
+    setWrapperRef(node);
+    // ref = node;
+    if (props.wrapperRef) {
+      props.wrapperRef.current = node;
+    }
+  };
+
   return (
     <Wrapper
       css={props.css}
-      ref={
-        composeRefs(props.wrapperRef, (s) => setWrapperRef(s)) as any
-      }
-      className={`hexx ${css(paragraphStyle)}`}
+      ref={composeRef}
+      className={`hexx ${css(paragraphStyle)()}`}
       onKeyDown={(e) => {
-        if (e.key === BackspaceKey && isSelectAll) {
-          clear();
-          setIsSelectAll(false);
-          requestAnimationFrame(() => {
-            focusLastBlock();
-            lastCursor();
-          });
-        } else if (e.key === BackspaceKey && blockSelect.size > 0) {
-          batchRemoveBlocks({ ids: [...blockSelect] });
-          setBlockSelect(new Set([]));
-        }
+        // if (e.key === BackspaceKey && isSelectAll) {
+        //   clear();
+        //   setIsSelectAll(false);
+        //   requestAnimationFrame(() => {
+        //     focusLastBlock();
+        //     lastCursor();
+        //   });
+        // } else if (e.key === BackspaceKey && blockSelect.size > 0) {
+        //   batchRemoveBlocks({ ids: [...blockSelect] });
+        //   setBlockSelect(new Set([]));
+        // }
       }}
       onClick={(e) => {
         if (e.target instanceof HTMLAnchorElement) {
@@ -270,36 +280,36 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         }
       }}
     >
-      <NewBlockOverlayPlugin />
-      <PastHtmlPlugin />
-      {props.children}
+      {/* <NewBlockOverlayPlugin /> */}
+      {/* <PastHtmlPlugin /> */}
+      {/* {props.children} */}
       <SortableBlockList
         updateBeforeSortStart={({ index }) => {
-          setUIState((s) => ({
-            ...s,
-            isSorting: true,
-            sortingItemKey: blockIdList[index],
-          }));
+          // setUIState((s) => ({
+          //   ...s,
+          //   isSorting: true,
+          //   sortingItemKey: blockIdList[index],
+          // }));
         }}
         onSortStart={(_, event) => event.preventDefault()}
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
-        blockIdList={blockIdList.filter((id) => {
-          // Do not hide the ghost of the element currently being sorted
-          if (uiState.sortingItemKey === id) {
-            return true;
-          }
+        // blockIdList={blockIdList.filter((id) => {
+        //   // Do not hide the ghost of the element currently being sorted
+        //   if (uiState.sortingItemKey === id) {
+        //     return true;
+        //   }
 
-          // Hide the other items that are selected
-          if (uiState.isSorting && blockSelect.has(id)) {
-            return false;
-          }
+        //   // Hide the other items that are selected
+        //   if (uiState.isSorting && blockSelect.has(id)) {
+        //     return false;
+        //   }
 
-          // Do not hide any other items
-          return true;
-        })}
-        blockIdMap={blockIdMap}
+        //   // Do not hide any other items
+        //   return true;
+        // })}
+        // blockIdMap={blockIdMap}
       />
       {!props.autoFocus && <AutoFocusInput />}
     </Wrapper>
@@ -330,29 +340,25 @@ function AutoFocusInput() {
 }
 
 const SortableBlockList = SortableContainer(
-  ({
-    blockCss,
-    blockIdList,
-    blockIdMap,
-  }: {
-    blockCss: any;
-    blockIdList: string[];
-    blockIdMap: Record<string, BlockType>;
-  }) => (
-    <div
-      className={css({
-        width: '100%',
-      })()}
-    >
-      {blockIdList.map(
-        (bId, i) =>
-          bId &&
-          blockIdMap[bId] && (
-            <Block key={bId} css={blockCss} id={bId} index={i} />
-          ),
-      )}
-    </div>
-  ),
+  ({ blockCss }: { blockCss: any }) => {
+    const [blocks] = useAtom(blocksAtom);
+    return (
+      <div
+        className={css({
+          width: '100%',
+        })()}
+      >
+        {blocks.map((blockAtom, i) => (
+          <BlockV2
+            index={i}
+            key={blockAtom.toString()}
+            blockAtom={blockAtom}
+            css={blockCss}
+          />
+        ))}
+      </div>
+    );
+  },
 );
 
 export const Editor = forwardRef<HexxHandler, EditorProps>(
@@ -361,18 +367,25 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
       type: TextBlock.block.type,
       data: TextBlock.block.defaultValue,
     };
-    const [initialData] = useState(() => normalize(props.data, 'id'));
+
+    const initDataAtom = useMemo(() => {
+      const dataAtom = createAtom(props.data || []);
+      return splitAtom(dataAtom);
+    }, []);
+
+    const [initData] = useAtom(initDataAtom);
+
     return (
       <Provider
         scope={_hexxScope}
-        // @ts-ignore
-        initialValues={[
-          [_blockIdListAtom, initialData.ids],
-          [_blocksIdMapAtom, initialData.byId],
-          [editorDefaultBlockAtom, defaultBlock],
-          [editorIdAtom, v4()],
-          [blockMapAtom, props.blockMap],
-        ]}
+        initialValues={
+          [
+            [editorDefaultBlockAtom, defaultBlock],
+            [editorIdAtom, v4()],
+            [blockMapAtom, props.blockMap],
+            [blocksAtom, initData],
+          ] as const
+        }
       >
         <Hexx
           ref={ref}

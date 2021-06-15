@@ -16,8 +16,9 @@ function _HeaderBlock({
   index,
   config,
   css,
+  blockAtom,
 }: BlockProps<{ placeholder: string }>) {
-  const { register, update, block } = useBlock(id, index);
+  const { register, update, block } = useBlock(blockAtom, index);
 
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -27,7 +28,7 @@ function _HeaderBlock({
 
   return (
     <Heading
-      h={String(block.data.level) || '3'}
+      h={(String(block.data.level) as any) || '3'}
       placeholder={config?.placeholder}
       ref={composeRefs(ref, register)}
       onChange={(evt) =>

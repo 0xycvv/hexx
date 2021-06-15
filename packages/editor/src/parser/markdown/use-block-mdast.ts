@@ -1,10 +1,10 @@
+import { useAtom } from 'jotai';
 import { useMemo } from 'react';
-import { usePlugin } from '../../plugins';
+import { blockMapAtom } from '../../constants/atom';
 import { getAllMdastConfig } from './parser';
 
 export function useBlockMdast() {
-  const { editor } = usePlugin();
-  const { blockMap } = editor;
+  const [blockMap] = useAtom(blockMapAtom);
 
   const allMdastConfig = useMemo(
     () => getAllMdastConfig(blockMap),

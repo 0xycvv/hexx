@@ -13,10 +13,6 @@ import {
 } from '../../constants/atom';
 import type SelectionJsType from './selection';
 
-const blockIdSelectionAtom = atom<string[]>([]);
-
-blockIdSelectionAtom.scope = _hexxScope;
-
 const globalStyles = global({
   '.selection': {
     background: 'rgba(46, 115, 252, 0.11)',
@@ -226,7 +222,8 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
         if (selectionHTML && selectionHTML.length > 0) {
           selectionRef.current?.clearSelection();
         }
-        const inputSelection = inputSelectionRef.current?.getSelection();
+        const inputSelection =
+          inputSelectionRef.current?.getSelection();
         if (inputSelection && inputSelection.length > 0) {
           inputSelectionRef.current?.clearSelection();
         }

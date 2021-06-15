@@ -11,8 +11,8 @@ interface Config {
 }
 
 const _BasicImageBlock = memo<BlockProps<Config>>(
-  ({ id, index, config }) => {
-    const { update, block } = useBlock(id, index);
+  ({ id, index, config, blockAtom }) => {
+    const { update, block } = useBlock(blockAtom, index);
     const handleImageUpdate = (url: string) => {
       update({
         ...block,

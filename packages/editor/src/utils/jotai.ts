@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useEffect, useRef } from 'react';
 import { atom, useAtom, WritableAtom } from 'jotai';
-import { Getter, Setter } from 'jotai/core/types';
+import { useMemo } from 'react';
 import { _hexxScope } from '../constants/atom';
 
 export function useUpdateAtom<Value, Update>(
@@ -15,147 +14,16 @@ export function useUpdateAtom<Value, Update>(
   return useAtom(writeOnlyAtom)[1];
 }
 
-export function useAtomCallback<Result>(
-  callback: (get: Getter, set: Setter) => Result,
-): () => Promise<Result>;
-
-export function useAtomCallback<Result, Arg>(
-  callback: (get: Getter, set: Setter, arg: Arg) => Result,
-): (arg: Arg) => Promise<Result>;
-
-export function useAtomCallback<Result, Arg>(
-  callback: (get: Getter, set: Setter, arg: Arg) => Result,
+export function useNullableAtom<T = unknown, A = unknown>(
+  at?: WritableAtom<T, A> | null,
 ) {
-  const anAtom = useMemo(
-    () =>
-      atom(
-        null,
-        (
-          get,
-          set,
-          [arg, resolve, reject]: [
-            Arg,
-            (result: Result) => void,
-            (reason: any) => void,
-          ],
-        ) => {
-          try {
-            resolve(callback(get, set, arg));
-          } catch (e) {
-            reject(e);
-          }
-        },
-      ),
-    [callback],
-  );
-
-  anAtom.scope = _hexxScope;
-  const [, invoke] = useAtom(anAtom);
-  return useCallback(
-    (arg: Arg) =>
-      new Promise<Result>((resolve, reject) => {
-        invoke([arg, resolve, reject]);
-      }),
-    [invoke],
-  );
-}
-
-type Config = {
-  instanceID?: number;
-  name?: string;
-  serialize?: boolean;
-  actionCreators?: any;
-  latency?: number;
-  predicate?: any;
-  autoPause?: boolean;
-};
-
-type Message = {
-  type: string;
-  payload?: any;
-  state?: any;
-};
-
-type ConnectionResult = {
-  subscribe: (dispatch: any) => () => void;
-  unsubscribe: () => void;
-  send: (action: string, state: any) => void;
-  init: (state: any) => void;
-  error: (payload: any) => void;
-};
-
-type Extension = {
-  connect: (options?: Config) => ConnectionResult;
-};
-
-export function useAtomDevtools<Value>(
-  anAtom: WritableAtom<Value, Value>,
-  name?: string,
-) {
-  let extension: Extension | undefined;
-  try {
-    extension = (window as any)
-      .__REDUX_DEVTOOLS_EXTENSION__ as Extension;
-  } catch {}
-  if (!extension) {
-    if (
-      typeof process === 'object' &&
-      process.env.NODE_ENV === 'development' &&
-      typeof window !== 'undefined'
-    ) {
-      console.warn('Please install/enable Redux devtools extension');
-    }
+  let atomValue = at;
+  if (!atomValue) {
+    // @ts-ignore
+    atomValue = atom(null);
+    // @ts-ignore
+    atomValue.scope = _hexxScope;
   }
-
-  const [value, setValue] = useAtom(anAtom);
-  const lastValue = useRef(value);
-  const isTimeTraveling = useRef(false);
-  const devtools = useRef<
-    ConnectionResult & { shouldInit?: boolean }
-  >();
-
-  const atomName = name || anAtom.debugLabel || anAtom.toString();
-
-  useEffect(() => {
-    if (extension) {
-      devtools.current = extension.connect({ name: atomName });
-      const unsubscribe = devtools.current.subscribe(
-        (message: Message) => {
-          if (message.type === 'DISPATCH' && message.state) {
-            if (
-              message.payload?.type === 'JUMP_TO_ACTION' ||
-              message.payload?.type === 'JUMP_TO_STATE'
-            ) {
-              isTimeTraveling.current = true;
-            }
-            setValue(JSON.parse(message.state));
-          } else if (
-            message.type === 'DISPATCH' &&
-            message.payload?.type === 'COMMIT'
-          ) {
-            devtools.current?.init(lastValue.current);
-          }
-        },
-      );
-      devtools.current.shouldInit = true;
-      return unsubscribe;
-    }
-  }, [anAtom, extension, atomName, setValue]);
-
-  useEffect(() => {
-    if (devtools.current) {
-      lastValue.current = value;
-      if (devtools.current.shouldInit) {
-        devtools.current.init(value);
-        devtools.current.shouldInit = false;
-      } else if (isTimeTraveling.current) {
-        isTimeTraveling.current = false;
-      } else {
-        devtools.current.send(
-          `${atomName} - ${new Date().toLocaleString()}`,
-          value,
-        );
-      }
-    }
-  }, [anAtom, extension, atomName, value]);
+  // @ts-ignore
+  return useAtom(atomValue);
 }

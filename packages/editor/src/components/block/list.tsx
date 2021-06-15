@@ -24,14 +24,13 @@ const _ListBlock = React.memo(function ({
   index,
   id,
   config,
+  blockAtom,
 }: BlockProps<{ placeholder: string }>) {
   const ref = React.useRef<HTMLElement>(null);
-  const [
-    activeListItemIndex,
-    setActiveListItemIndex,
-  ] = React.useState<number>(0);
+  const [activeListItemIndex, setActiveListItemIndex] =
+    React.useState<number>(0);
 
-  const { update, block } = useBlock(id, index);
+  const { update, block } = useBlock(blockAtom, index);
   const { defaultBlock, insertBlockAfter } = useEditor();
 
   const handleEmptyListItem = (i: number) => {
@@ -169,10 +168,11 @@ function ListItem(props: {
   blockId: string;
   blockIndex: number;
 }) {
-  const { registerByIndex } = useBlock(
-    props.blockId,
-    props.blockIndex,
-  );
+  // const { registerByIndex } = useBlock(
+  //   props.blockId,
+  //   props.blockIndex,
+  // );
+  return null;
   return (
     <li className={css(listStyle.item)}>
       <Editable

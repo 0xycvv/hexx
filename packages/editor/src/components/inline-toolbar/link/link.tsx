@@ -3,7 +3,7 @@ import { useAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActiveBlock,
-  activeBlockIdAtom,
+  activeBlockAtom,
 } from '../../../constants/atom';
 import { getSelectionRange } from '../../../utils/ranges';
 import Link from '../../icons/link';
@@ -59,7 +59,7 @@ function highlight(r: Range | null) {
 }
 
 export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
-  const [activeBlock] = useAtom(activeBlockIdAtom);
+  const [activeBlock] = useAtom(activeBlockAtom);
   const [initialValue, setInitialValue] = useState('');
   const [
     currentActiveBlock,

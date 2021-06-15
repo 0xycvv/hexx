@@ -25,7 +25,8 @@ export function Unstable_FileDropPlugin(props: {
       closestBlock instanceof HTMLElement &&
       'blockId' in closestBlock.dataset
     ) {
-      setDropId(closestBlock.dataset.blockId!);
+      // TODO:
+      // setDropId(closestBlock.dataset.blockId!);
     }
     e.stopPropagation();
     e.preventDefault();

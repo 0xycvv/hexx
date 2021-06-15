@@ -1,12 +1,13 @@
 import { useAtom } from 'jotai';
 import {
-  activeBlockIdAtom,
-  blockIdListAtom,
+  activeBlockAtom,
   blockSelectAtom,
+  dropAtom,
   dropBlockAtom,
   editorDefaultBlockAtom,
   editorWrapperAtom,
   isEditorSelectAllAtom,
+  selectAtom,
   uiStateAtom,
 } from '../constants/atom';
 import { useEditor } from '../hooks';
@@ -15,12 +16,11 @@ export function usePlugin() {
   const [wrapperRef] = useAtom(editorWrapperAtom);
   const uiState = useAtom(uiStateAtom);
   const defaultBlock = useAtom(editorDefaultBlockAtom);
-  const [activeBlock] = useAtom(activeBlockIdAtom);
+  const [activeBlock] = useAtom(activeBlockAtom);
   const selectAll = useAtom(isEditorSelectAllAtom);
-  const blockSelect = useAtom(blockSelectAtom);
+  const blockSelect = useAtom(selectAtom);
   const editor = useEditor();
-  const ids = useAtom(blockIdListAtom);
-  const drop = useAtom(dropBlockAtom);
+  const drop = useAtom(dropAtom);
 
   return {
     wrapperRef,
@@ -29,7 +29,6 @@ export function usePlugin() {
     activeBlock,
     uiState,
     selectAll,
-    ids,
     blockSelect,
     drop,
   };

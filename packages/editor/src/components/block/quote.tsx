@@ -12,9 +12,9 @@ import { applyBlock, BlockProps } from '../../utils/blocks';
 function _QuoteBlock({
   config,
   index,
-  id,
+  blockAtom,
 }: BlockProps<{ placeholder: string }>) {
-  const { update, register, block } = useBlock(id, index);
+  const { update, register, block } = useBlock(blockAtom, index);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     ref.current?.focus();
@@ -22,10 +22,10 @@ function _QuoteBlock({
   }, []);
 
   return (
-    <blockquote className={css(quoteStyle.wrapper)}>
+    <blockquote className={css(quoteStyle.wrapper)()}>
       <Editable
         placeholder={config?.placeholder}
-        className={css(quoteStyle.text)}
+        className={css(quoteStyle.text)()}
         onChange={(evt) => {
           update({
             ...block,

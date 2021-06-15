@@ -13,7 +13,7 @@ export const dividerStyles: StitchesStyleObject = {
   textAlign: 'center',
   margin: 'unset',
   borderStyle: 'none',
-  '::before': {
+  '&::before': {
     display: 'inline-block',
     color: '#C4C4C4',
     content: `'・・・'`,

@@ -33,9 +33,8 @@ linkify.tlds(tlds);
 const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
   const [showDataViewer, setShowDataViewer] = useState(false);
   const editorRef = useRef<ElementRef<typeof Editor>>();
-  const localSaverRef = useRef<
-    ElementRef<typeof LocalStoragePlugin>
-  >();
+  const localSaverRef =
+    useRef<ElementRef<typeof LocalStoragePlugin>>();
 
   const onLoadLocalStorage = useCallback(() => {
     requestAnimationFrame(() => {
@@ -87,11 +86,12 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
       >
         <PlusButton />
         <TuneButton />
+        {/* <PlusButton />
         <HistoryPlugin />
         <EditorWidthPlugin />
-        <SelectionPlugin />
+        <SelectionPlugin /> */}
         <HexxDevTool />
-        <Unstable_MarkdownShortcutPlugin />
+        {/* <Unstable_MarkdownShortcutPlugin />
         <Unstable_FileDropPlugin
           resolve={async (files) => {
             if (files[0] && files[0].type.includes('image')) {
@@ -112,7 +112,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
           <InlineCode />
           <InlineLink />
         </InlineTool>
-        <LocalStoragePlugin ref={localSaverRef} />
+        <LocalStoragePlugin ref={localSaverRef} /> */}
         {/* <ChangeDetectPlugin
           onChange={() => {
             console.log('change');

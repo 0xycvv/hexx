@@ -1,14 +1,10 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import {
-  _blockIdListAtom,
-  _blocksIdMapAtom,
-} from '../constants/atom';
+import { blocksAtom } from '../constants/atom';
 
 export function ChangeDetectPlugin(props: { onChange: () => void }) {
   const [isMount, setIsMount] = useState(false);
-  const [idMapAtom] = useAtom(_blocksIdMapAtom);
-  const [idsAtom] = useAtom(_blockIdListAtom);
+  const [blocks] = useAtom(blocksAtom);
 
   useEffect(() => {
     if (isMount) {
@@ -19,7 +15,7 @@ export function ChangeDetectPlugin(props: { onChange: () => void }) {
         setIsMount(true);
       }
     };
-  }, [idMapAtom, idsAtom]);
+  }, [blocks]);
 
   return null;
 }

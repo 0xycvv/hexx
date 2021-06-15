@@ -1,8 +1,11 @@
 import { StitchesProps, styled } from '@hexx/theme';
-import { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { BlockAtom } from '../constants/atom';
 import { useEditor, useEventListener } from '../hooks';
 import { usePlugin } from '../plugins';
-import { isBlockEmpty } from '../utils/blocks';
+import { BlockType, isBlockEmpty } from '../utils/blocks';
+import { findBlockById } from '../utils/find-blocks';
 import { BlockMenu, BlockMenuItem } from './block-menu';
 import { PortalPopper } from './popper/portal-popper';
 import {
@@ -78,10 +81,11 @@ function useTabMenu(
     onActive: () => void;
     onClose: () => void;
   },
-  id?: string,
+  block: BlockType<any> | null,
 ) {
   const { wrapperRef } = usePlugin();
-  const { getBlock, blockMap } = useEditor();
+  const { blockMap } = useEditor();
+;
   useEventListener(
     'keydown',
     (e) => {
@@ -89,18 +93,14 @@ function useTabMenu(
         onClose();
       }
       if (e.key === 'Tab' && !e.shiftKey) {
-        if (id) {
-          getBlock({ id })
-            .then((block) => {
-              const isEmpty = isBlockEmpty(
-                blockMap[block.type],
-                block.data,
-              );
-              if (isEmpty) {
-                onActive();
-              }
-            })
-            .catch((err) => console.log(err));
+        if (block) {
+          const isEmpty = isBlockEmpty(
+            blockMap[block.type],
+            block.data,
+          );
+          if (isEmpty) {
+            onActive();
+          }
         }
       }
     },
@@ -108,8 +108,49 @@ function useTabMenu(
   );
 }
 
+function _PlusButton({
+  hoverBlockAtom,
+  menuPopper,
+  popper,
+}: {
+  hoverBlockAtom: BlockAtom<any>;
+  menuPopper: any;
+  popper: any;
+}) {
+  const [hover] = useAtom(hoverBlockAtom);
+  useTabMenu(
+    {
+      onActive: () => {
+        menuPopper.popperElement?.focus();
+        popper.setActive(true);
+        menuPopper.setActive(true);
+      },
+      onClose: () => {
+        popper.setActive(false);
+      },
+    },
+    hover,
+  );
+
+  useEffect(() => {
+    const el = hover?.id && findBlockById(hover.id)?.el;
+    if (el) {
+      popper.setReferenceElement(el);
+      if (hover) {
+        popper.setActive(true);
+      } else {
+        popper.setActive(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hover]);
+
+  return null;
+}
+
 export function PlusButton(props: PlusButtonProps) {
-  const { hoverBlock } = useEditor();
+  const { hoverBlockAtom } = useEditor();
+  const [activeBlockAtom, setActiveBlockAtom] = useState<BlockAtom>();
 
   const popper = useReactPopper({
     defaultActive: false,
@@ -137,39 +178,19 @@ export function PlusButton(props: PlusButtonProps) {
     ...props.menuPopper,
   });
 
-  useTabMenu(
-    {
-      onActive: () => {
-        menuPopper.popperElement?.focus();
-        popper.setActive(true);
-        menuPopper.setActive(true);
-      },
-      onClose: () => {
-        popper.setActive(false);
-      },
-    },
-    hoverBlock?.id,
-  );
-
-  useEffect(() => {
-    popper.setReferenceElement(hoverBlock?.el);
-    if (hoverBlock) {
-      popper.setActive(true);
-    } else {
-      popper.setActive(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoverBlock]);
-
   return (
     <>
       <PortalPopper popper={popper}>
         <Plus
+          title="add-block"
           color={menuPopper.active ? 'active' : 'inactive'}
           {...props.iconProps}
           ref={menuPopper.setReferenceElement}
           onClick={() => {
-            menuPopper.setActive(true);
+            if (hoverBlockAtom) {
+              setActiveBlockAtom(hoverBlockAtom);
+              menuPopper.setActive(true);
+            }
           }}
         >
           <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
@@ -181,13 +202,23 @@ export function PlusButton(props: PlusButtonProps) {
         </Plus>
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
-        <AddMenu {...props.menuProps}>
-          <BlockMenu
-            menu={props.menu}
-            onAdd={() => menuPopper.setActive(false)}
-          />
-        </AddMenu>
+        {activeBlockAtom && (
+          <AddMenu {...props.menuProps}>
+            <BlockMenu
+              blockAtom={activeBlockAtom}
+              menu={props.menu}
+              onAdd={() => menuPopper.setActive(false)}
+            />
+          </AddMenu>
+        )}
       </PortalPopper>
+      {hoverBlockAtom && (
+        <_PlusButton
+          menuPopper={menuPopper}
+          hoverBlockAtom={hoverBlockAtom}
+          popper={popper}
+        />
+      )}
     </>
   );
 }

@@ -1,26 +1,22 @@
 import { styled } from '@hexx/theme';
-import { useAtom } from 'jotai';
+import { PrimitiveAtom, useAtom } from 'jotai';
 import {
   createElement,
   KeyboardEvent,
-  useCallback,
   useEffect,
   useRef,
 } from 'react';
 import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import {
-  blockMapFamily,
+  $hoverAtom,
   blockSelectAtom,
-  dropBlockAtom,
+  dropAtom,
   editorIdAtom,
-  hoverBlockAtom,
   isEditorSelectAllAtom,
-  isHoveringFamily,
-  _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey, commandKey } from '../../constants/key';
 import { useEditor } from '../../hooks/use-editor';
-import { BlockProps } from '../../utils/blocks';
+import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
   findContentEditable,
@@ -88,36 +84,33 @@ const SelectOverlay = styled('div', {
   cursor: 'grab',
 });
 
-function useBlockWrapper({
-  id,
+function useBlockWrapperV2({
+  blockAtom,
   index,
 }: {
-  id: string;
+  blockAtom: PrimitiveAtom<BlockType<any>>;
   index: number;
 }) {
-  const { removeBlockById, splitBlock, blockMap } = useEditor();
+  const { removeBlock, blockMap, insertBlock } = useEditor();
   const [editorId] = useAtom(editorIdAtom);
-  const [hoverBlockId, setHoverBlockId] = useAtom(hoverBlockAtom);
   const [isEditorSelectAll, setIsEditorSelectAll] = useAtom(
     isEditorSelectAllAtom,
   );
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const ref = useRef<HTMLDivElement>(null);
   const selectInputRef = useRef<HTMLInputElement>(null);
-  const family = blockMapFamily(id);
-  family.scope = _hexxScope;
-  const [block] = useAtom<any>(family);
-  const isHoverFamily = isHoveringFamily(id);
-  isHoverFamily.scope = _hexxScope;
-  const [isHovering, setHovering] = useAtom(isHoveringFamily(id));
-  const currentBlock = block && blockMap[block.type];
-  const isBlockSelect = blockSelect.has(block.id);
-  const [drop] = useAtom(dropBlockAtom);
+  const [block, setBlock] = useAtom(blockAtom);
+  const [hoverBlock, setHoverBlock] = useAtom($hoverAtom);
 
-  const isDropping = drop === id;
+  const isHovering = hoverBlock === blockAtom;
+  const currentBlock = block && blockMap[block.type];
+  const isBlockSelect = blockSelect.has(blockAtom);
+  const [drop] = useAtom(dropAtom);
+
+  const isDropping = drop === blockAtom;
 
   const onKeyDown = (e: KeyboardEvent) => {
-    setHoverBlockId(null);
+    setHoverBlock(null);
     if (e.key === 'ArrowUp') {
       const range = getSelectionRange();
       if (!range) {
@@ -149,17 +142,9 @@ function useBlockWrapper({
       }
 
       const { current, next } = fragment;
-      splitBlock({
-        index,
-        id,
+      insertBlock({
+        index: index + 1,
         block: {
-          ...block,
-          data: {
-            ...block.data,
-            text: current,
-          },
-        },
-        newBlock: {
           type: TextBlock.block.type,
           data: {
             ...TextBlock.block.defaultValue,
@@ -167,6 +152,14 @@ function useBlockWrapper({
           },
         },
       });
+
+      setBlock((s) => ({
+        ...s,
+        data: {
+          ...s.data,
+          text: current,
+        },
+      }));
       e.preventDefault();
     }
     if (e[commandKey] && e.key === 'a') {
@@ -200,7 +193,7 @@ function useBlockWrapper({
           isBlockSelect) &&
         index !== 0
       ) {
-        removeBlockById({ id: block.id });
+        removeBlock(blockAtom);
         setBlockSelect(new Set());
         requestAnimationFrame(() => {
           const previousBlock = findBlockByIndex(index - 1);
@@ -226,12 +219,9 @@ function useBlockWrapper({
     console.error(`missing block type ${block.type}`);
   }
 
-  const setHoverId = useCallback(() => {
-    setHovering({
-      id: block.id,
-      el: ref.current!,
-    });
-  }, [block.id, ref.current]);
+  const setHover = () => {
+    setHoverBlock(blockAtom);
+  };
 
   return {
     block,
@@ -245,9 +235,9 @@ function useBlockWrapper({
       className: 'hexx-block-wrapper',
       onKeyDown,
       onBlur: () => {
-        setHoverBlockId(null);
+        setHoverBlock(null);
       },
-      onMouseEnter: setHoverId,
+      onMouseEnter: setHover,
       onClick: (e) => {
         if (!ref.current) return;
         const editable = findContentEditable(ref.current);
@@ -255,7 +245,7 @@ function useBlockWrapper({
           setBlockSelect(new Set(block.id));
           e.stopPropagation();
         }
-        setHoverId();
+        setHover();
       },
     },
     isBlockSelect,
@@ -275,6 +265,7 @@ const SortableItem = SortableElement(
     selectInputRef,
     id,
     i,
+    blockAtom,
     isDropping,
   }) => {
     return (
@@ -282,6 +273,7 @@ const SortableItem = SortableElement(
         {createElement(blockComponent, {
           id,
           index: i,
+          blockAtom,
           css: blockComponent.block.css,
           config: blockComponent.block.config,
         })}
@@ -298,7 +290,15 @@ const SortableItem = SortableElement(
   },
 );
 
-export function Block({ id, index, css }: BlockProps) {
+export function BlockV2({
+  blockAtom,
+  index,
+  css,
+}: {
+  index: number;
+  blockAtom: PrimitiveAtom<BlockType<any>>;
+  css?: any;
+}) {
   const {
     block,
     selectInputRef,
@@ -308,8 +308,8 @@ export function Block({ id, index, css }: BlockProps) {
     blockComponent,
     ref,
     isDropping,
-  } = useBlockWrapper({
-    id,
+  } = useBlockWrapperV2({
+    blockAtom,
     index,
   });
 
@@ -324,6 +324,7 @@ export function Block({ id, index, css }: BlockProps) {
         isBlockSelect={isBlockSelect}
         isEditorSelectAll={isEditorSelectAll}
         id={block.id}
+        blockAtom={blockAtom}
         blockComponent={blockComponent}
         index={index}
         i={index}

@@ -32,7 +32,7 @@ function focusContentEditableWithOffset(
         );
       }
     } else {
-      const currentBlockDiv = findBlockById(editableWeakData.id);
+      const currentBlockDiv = findBlockById(editableWeakData.id)?.el;
       const nodeList = currentBlockDiv?.querySelectorAll(
         '[contenteditable]',
       );
@@ -100,9 +100,18 @@ export function focusContentEditable(
   }
 }
 
-function findBlockById(id: string) {
+export function findBlockById(id: string, first?: boolean) {
   const el = document.querySelector(`[data-block-id="${id}"]`);
-  return el;
+  if (el instanceof HTMLElement) {
+    const editable = findContentEditable(el, first);
+    const blockId = el.dataset?.blockId;
+    return {
+      el,
+      editable,
+      blockId,
+    };
+  }
+  return null;
 }
 
 export function findBlockByIndex(i: number, first?: boolean) {
@@ -145,9 +154,10 @@ export function findContentEditable(
 }
 
 export function findLastBlock() {
-  const el = document.querySelectorAll(`[data-block-id]`)[
-    document.querySelectorAll(`[data-block-id]`).length - 1
-  ];
+  const el =
+    document.querySelectorAll(`[data-block-id]`)[
+      document.querySelectorAll(`[data-block-id]`).length - 1
+    ];
   if (el instanceof HTMLElement) {
     const editable = findContentEditable(el);
     const blockId = el.dataset?.blockId;
@@ -160,10 +170,15 @@ export function findLastBlock() {
   return null;
 }
 
-export function focusLastBlock() {
+export function focusLastBlock(shouldFocusLast = false) {
   const lastBlock = findLastBlock();
   if (lastBlock) {
     lastBlock.editable?.focus();
+    if (shouldFocusLast) {
+      requestAnimationFrame(() => {
+        lastCursor();
+      });
+    }
   }
 }
 

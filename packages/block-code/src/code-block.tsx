@@ -20,8 +20,9 @@ const _CodeBlock = React.memo(function _CodeBlock({
   id,
   index,
   config,
+  blockAtom,
 }: BlockProps<{ placeholder?: string }>) {
-  const { update, register, block } = useBlock(id, index);
+  const { update, register, block } = useBlock(blockAtom, index);
   const ref = React.useRef<HTMLDivElement>(null);
 
   useEditable(ref, (html) => {

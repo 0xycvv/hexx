@@ -14,9 +14,9 @@ import {
   text as TextIcon,
 } from '../icons';
 
-function _TextBlock({ index, id }: BlockProps) {
+function _TextBlock({ index, id, blockAtom }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { update, register, block } = useBlock(id, index);
+  const { update, register, block } = useBlock(blockAtom, index);
 
   useEffect(() => {
     ref.current?.focus();
@@ -34,9 +34,9 @@ function _TextBlock({ index, id }: BlockProps) {
     onChange: (evt) => {
       update((s) => ({
         ...s,
-        [id]: {
-          ...s[id],
-          data: { ...s[id].data, text: evt.target.value },
+        data: {
+          ...s.data,
+          text: evt.target.value,
         },
       }));
     },
@@ -46,7 +46,7 @@ function _TextBlock({ index, id }: BlockProps) {
     <Editable
       className={css({
         padding: '3px 2px',
-      })}
+      })()}
       {...props}
     />
   );
