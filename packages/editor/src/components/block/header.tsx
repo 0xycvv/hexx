@@ -1,13 +1,13 @@
-import * as mdast from 'mdast';
-import { headerStyle, Header } from '@hexx/renderer';
+import { Header, headerStyle } from '@hexx/renderer';
 import { styled } from '@hexx/theme';
+import * as mdast from 'mdast';
 import * as React from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
-import { header as HeaderSvg, h1, h2, h3 } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
+import { h1, h2, h3, header as HeaderSvg } from '../icons';
 
 const Heading = styled(Editable, headerStyle);
 
@@ -49,7 +49,7 @@ function _HeaderBlock({
 export const HeaderBlock = applyBlock<
   Header['data'],
   { placeholder: string }
->(React.memo(_HeaderBlock), {
+>(_HeaderBlock, {
   type: 'header',
   config: {
     placeholder: 'Heading',

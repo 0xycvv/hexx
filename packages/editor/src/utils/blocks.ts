@@ -1,7 +1,7 @@
-import { ReactNode, NamedExoticComponent } from 'react';
-import { PrimitiveAtom } from 'jotai';
 import { StitchesCssProp } from '@hexx/theme';
+import { PrimitiveAtom } from 'jotai';
 import { BlockContent, PhrasingContent } from 'mdast';
+import { FunctionComponent, ReactNode } from 'react';
 
 export type BlockType<T = any> = {
   id: string;
@@ -49,7 +49,7 @@ export interface BlockProps<C = {}, D = any> {
 }
 
 interface BlockComponentBefore<BlockData = unknown, Config = unknown>
-  extends NamedExoticComponent<BlockProps<Config>> {
+  extends FunctionComponent<BlockProps<Config>> {
   block?: BlockConfig<BlockData, Config>;
 }
 

@@ -1,7 +1,7 @@
 import type { Paragraph } from '@hexx/renderer';
 import { css } from '@hexx/theme';
 import * as mdast from 'mdast';
-import { memo, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
 import { applyBlock, BlockProps } from '../../utils/blocks';
@@ -53,7 +53,7 @@ function _TextBlock({ index, id, blockAtom }: BlockProps) {
 }
 
 export const TextBlock = applyBlock<Paragraph['data'], {}>(
-  memo(_TextBlock),
+  _TextBlock,
   {
     type: 'paragraph',
     icon: {

@@ -112,7 +112,6 @@ function useBlockSelectCopy() {
   } = usePlugin();
 
   const [, setBlocks] = useAtom(blocksAtom);
-  const [blocksData] = useAtom(blocksDataAtom);
   const [selectData] = useAtom(selectDataAtom);
 
   const handleClipboardEvent = (e: ClipboardEvent) => {
@@ -122,30 +121,38 @@ function useBlockSelectCopy() {
     }
   };
 
-  const setData = (e: ClipboardEvent) => {
-    const blocksToClip = isSelectAll ? blocksData : [...selectData];
-    const selectedBlockNodeList = blocksToClip
-      .map((b) => document.querySelector(`[data-block-id='${b.id}']`))
-      .filter(Boolean);
+  const setData = useAtomCallback(
+    useCallback((get, set, e: ClipboardEvent) => {
+      const blocksData = get(blocksDataAtom);
+      const blocksToClip = isSelectAll ? blocksData : [...selectData];
+      const selectedBlockNodeList = blocksToClip
+        .map((b) =>
+          document.querySelector(`[data-block-id='${b.id}']`),
+        )
+        .filter(Boolean);
 
-    const text = selectedBlockNodeList
-      .map((s) => s?.textContent)
-      .join('\n\n');
+      const text = selectedBlockNodeList
+        .map((s) => s?.textContent)
+        .join('\n\n');
 
-    const htmlArray = selectedBlockNodeList.map((s) => s?.innerHTML); // TODO: xss
-    let html = document.createElement('div');
-    for (const innerHTML of htmlArray) {
-      const frag = document.createElement('p');
-      frag.innerHTML = innerHTML!;
-      html.appendChild(frag);
-    }
-    e.clipboardData?.setData(
-      CLIPBOARD_DATA_FORMAT,
-      JSON.stringify(blocksToClip),
-    );
-    e.clipboardData?.setData('text/plain', text);
-    e.clipboardData?.setData('text/html', html.innerHTML);
-  };
+      const htmlArray = selectedBlockNodeList.map(
+        (s) => s?.innerHTML,
+      ); // TODO: xss
+      let html = document.createElement('div');
+      for (const innerHTML of htmlArray) {
+        const frag = document.createElement('p');
+        frag.innerHTML = innerHTML!;
+        html.appendChild(frag);
+      }
+      e.clipboardData?.setData(
+        CLIPBOARD_DATA_FORMAT,
+        JSON.stringify(blocksToClip),
+      );
+      e.clipboardData?.setData('text/plain', text);
+      e.clipboardData?.setData('text/html', html.innerHTML);
+    }, []),
+    _hexxScope,
+  );
 
   useEventListener('copy', handleClipboardEvent, wrapperRef);
   useEventListener(

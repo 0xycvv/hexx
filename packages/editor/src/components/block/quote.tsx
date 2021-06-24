@@ -1,13 +1,13 @@
-import * as React from 'react';
-import * as mdast from 'mdast';
-import { quoteStyle, Quote } from '@hexx/renderer';
-import composeRefs from '../..//hooks/use-compose-ref';
-import { useBlock } from '../../hooks/use-editor';
+import { Quote, quoteStyle } from '@hexx/renderer';
 import { css } from '@hexx/theme';
+import * as mdast from 'mdast';
+import * as React from 'react';
+import composeRefs from '../..//hooks/use-compose-ref';
 import { lastCursor } from '../..//utils/find-blocks';
+import { useBlock } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
 
 function _QuoteBlock({
   config,
@@ -44,7 +44,7 @@ function _QuoteBlock({
 export const QuoteBlock = applyBlock<
   Quote['data'],
   { placeholder: string }
->(React.memo(_QuoteBlock), {
+>(_QuoteBlock, {
   type: 'quote',
   icon: {
     text: 'Quote',

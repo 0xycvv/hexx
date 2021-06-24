@@ -1,28 +1,24 @@
-import * as React from 'react';
-import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
-import { BackspaceKey } from '../../constants/key';
-import { useBlock, useEditor } from '../../hooks/use-editor';
 import { css, styled } from '@hexx/theme';
+import * as mdast from 'mdast';
+import * as React from 'react';
+import { BlockAtom } from '../../constants/atom';
+import { BackspaceKey } from '../../constants/key';
 import composeRefs from '../../hooks/use-compose-ref';
-import {
-  findContentEditable,
-  focusBlockByIndex,
-  lastCursor,
-} from '../../utils/find-blocks';
+import { useBlock, useEditor } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
+import { lastCursor } from '../../utils/find-blocks';
 import {
   extractFragmentFromPosition,
   getSelectionRange,
 } from '../../utils/ranges';
 import { Editable } from '../editable';
-import { list as ListSvg, IcNumList } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
-import { BlockAtom } from '../../constants/atom';
+import { IcNumList, list as ListSvg } from '../icons';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
 
-const _ListBlock = React.memo(function ({
+function _ListBlock({
   index,
   id,
   config,
@@ -150,7 +146,7 @@ const _ListBlock = React.memo(function ({
       {listItems}
     </Ul>
   );
-});
+}
 
 function ListItem(props: {
   data: string;

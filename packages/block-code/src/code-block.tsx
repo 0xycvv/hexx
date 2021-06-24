@@ -16,7 +16,7 @@ const CodeEditable = styled('code', {
   whiteSpace: 'pre',
 });
 
-const _CodeBlock = React.memo(function _CodeBlock({
+function _CodeBlock({
   id,
   index,
   config,
@@ -39,6 +39,8 @@ const _CodeBlock = React.memo(function _CodeBlock({
     ref.current?.focus();
     lastCursor();
   }, []);
+
+  console.log('render, code');
 
   const codeClassName = block.data.lang
     ? `language-${block.data.lang}`
@@ -66,7 +68,7 @@ const _CodeBlock = React.memo(function _CodeBlock({
       </CodeEditable>
     </pre>
   );
-});
+}
 
 export const CodeBlock = applyBlock<
   TCodeBlock['data'],
