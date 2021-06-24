@@ -40,8 +40,6 @@ function _CodeBlock({
     lastCursor();
   }, []);
 
-  console.log('render, code');
-
   const codeClassName = block.data.lang
     ? `language-${block.data.lang}`
     : 'language-';
