@@ -3,7 +3,7 @@ import { Parent } from 'mdast';
 import fromMarkdown from 'mdast-util-from-markdown';
 import { v4 } from 'uuid';
 import { CLIPBOARD_DATA_FORMAT } from '../constants';
-import { blocksAtom } from '../constants/atom';
+import { blocksIdsAtom } from '../constants/atom';
 import { useEventListener } from '../hooks';
 import { htmlToMdast } from '../parser/html/parser';
 import { mdastToData } from '../parser/markdown/parser';
@@ -13,7 +13,7 @@ import { usePlugin } from './plugin';
 export function PastHtmlPlugin() {
   const { wrapperRef, activeBlock, editor } = usePlugin();
   const { batchInsertBlocks } = editor;
-  const [blocks] = useAtom(blocksAtom);
+  const [idList] = useAtom(blocksIdsAtom);
   const { allMdastConfig } = useBlockMdast();
 
   useEventListener(

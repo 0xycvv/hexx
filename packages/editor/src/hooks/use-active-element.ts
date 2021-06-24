@@ -1,6 +1,8 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { activeBlockAtom } from '../constants/atom';
+import {
+  activeBlockAtom
+} from '../constants/atom';
 import { debounce } from '../utils/debounce';
 
 export const useActiveBlockId = () => {

@@ -150,7 +150,7 @@ function _PlusButton({
 
 export function PlusButton(props: PlusButtonProps) {
   const { hoverBlockAtom } = useEditor();
-  const [activeBlockAtom, setActiveBlockAtom] = useState<BlockAtom>();
+  const [activeAddingBlockAtom, setActiveAddingBlockAtom] = useState<BlockAtom>();
 
   const popper = useReactPopper({
     defaultActive: false,
@@ -188,7 +188,7 @@ export function PlusButton(props: PlusButtonProps) {
           ref={menuPopper.setReferenceElement}
           onClick={() => {
             if (hoverBlockAtom) {
-              setActiveBlockAtom(hoverBlockAtom);
+              setActiveAddingBlockAtom(hoverBlockAtom);
               menuPopper.setActive(true);
             }
           }}
@@ -202,10 +202,10 @@ export function PlusButton(props: PlusButtonProps) {
         </Plus>
       </PortalPopper>
       <PortalPopper popper={menuPopper}>
-        {activeBlockAtom && (
+        {activeAddingBlockAtom && (
           <AddMenu {...props.menuProps}>
             <BlockMenu
-              blockAtom={activeBlockAtom}
+              blockAtom={activeAddingBlockAtom}
               menu={props.menu}
               onAdd={() => menuPopper.setActive(false)}
             />

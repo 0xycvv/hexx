@@ -88,7 +88,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         <TuneButton />
         <EditorWidthPlugin />
         <HistoryPlugin />
-        {/* <SelectionPlugin /> */}
+        <SelectionPlugin enableInputCrossSelection />
         <HexxDevTool />
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>

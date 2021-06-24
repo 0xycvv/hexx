@@ -1761,6 +1761,11 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@simonwep/selection-js@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@simonwep/selection-js/-/selection-js-2.1.2.tgz#ec4eae826e4b31a06f77f5c1f3c46b95f3515804"
+  integrity sha512-IEufEqueHuSOR2KfQ/djSRC/6N6J6oca9eosDK2SY1+boe99ZW20kJ7yre43kb+jO9jhouG5adlmVQhbQrnH+g==
+
 "@sitespeed.io/tracium@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@sitespeed.io/tracium/-/tracium-0.3.3.tgz#b497a4a8d5837db1fd9e3053c99b78f6c0e1f53b"

@@ -1,11 +1,7 @@
 import { paragraphStyle } from '@hexx/renderer';
 import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
-import {
-  splitAtom,
-  useAtomCallback,
-  useUpdateAtom,
-} from 'jotai/utils';
+import { splitAtom, useAtomCallback } from 'jotai/utils';
 import {
   forwardRef,
   MutableRefObject,
@@ -43,10 +39,10 @@ import {
 import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
-import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
+import { PastHtmlPlugin } from '../../plugins/paste';
 import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
@@ -54,7 +50,7 @@ import {
   focusLastBlock,
   lastCursor,
 } from '../../utils/find-blocks';
-import { BlockV2 } from '../block/block';
+import { Block } from '../block/block';
 import { TextBlock } from '../block/text';
 
 export interface EditorProps extends HexxProps {
@@ -169,8 +165,6 @@ function useBlockSelectCopy() {
   );
 }
 
-const test = createAtom('');
-
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [uiState, setUIState] = useAtom(uiStateAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
@@ -182,7 +176,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
 
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
   const editor = useEditor();
-  const { insertBlock, clear, batchRemoveBlocks } = editor;
+  const { clear, batchRemoveBlocks } = editor;
 
   // useEffect(() => {
   //   if (
@@ -296,7 +290,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       }}
     >
       <NewBlockOverlayPlugin />
-      {/* <PastHtmlPlugin /> */}
+      <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
         updateBeforeSortStart={({ index }) => {
@@ -362,7 +356,7 @@ const SortableBlockList = SortableContainer(
         })()}
       >
         {blocks.map((blockAtom, i) => (
-          <BlockV2
+          <Block
             index={i}
             key={blockAtom.toString()}
             blockAtom={blockAtom}

@@ -84,7 +84,7 @@ const SelectOverlay = styled('div', {
   cursor: 'grab',
 });
 
-function useBlockWrapperV2({
+function useBlockWrapper({
   blockAtom,
   index,
 }: {
@@ -104,6 +104,7 @@ function useBlockWrapperV2({
 
   const isHovering = hoverBlock === blockAtom;
   const currentBlock = block && blockMap[block.type];
+
   const isBlockSelect = blockSelect.has(blockAtom);
   const [drop] = useAtom(dropAtom);
 
@@ -236,7 +237,6 @@ function useBlockWrapperV2({
       onKeyDown,
       onBlur: () => {
         setHoverBlock(null);
-        setBlockSelect(new Set());
       },
       onMouseEnter: setHover,
       onClick: (e) => {
@@ -291,7 +291,7 @@ const SortableItem = SortableElement(
   },
 );
 
-export function BlockV2({
+export function Block({
   blockAtom,
   index,
   css,
@@ -309,7 +309,7 @@ export function BlockV2({
     blockComponent,
     ref,
     isDropping,
-  } = useBlockWrapperV2({
+  } = useBlockWrapper({
     blockAtom,
     index,
   });

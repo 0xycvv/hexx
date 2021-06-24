@@ -46,8 +46,13 @@ export const blocksDataAtom = atom((get) => {
   const blocks = get(blocksAtom);
   return blocks.map((b) => get(b));
 });
-
 blocksDataAtom.scope = _hexxScope;
+
+export const blocksIdsAtom = atom((get) => {
+  const blocks = get(blocksDataAtom);
+  return blocks.map((b) => b.id);
+});
+blocksIdsAtom.scope = _hexxScope;
 
 export const $lastBlockAtom = atom((get) => {
   const blocks = get(blocksAtom);
@@ -196,7 +201,6 @@ function updateHistory(data) {
 }
 
 const debounceUpdateHistory = debounce(updateHistory, 200, false);
-
 
 export const blockIdListAtom = atom(
   (get) => get(_blockIdListAtom),

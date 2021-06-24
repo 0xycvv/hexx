@@ -107,7 +107,11 @@ export function useEditor() {
         if (currentBockIndex > -1) {
           set(
             blocksAtom,
-            insert(blockData, currentBockIndex + 1, atom(newBlock)),
+            insert(
+              blockData,
+              currentBockIndex + 1,
+              createAtom(newBlock),
+            ),
           );
         }
         return newBlock;
@@ -143,7 +147,9 @@ export function useEditor() {
         set,
         { index, blocks }: { index?: number; blocks: any[] },
       ) => {
-        let newBlocks = blocks.map((s) => ({ ...s, id: v4() }));
+        let newBlocks = blocks.map((s) =>
+          createAtom({ ...s, id: v4() }),
+        );
         if (typeof index === 'undefined') {
           set(blocksAtom, (s) => [...s, ...newBlocks]);
         } else {

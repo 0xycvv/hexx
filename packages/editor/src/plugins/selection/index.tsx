@@ -1,17 +1,13 @@
 import { global } from '@hexx/theme';
-import { atom, useAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import {
   forwardRef,
   useEffect,
   useImperativeHandle,
   useRef,
 } from 'react';
-import {
-  blockSelectAtom,
-  uiStateAtom,
-  _hexxScope,
-} from '../../constants/atom';
-import type SelectionJsType from './selection';
+import { blockSelectAtom, uiStateAtom } from '../../constants/atom';
+import type SelectionJsType from './selection.d';
 
 const globalStyles = global({
   '.selection': {
@@ -37,59 +33,42 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
     const inputSelectionRef = useRef<SelectionJsType>();
 
     useEffect(() => {
-      import('./selection').then((s) => {
+      import('./selection.js').then((s) => {
         const SelectionJs = s.default;
         selectionRef.current = new SelectionJs({
           class: 'selection',
           // px, how many pixels the point should move before starting the selection (combined distance).
           // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
           startThreshold: 50,
+          allowTouch: false,
+          singleTap: {
+            allow: false,
+            intersect: 'native',
+          },
+          intersect: 'touch',
 
-          // Disable the selection functionality for touch devices
-          disableTouch: true,
-          singleClick: false,
-
-          // On which point an element should be selected.
-          // Available modes are cover (cover the entire element), center (touch the center) or
-          // the default mode is touch (just touching it).
-          mode: 'touch',
-
-          // Behaviour on single-click
-          // Available modes are 'native' (element was mouse-event target) or
-          // 'touch' (element got touched)
-          tapMode: 'native',
-
-          // Query selectors from elements which can be selected
           selectables: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements from where a selection can be start
           startareas: ['.hexx'],
-
-          // Query selectors for elements which will be used as boundaries for the selection
           boundaries: ['html'],
-
-          // Query selector or dom node to set up container for selection-area-element
-          selectionAreaContainer: 'body',
-
-          // On scrollable areas the number on px per frame is devided by this amount.
-          // Default is 10 to provide a enjoyable scroll experience.
-          scrollSpeedDivider: 10,
-
-          // Browsers handle mouse-wheel events differently, this number will be used as
-          // numerator to calculate the mount of px while scrolling manually: manualScrollSpeed / scrollSpeedDivider
-          manualScrollSpeed: 750,
         })
-          .on('beforestart', ({ oe }) => {
+          .on('beforestart', (evt) => {
             if (uiState.isDragging || uiState.isSorting) return false;
-            if (oe.target instanceof HTMLElement) {
+            if (evt?.event?.target instanceof HTMLElement) {
               if (
-                oe.target.classList.contains('hexx-block-overlay')
+                evt.event.target.classList.contains(
+                  'hexx-block-overlay',
+                )
               ) {
                 return false;
               }
               const isEditable =
-                oe.target.getAttribute('contenteditable') ===
-                  'true' || oe.target.tagName === 'TEXTAREA';
+                evt.event.target.getAttribute('contenteditable') ===
+                  'true' ||
+                evt.event.target.getAttribute('contenteditable') ===
+                  'plaintext-only' ||
+                evt.event.target.tagName === 'TEXTAREA' ||
+                !!evt.event.target.closest('[contenteditable]');
+
               if (!isEditable) {
                 return true;
               }
@@ -108,8 +87,8 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
             // @ts-ignore
             return oe.target.tagName !== 'INPUT';
           })
-          .on('move', ({ selected }) => {
-            const selectedBlockId = selected.map(
+          .on('move', ({ store }) => {
+            const selectedBlockId = store.selected.map(
               (s) =>
                 // @ts-ignore
                 s.dataset.blockId,
@@ -119,84 +98,70 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           .on('start', () => {
             setUIState((s) => ({ ...s, isDragging: true }));
           })
-          .on('stop', ({ inst }) => {
-            // Remember selection in case the user wants to add smth in the next one
-            // inst.keepSelection();
+          .on('stop', ({ event }) => {
             requestAnimationFrame(() => {
               setUIState((s) => ({ ...s, isDragging: false }));
             });
+            event?.stopPropagation();
+            event?.preventDefault();
           });
       });
+      return () => {
+        selectionRef.current?.destroy();
+      };
     }, []);
 
     useEffect(() => {
-      // if (!props.enableInputCrossSelection) {
-      //   return;
-      // }
-      import('./selection').then((s) => {
+      if (!props.enableInputCrossSelection) {
+        return;
+      }
+      import('./selection.js').then((s) => {
         const SelectionJs = s.default;
         inputSelectionRef.current = new SelectionJs({
           class: 'selection-2',
-          singleClick: false,
-          // px, how many pixels the point should move before starting the selection (combined distance).
-          // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
-          startThreshold: 100,
-
-          // Disable the selection functionality for touch devices
-          disableTouch: true,
-
-          // On which point an element should be selected.
-          // Available modes are cover (cover the entire element), center (touch the center) or
-          // the default mode is touch (just touching it).
-          mode: 'touch',
-          firstItemMode: 'outside',
-
-          // Behaviour on single-click
-          // Available modes are 'native' (element was mouse-event target) or
-          // 'touch' (element got touched)
-          tapMode: 'touch',
-
-          // Query selectors from elements which can be selected
+          startThreshold: 200,
+          intersect: 'touch',
+          singleTap: {
+            allow: false,
+            intersect: 'native',
+          },
+          allowTouch: false,
           selectables: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements from where a selection can be start
           startareas: ['.hexx-block-wrapper'],
-
-          // Query selectors for elements which will be used as boundaries for the selection
           boundaries: ['html'],
-
-          // Query selector or dom node to set up container for selection-area-element
-          selectionAreaContainer: 'body',
-
-          // On scrollable areas the number on px per frame is devided by this amount.
-          // Default is 10 to provide a enjoyable scroll experience.
-          scrollSpeedDivider: 10,
-
-          // Browsers handle mouse-wheel events differently, this number will be used as
-          // numerator to calculate the mount of px while scrolling manually: manualScrollSpeed / scrollSpeedDivider
-          manualScrollSpeed: 750,
         })
-          .on('beforestart', ({ oe }) => {
-            if (uiState.isDragging || uiState.isSorting) return false;
-            if (oe.target instanceof HTMLDivElement) {
+          .on('beforestart', ({ event }) => {
+            if (uiState.isDragging || uiState.isSorting) {
+              setBlockSelect(new Set());
+              return false;
+            }
+            if (event?.target instanceof HTMLDivElement) {
               if (
-                oe.target.classList.contains('hexx-block-overlay')
+                event.target.classList.contains('hexx-block-overlay')
               ) {
+                setBlockSelect(new Set());
                 return false;
               }
               const isEditable =
-                oe.target.getAttribute('contenteditable') ===
-                  'true' || oe.target.tagName === 'TEXTAREA';
+                event.target.getAttribute('contenteditable') ===
+                  'true' ||
+                event.target.getAttribute('contenteditable') ===
+                  'plaintext-only' ||
+                event.target.tagName === 'TEXTAREA' ||
+                !!event.target.closest('[contenteditable]');
+
               if (isEditable) {
-                setBlockSelect(new Set([]));
-                //   return true;
+                setBlockSelect(new Set());
+                return true;
               }
-              // return false;
+              setBlockSelect(new Set());
+              return false;
             }
-            return true;
+            setBlockSelect(new Set());
+            return false;
           })
-          .on('move', ({ selected }) => {
-            const selectedBlockId = selected.map(
+          .on('move', ({ store }) => {
+            const selectedBlockId = store.selected.map(
               (s) =>
                 // @ts-ignore
                 s.dataset.blockId,
@@ -206,14 +171,16 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
           .on('start', () => {
             setUIState((s) => ({ ...s, isDragging: true }));
           })
-          .on('stop', ({ inst }) => {
-            // Remember selection in case the user wants to add smth in the next one
-            // inst.keepSelection();
+          .on('stop', ({}) => {
             requestAnimationFrame(() => {
               setUIState((s) => ({ ...s, isDragging: false }));
             });
           });
       });
+
+      return () => {
+        inputSelectionRef.current?.destroy();
+      };
     }, [props.enableInputCrossSelection]);
 
     useEffect(() => {
