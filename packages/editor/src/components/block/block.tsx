@@ -37,6 +37,22 @@ const Wrapper = styled('div', {
   position: 'relative',
   marginTop: '1px',
   marginBottom: '1px',
+  '.hexx-block-selecting-overlay': {
+    display: 'none',
+  },
+  '&.selecting': {
+    userSelect: 'none',
+  },
+  '&.selecting .hexx-block-selecting-overlay': {
+    display: 'block',
+  },
+  variants: {
+    selected: {
+      true: {
+        userSelect: 'none',
+      },
+    },
+  },
 });
 
 const RightIndicator = styled('div', {
@@ -269,6 +285,7 @@ const SortableItem = SortableElement(
     blockAtom,
     isDropping,
   }) => {
+    const isSelected = isBlockSelect || isEditorSelectAll;
     return (
       <div className="hexx-block">
         {createElement(blockComponent, {
@@ -278,9 +295,10 @@ const SortableItem = SortableElement(
           css: blockComponent.block.css,
           config: blockComponent.block.config,
         })}
-        {(isBlockSelect || isEditorSelectAll) && (
+        {isSelected && (
           <SortableOverlay selectInputRef={selectInputRef} />
         )}
+        <SelectOverlay className="hexx-block-selecting-overlay" />
         <BottomIndicator
           className="hexx-bottom-indicator"
           drop={isDropping && 'active'}
@@ -318,8 +336,15 @@ export function Block({
     return null;
   }
 
+  const isSelected = isBlockSelect || isEditorSelectAll;
+
   return (
-    <Wrapper css={css} ref={ref} {...getBlockProps}>
+    <Wrapper
+      css={css}
+      ref={ref}
+      {...getBlockProps}
+      selected={isSelected}
+    >
       <SortableItem
         selectInputRef={selectInputRef}
         isBlockSelect={isBlockSelect}

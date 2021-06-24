@@ -87,23 +87,37 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
             // @ts-ignore
             return oe.target.tagName !== 'INPUT';
           })
-          .on('move', ({ store }) => {
+          .on(
+            'move',
+            ({
+              store: {
+                changed: { added, removed },
+              },
+            }) => {
+              for (const el of added) {
+                el.classList.add('selecting');
+              }
+              for (const el of removed) {
+                el.classList.remove('selecting');
+              }
+            },
+          )
+          .on('start', () => {
+            setUIState((s) => ({ ...s, isDragging: true }));
+          })
+          .on('stop', ({ event, store }) => {
             const selectedBlockId = store.selected.map(
               (s) =>
                 // @ts-ignore
                 s.dataset.blockId,
             );
+            for (const el of store.stored) {
+              el.classList.remove('selecting');
+            }
             setBlockSelect(new Set(selectedBlockId));
-          })
-          .on('start', () => {
-            setUIState((s) => ({ ...s, isDragging: true }));
-          })
-          .on('stop', ({ event }) => {
             requestAnimationFrame(() => {
               setUIState((s) => ({ ...s, isDragging: false }));
             });
-            event?.stopPropagation();
-            event?.preventDefault();
           });
       });
       return () => {
@@ -132,14 +146,12 @@ export const SelectionPlugin = forwardRef<any, SelectionPluginProps>(
         })
           .on('beforestart', ({ event }) => {
             if (uiState.isDragging || uiState.isSorting) {
-              setBlockSelect(new Set());
               return false;
             }
             if (event?.target instanceof HTMLDivElement) {
               if (
                 event.target.classList.contains('hexx-block-overlay')
               ) {
-                setBlockSelect(new Set());
                 return false;
               }
               const isEditable =
