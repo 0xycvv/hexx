@@ -23,6 +23,10 @@ export function DataViewer(props: {
     };
   }, []);
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <div
       className={css({
@@ -48,7 +52,7 @@ export function DataViewer(props: {
         Close
       </div>
       <CodeBlockRenderer
-        data={{ value: JSON.stringify(data, null, 2) }}
+        data={{ value: JSON.stringify(data, null, 2), lang: 'json' }}
       />
     </div>
   );
