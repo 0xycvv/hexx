@@ -77,7 +77,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         <TuneButton />
         <EditorWidthPlugin />
         <HistoryPlugin />
-        {/* <SelectionPlugin  /> */}
+        <SelectionPlugin />
         <HexxDevTool />
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>
@@ -85,7 +85,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
           <InlineCode />
           <InlineLink />
         </InlineTool>
-        {/* <Unstable_MarkdownShortcutPlugin />
+        <Unstable_MarkdownShortcutPlugin />
         <Unstable_FileDropPlugin
           resolve={async (files) => {
             if (files[0] && files[0].type.includes('image')) {
@@ -100,8 +100,6 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
             }
           }}
         />
-
-         */}
         <LocalStoragePlugin ref={localSaverRef} />
         {/* <ChangeDetectPlugin
           onChange={() => {
