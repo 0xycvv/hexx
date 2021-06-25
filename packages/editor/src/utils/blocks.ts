@@ -1,6 +1,7 @@
-import { ReactNode, NamedExoticComponent } from 'react';
 import { StitchesCssProp } from '@hexx/theme';
+import { PrimitiveAtom } from 'jotai';
 import { BlockContent, PhrasingContent } from 'mdast';
+import { FunctionComponent, ReactNode } from 'react';
 
 export type BlockType<T = any> = {
   id: string;
@@ -38,22 +39,23 @@ interface BlockConfig<Data, Config> {
   [x: string]: any;
 }
 
-export interface BlockProps<C = {}> {
+export interface BlockProps<C = {}, D = any> {
   id: string;
   index: number;
   config?: C;
   children?: ReactNode;
+  blockAtom: PrimitiveAtom<BlockType<D>>;
   css?: StitchesCssProp;
 }
 
 interface BlockComponentBefore<BlockData = unknown, Config = unknown>
-  extends NamedExoticComponent<BlockProps<Config>> {
+  extends FunctionComponent<BlockProps<Config>> {
   block?: BlockConfig<BlockData, Config>;
 }
 
 export interface BlockComponent<
   BlockConfig = unknown,
-  Config = undefined
+  Config = undefined,
 > {
   block: BlockConfig;
   (props: BlockProps<Config>): JSX.Element;

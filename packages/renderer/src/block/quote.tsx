@@ -6,7 +6,7 @@ export type Quote = {
   type: 'quote';
   data: {
     alignment?: string;
-    caption: string;
+    caption?: string;
     text: string;
   };
 };

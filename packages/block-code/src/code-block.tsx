@@ -1,90 +1,110 @@
-import {
-  composeRef,
-  lastCursor,
-  useBlock,
-  applyBlock,
-  BlockProps,
-  useEditable,
-} from '@hexx/editor';
+import { applyBlock, BlockProps, useBlock } from '@hexx/editor';
+import { styled } from '@hexx/theme';
+import Highlight, { Prism, PrismTheme } from 'prism-react-renderer';
 import * as React from 'react';
+import Editor from 'react-simple-code-editor';
 import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
-import { css, styled } from '@hexx/theme';
 
-const CodeEditable = styled('code', {
+const Code = styled('code', {
   display: 'block',
   whiteSpace: 'pre',
+  minHeight: '24px',
 });
 
-const _CodeBlock = React.memo(function _CodeBlock({
+type Config = {
+  placeholder?: string;
+  theme?: PrismTheme;
+};
+
+function _CodeBlock({
   id,
   index,
   config,
-}: BlockProps<{ placeholder?: string }>) {
-  const { update, register, block } = useBlock(id, index);
-  const ref = React.useRef<HTMLDivElement>(null);
+  blockAtom,
+}: BlockProps<Config>) {
+  const { update, block } = useBlock(blockAtom, index);
 
-  useEditable(ref, (html) => {
-    update({
-      ...block,
-      data: {
-        ...block.data,
-        value: html,
-      },
-    });
-  });
+  const { padding, ...restCodeBlockStyle } = codeBlockStyle;
 
-  React.useEffect(() => {
-    ref.current?.focus();
-    lastCursor();
-  }, []);
+  const onChange = React.useCallback(
+    (html) => {
+      update({
+        ...block,
+        data: {
+          ...block.data,
+          value: html,
+        },
+      });
+    },
+    [update],
+  );
 
-  const codeClassName = block.data.lang
-    ? `language-${block.data.lang}`
-    : 'language-';
+  const highlightCode = React.useCallback(
+    (code: string) => {
+      return (
+        <Highlight
+          Prism={Prism}
+          theme={config?.theme}
+          code={code}
+          language={block.data.lang}
+        >
+          {({ tokens, getLineProps, getTokenProps }) => (
+            <Code>
+              {tokens.map((line, i) => (
+                // eslint-disable-next-line react/jsx-key
+                <div {...getLineProps({ line, key: i })}>
+                  {line.map((token, key) => (
+                    // eslint-disable-next-line react/jsx-key
+                    <span {...getTokenProps({ token, key })} />
+                  ))}
+                </div>
+              ))}
+            </Code>
+          )}
+        </Highlight>
+      );
+    },
+    [block.data.lang],
+  );
 
   return (
-    <pre className={`${css(codeBlockStyle)()} ${codeClassName}`}>
-      <CodeEditable
-        className={codeClassName}
-        contentEditable
-        ref={composeRef(ref, register)}
-        suppressContentEditableWarning
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.stopPropagation();
-          }
-          if (e.key === 'Tab') {
-            document.execCommand('insertText', false, '  ');
-            e.preventDefault();
-          }
-        }}
-        placeholder={config?.placeholder || 'Code...'}
-      >
-        {block.data.value}
-      </CodeEditable>
-    </pre>
+    <Editor
+      value={block.data.value}
+      onValueChange={onChange}
+      highlight={highlightCode}
+      padding={padding}
+      style={restCodeBlockStyle}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.stopPropagation();
+        }
+        if (e.key === 'Backspace') {
+          e.stopPropagation();
+        }
+      }}
+    />
   );
-});
+}
 
-export const CodeBlock = applyBlock<
-  TCodeBlock['data'],
-  { placeholder: string }
->(_CodeBlock, {
-  type: 'code',
-  isEmpty: (d) => !d.value?.trim(),
-  icon: {
-    text: 'Code Block',
-    svg: SvgCode,
-  },
-  mdast: {
+export const CodeBlock = applyBlock<TCodeBlock['data'], Config>(
+  _CodeBlock,
+  {
     type: 'code',
-    in: ({ lang, value }) => ({ value, lang }),
+    isEmpty: (d) => !d.value?.trim(),
+    icon: {
+      text: 'Code Block',
+      svg: SvgCode,
+    },
+    mdast: {
+      type: 'code',
+      in: ({ lang, value }) => ({ value, lang }),
+    },
+    config: {
+      placeholder: 'Code...',
+    },
+    defaultValue: {
+      value: '',
+    },
   },
-  config: {
-    placeholder: 'Code...',
-  },
-  defaultValue: {
-    value: '',
-  },
-});
+);

@@ -1,13 +1,13 @@
-import * as mdast from 'mdast';
-import { headerStyle, Header } from '@hexx/renderer';
+import { Header, headerStyle } from '@hexx/renderer';
 import { styled } from '@hexx/theme';
+import * as mdast from 'mdast';
 import * as React from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
-import { header as HeaderSvg, h1, h2, h3 } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
+import { h1, h2, h3, header as HeaderSvg } from '../icons';
 
 const Heading = styled(Editable, headerStyle);
 
@@ -16,8 +16,9 @@ function _HeaderBlock({
   index,
   config,
   css,
+  blockAtom,
 }: BlockProps<{ placeholder: string }>) {
-  const { register, update, block } = useBlock(id, index);
+  const { register, update, block } = useBlock(blockAtom, index);
 
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -27,7 +28,7 @@ function _HeaderBlock({
 
   return (
     <Heading
-      h={String(block.data.level) || '3'}
+      h={(String(block.data.level) as any) || '3'}
       placeholder={config?.placeholder}
       ref={composeRefs(ref, register)}
       onChange={(evt) =>
@@ -48,7 +49,7 @@ function _HeaderBlock({
 export const HeaderBlock = applyBlock<
   Header['data'],
   { placeholder: string }
->(React.memo(_HeaderBlock), {
+>(_HeaderBlock, {
   type: 'header',
   config: {
     placeholder: 'Heading',

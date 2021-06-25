@@ -1,10 +1,99 @@
-import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atom, PrimitiveAtom } from 'jotai';
+import { atomFamily, atomWithReset } from 'jotai/utils';
 import { SetStateAction } from 'react';
 import { BlockType, BlockComponent } from '../utils/blocks';
 import { debounce } from '../utils/debounce';
 
+export type BlockAtom<T = any> = PrimitiveAtom<BlockType<T>>;
+
 export const _hexxScope = Symbol();
+
+// @ts-ignore
+export const createAtom: typeof atom = (...arg) => {
+  // @ts-ignore
+  const createdAtom = atom(...arg);
+  createdAtom.scope = _hexxScope;
+  return createdAtom;
+};
+
+export const _blocksAtom = atom<BlockAtom[]>([]);
+_blocksAtom.scope = _hexxScope;
+
+export const blocksAtom = atom(
+  (get) => get(_blocksAtom),
+  (get, set, arg: SetStateAction<BlockAtom<any>[]>) => {
+    const oldValue = get(_blocksAtom);
+    set(_blocksAtom, arg);
+    const newValue = get(_blocksAtom);
+    updateHistory({
+      label: `${JSON.stringify(oldValue)} -> ${JSON.stringify(
+        newValue,
+      )}`,
+      undo: () => {
+        set(_blocksAtom, oldValue);
+      },
+      redo: () => {
+        set(_blocksAtom, newValue);
+      },
+    });
+  },
+);
+
+blocksAtom.debugLabel = 'BlockData';
+blocksAtom.scope = _hexxScope;
+
+export const blocksDataAtom = atom((get) => {
+  const blocks = get(blocksAtom);
+  return blocks.map((b) => get(b));
+});
+blocksDataAtom.scope = _hexxScope;
+
+export const blocksIdsAtom = atom((get) => {
+  const blocks = get(blocksDataAtom);
+  return blocks.map((b) => b.id);
+});
+blocksIdsAtom.scope = _hexxScope;
+
+export const $lastBlockAtom = atom((get) => {
+  const blocks = get(blocksAtom);
+  return blocks[blocks.length - 1];
+});
+
+$lastBlockAtom.scope = _hexxScope;
+
+export const $hoverAtom = atom<BlockAtom | null>(null);
+
+$hoverAtom.scope = _hexxScope;
+
+let lastExistedHover: BlockAtom<any> | null;
+
+export const $lastHoverAtom = atom(
+  (get) => {
+    const hoverBlock = get($hoverAtom);
+    if (hoverBlock) {
+      lastExistedHover = hoverBlock;
+      return hoverBlock;
+    }
+    return hoverBlock || lastExistedHover;
+  },
+  // (_get, set, arg: SetStateAction<BlockAtom<any> | null>) =>
+  //   set($hoverAtom, arg),
+);
+
+$lastHoverAtom.scope = _hexxScope;
+
+export const dropAtom = atomWithReset<
+  BlockAtom | PrimitiveAtom<null>
+>(atom(null));
+dropAtom.scope = _hexxScope;
+
+export const selectAtom = atom<Set<BlockAtom>>(new Set([]));
+selectAtom.scope = _hexxScope;
+
+export const selectDataAtom = atom((get) => {
+  const selectBlocks = get(selectAtom);
+  return [...selectBlocks].map((s) => get(s));
+});
 
 // editor id
 export const editorIdAtom = atom('');
@@ -13,7 +102,6 @@ editorIdAtom.scope = _hexxScope;
 export const editorWrapperAtom = atom<HTMLElement | null>(null);
 editorWrapperAtom.scope = _hexxScope;
 
-// TODO: put it to state
 export const editorDefaultBlockAtom = atom<
   Pick<BlockType<any>, 'type' | 'data'>
 >({
@@ -28,7 +116,7 @@ editorDefaultBlockAtom.scope = _hexxScope;
 type UIState = {
   isDragging: boolean;
   isSorting: boolean;
-  sortingItemKey?: string;
+  sortingItemKey?: BlockAtom;
   [x: string]: any;
 };
 
@@ -46,14 +134,24 @@ export type ActiveBlock = {
 };
 
 // active block id
-export const activeBlockIdAtom = atom<ActiveBlock | null>(null);
+export const activeBlockAtom = atom<ActiveBlock | null>(null);
 
-activeBlockIdAtom.scope = _hexxScope;
+activeBlockAtom.scope = _hexxScope;
 
 export const isEditorSelectAllAtom = atom<boolean>(false);
 isEditorSelectAllAtom.scope = _hexxScope;
 
-export const blockSelectAtom = atom<Set<string>>(new Set<string>());
+export const blockSelectAtom = atom(
+  (get) => {
+    return get(selectAtom);
+  },
+  (get, set, update: Set<string>) => {
+    const selectedBlocksAtom = get(blocksAtom).filter((s) =>
+      update.has(get(s).id),
+    );
+    set(selectAtom, new Set(selectedBlocksAtom));
+  },
+);
 
 blockSelectAtom.scope = _hexxScope;
 
@@ -64,31 +162,9 @@ blockMapAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
 _blockIdListAtom.scope = _hexxScope;
-export const _blocksIdMapAtom = atom<Record<string, BlockType>>({});
-_blocksIdMapAtom.scope = _hexxScope;
-
-export const hoverBlockAtom = atom<{
-  id: string;
-  el: HTMLElement;
-} | null>(null);
-hoverBlockAtom.scope = _hexxScope;
 
 export const dropBlockAtom = atom<string | null>(null);
 dropBlockAtom.scope = _hexxScope;
-
-export const isHoveringFamily = atomFamily(
-  (id: string) => (get) => get(hoverBlockAtom)?.id === id,
-  (id) => (
-    get,
-    set,
-    arg: {
-      id: string;
-      el: HTMLElement;
-    } | null,
-  ) => {
-    set(hoverBlockAtom, arg);
-  },
-);
 
 // history
 type EditorHistory = Array<{
@@ -122,42 +198,9 @@ function updateHistory(data) {
   if (history.length > MAX_HISTORY_COUNT) {
     history.shift();
   }
-  canUpdate = true;
 }
 
 const debounceUpdateHistory = debounce(updateHistory, 200, false);
-let firstOldValue: Record<string, any> | null = null;
-let canUpdate = false;
-
-export const blocksIdMapAtom = atom(
-  (get) => get(_blocksIdMapAtom),
-  (get, set, arg: SetStateAction<Record<string, any>>) => {
-    const oldValue = get(_blocksIdMapAtom);
-    if (canUpdate) {
-      firstOldValue = oldValue;
-      canUpdate = false;
-    }
-    if (!oldValue) {
-      return;
-    }
-    set(_blocksIdMapAtom, arg);
-    const newValue = get(_blocksIdMapAtom);
-    const old = { ...firstOldValue };
-    if (!firstOldValue) {
-      return;
-    }
-    debounceUpdateHistory({
-      label: `${JSON.stringify(old)} -> ${JSON.stringify(newValue)}`,
-      undo: () => {
-        set(_blocksIdMapAtom, old);
-      },
-      redo: () => {
-        set(_blocksIdMapAtom, newValue);
-      },
-    });
-  },
-);
-blocksIdMapAtom.scope = _hexxScope;
 
 export const blockIdListAtom = atom(
   (get) => get(_blockIdListAtom),
@@ -180,30 +223,3 @@ export const blockIdListAtom = atom(
 );
 
 blockIdListAtom.scope = _hexxScope;
-
-export const blockMapFamily = atomFamily<
-  string,
-  BlockType<unknown>,
-  BlockType<unknown> | SetStateAction<Record<string, any>>
->(
-  (id: string) => (get) => get(blocksIdMapAtom)[id],
-  (id) => (get, set, arg) => {
-    if (typeof arg === 'function') {
-      set(blocksIdMapAtom, arg);
-    } else {
-      set(blocksIdMapAtom, (prev) => {
-        return {
-          ...prev,
-          [id]: {
-            ...prev[id],
-            ...arg,
-            data: {
-              ...prev[id].data,
-              ...arg.data,
-            },
-          },
-        };
-      });
-    }
-  },
-);

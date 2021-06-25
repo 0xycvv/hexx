@@ -1,6 +1,8 @@
 import { styled } from '@hexx/theme';
-import { ReactNode } from 'react';
-import { useIdMap } from '../hooks';
+import { useAtom } from 'jotai';
+import { useAtomCallback } from 'jotai/utils';
+import { ReactNode, useCallback } from 'react';
+import { $lastBlockAtom, _hexxScope } from '../constants/atom';
 import { findLastBlock } from '../utils/find-blocks';
 import { usePlugin } from './plugin';
 
@@ -23,51 +25,61 @@ export function NewBlockOverlayPlugin(props: {
     activeBlock,
   } = usePlugin();
 
-  const [idMap] = useIdMap();
+  const [lastBlock] = useAtom($lastBlockAtom);
 
   const { blockSelect, selectBlock, insertBlock, blockMap } = editor;
 
-  const handleClick = () => {
-    if (
-      blockSelect.size > 0 &&
-      !uiState.isDragging &&
-      !uiState.isSorting
-    ) {
-      selectBlock();
-      return;
-    }
-    if (isSelectAll) {
-      setIsSelectAll(false);
-    }
-    if (!activeBlock) {
-      const lastBlock = findLastBlock();
-      if (lastBlock && lastBlock.blockId) {
-        const block = idMap[lastBlock.blockId];
-
-        const blockType = blockMap[block.type];
+  const handleClick = useAtomCallback(
+    useCallback(
+      (get) => {
         if (
-          blockType &&
-          blockType.block &&
-          // @ts-ignore
-          typeof blockType.block.isEmpty === 'function' &&
-          // @ts-ignore
-          blockType.block.isEmpty(block.data)
+          blockSelect.size > 0 &&
+          !uiState.isDragging &&
+          !uiState.isSorting
         ) {
-          if (lastBlock?.editable) {
-            lastBlock?.editable?.focus();
+          // reset the selection
+          selectBlock();
+          return;
+        }
+        if (isSelectAll) {
+          setIsSelectAll(false);
+        }
+        // add a new block
+        if (!activeBlock) {
+          if (lastBlock) {
+            const lastBlockType = get(lastBlock);
+
+            if (!lastBlockType) {
+              return;
+            }
+            const blockType = blockMap[lastBlockType.type];
+
+            if (
+              blockType &&
+              blockType.block &&
+              typeof blockType.block.isEmpty === 'function' &&
+              blockType.block.isEmpty(lastBlockType.data)
+            ) {
+              const lastBlock = findLastBlock();
+              if (lastBlock?.editable) {
+                lastBlock.editable.focus();
+              } else {
+                insertBlock({ block: defaultBlock });
+              }
+            } else {
+              insertBlock({ block: defaultBlock });
+            }
           } else {
             insertBlock({ block: defaultBlock });
           }
         } else {
-          insertBlock({ block: defaultBlock });
+          activeBlock?.editable?.focus();
         }
-      } else {
-        insertBlock({ block: defaultBlock });
-      }
-    } else {
-      activeBlock?.editable?.focus();
-    }
-  };
+      },
+      [lastBlock],
+    ),
+    _hexxScope,
+  );
 
   return (
     <NewBlockOverlay

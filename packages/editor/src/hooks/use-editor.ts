@@ -1,22 +1,19 @@
-import { useAtom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
+import { atom, PrimitiveAtom, useAtom } from 'jotai';
+import { useAtomCallback, useAtomValue } from 'jotai/utils';
 import { useCallback, useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 import {
-  blockIdListAtom,
+  $hoverAtom,
+  BlockAtom,
   blockMapAtom,
-  blockMapFamily,
-  blockSelectAtom,
-  blocksIdMapAtom,
+  blocksAtom,
+  createAtom,
   editorDefaultBlockAtom,
-  hoverBlockAtom,
+  selectAtom,
   _hexxScope,
 } from '../constants/atom';
-import { BlockType } from '../utils/blocks';
 import { insert, insertArray } from '../utils/array';
-import { useAtomCallback, useUpdateAtom } from '../utils/jotai';
-import { normalize } from '../utils/normalize';
-import { usePreviousExistValue } from './use-previous-exist-value';
+import { BlockType } from '../utils/blocks';
 
 export const EditableWeakMap = new WeakMap<
   HTMLDivElement | HTMLElement | Element,
@@ -27,17 +24,16 @@ export const EditableWeakMap = new WeakMap<
   }
 >();
 
-export function useBlock<T = any>(id: string, blockIndex: number) {
-  const family = blockMapFamily(id);
-  family.scope = _hexxScope;
-  // @ts-ignore
-  const [block, updateBlockIdMap] = useAtom<BlockType<T>>(family);
-  const [, setIds] = useAtom(blockIdListAtom);
+export function useBlock<T = unknown>(
+  blockAtom: PrimitiveAtom<BlockType<T>>,
+  blockIndex: number,
+) {
+  const [block, setBlock] = useAtom(blockAtom);
+  const [, setBlocks] = useAtom(blocksAtom);
   const registeredRef = useRef<Array<any>>();
 
   const remove = () => {
-    blockMapFamily.remove(id);
-    setIds((s) => s.filter((s) => s !== id));
+    setBlocks((s) => s.filter((item) => item !== blockAtom));
   };
 
   const register = useCallback(
@@ -48,7 +44,7 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
         );
       }
       if (ref) {
-        EditableWeakMap.set(ref, { index, id, blockIndex });
+        EditableWeakMap.set(ref, { index, id: block.id, blockIndex });
         registeredRef.current?.push(ref);
       }
     },
@@ -77,175 +73,121 @@ export function useBlock<T = any>(id: string, blockIndex: number) {
   return {
     block,
     remove,
-    update: updateBlockIdMap,
+    update: setBlock,
     registerByIndex,
     register,
   };
 }
 
-export function useIdMap() {
-  return useAtom(blocksIdMapAtom);
-}
-
-export function useGetBlockCallback() {
-  return useAtomCallback<BlockType, { id: string }>(
-    useCallback((get, set, arg) => {
-      const block = get(blocksIdMapAtom)[arg.id];
-
-      return block;
-    }, []),
-  );
-}
+export function useRemoveBlock() {}
 
 export type UseEditorReturn = ReturnType<typeof useEditor>;
 export function useEditor() {
-  const hoverBlock = useAtomValue(hoverBlockAtom);
+  const [hoverBlockAtom] = useAtom($hoverAtom);
   const blockMap = useAtomValue(blockMapAtom);
-  const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
+  const [blockSelect, setBlockSelect] = useAtom(selectAtom);
   const defaultBlock = useAtomValue(editorDefaultBlockAtom);
 
-  const setIdList = useUpdateAtom(blockIdListAtom);
-  const setIdMap = useUpdateAtom(blocksIdMapAtom);
-  const lastHoverBlock = usePreviousExistValue(hoverBlock);
-
-  const selectBlock = (id?: string) => {
-    setBlockSelect(id ? new Set([id]) : new Set([]));
+  const selectBlock = (blockAtom?: BlockAtom | null) => {
+    setBlockSelect(blockAtom ? new Set([blockAtom]) : new Set([]));
   };
 
-  const getBlock = useGetBlockCallback();
-
   const insertBlockAfter = useAtomCallback(
-    useCallback((get, set, arg: { id: string; block: any }) => {
-      let newBlock = {
-        ...arg.block,
-        id: v4(),
-      };
-      const ids = get(blockIdListAtom);
-      const currentBockIndex = ids.findIndex((d) => d === arg.id);
-      if (currentBockIndex > -1) {
-        setIdList(insert(ids, currentBockIndex + 1, newBlock.id));
-        setIdMap((s) => ({
-          ...s,
-          [newBlock.id]: newBlock,
-        }));
-      }
-      return newBlock;
-    }, []),
-  );
-
-  const insertBlock = useCallback(
-    (arg: { index?: number; block: any }) => {
-      let newBlock = {
-        ...arg.block,
-        id: v4(),
-      };
-      if (typeof arg.index === 'undefined') {
-        setIdList((s) => [...s, newBlock.id]);
-        setIdMap((s) => ({
-          ...s,
-          [newBlock.id]: newBlock,
-        }));
-      } else {
-        setIdList((s) => insert(s, arg.index!, newBlock.id));
-        setIdMap((s) => ({
-          ...s,
-          [newBlock.id]: newBlock,
-        }));
-      }
-      return newBlock;
-    },
-    [],
-  );
-
-  const batchInsertBlocks = useCallback(
-    ({ index, blocks }: { index?: number; blocks: any[] }) => {
-      let newBlocks: BlockType[] = [];
-      for (const block of blocks) {
-        newBlocks.push({
+    useCallback(
+      (get, set, arg: { atom: BlockAtom; block: any }) => {
+        let newBlock = {
+          ...arg.block,
           id: v4(),
-          ...block,
+        };
+        const blockData = get(blocksAtom);
+
+        const currentBockIndex = blockData.findIndex(
+          (d) => d === arg.atom,
+        );
+        if (currentBockIndex > -1) {
+          set(
+            blocksAtom,
+            insert(
+              blockData,
+              currentBockIndex + 1,
+              createAtom(newBlock),
+            ),
+          );
+        }
+        return newBlock;
+      },
+      [blocksAtom],
+    ),
+    _hexxScope,
+  );
+
+  const insertBlock = useAtomCallback(
+    useCallback(
+      (_, set, arg: { index?: number; block: any }) => {
+        let newBlock = createAtom({
+          ...arg.block,
+          id: v4(),
         });
-      }
-      const { byId, ids } = normalize(newBlocks, 'id');
-      if (typeof index === 'undefined') {
-        setIdList((s) => [...s, ...ids]);
-        setIdMap((s) => ({
-          ...s,
-          ...byId,
-        }));
-      } else {
-        setIdList((s) => insertArray(s, index, ids));
-        setIdMap((s) => ({
-          ...s,
-          ...byId,
-        }));
-      }
-    },
-    [],
+        if (typeof arg.index === 'undefined') {
+          set(blocksAtom, (s) => [...s, newBlock]);
+        } else {
+          set(blocksAtom, (s) => insert(s, arg.index!, newBlock));
+        }
+        return newBlock;
+      },
+      [blocksAtom],
+    ),
+    _hexxScope,
   );
 
-  const replaceBlockById = useCallback(
-    ({ id, block }: { id: string; block: BlockType }) => {
-      setIdList((s) => s.map((s) => (s === id ? block.id : s)));
-      setIdMap((s) => ({
-        ...s,
-        [block.id]: block,
-      }));
-      blockMapFamily.remove(id);
-    },
-    [],
+  const batchInsertBlocks = useAtomCallback(
+    useCallback(
+      (
+        _,
+        set,
+        { index, blocks }: { index?: number; blocks: any[] },
+      ) => {
+        let newBlocks = blocks.map((s) =>
+          createAtom({ ...s, id: v4() }),
+        );
+        if (typeof index === 'undefined') {
+          set(blocksAtom, (s) => [...s, ...newBlocks]);
+        } else {
+          set(blocksAtom, (s) => insertArray(s, index, newBlocks));
+        }
+      },
+      [blocksAtom],
+    ),
+    _hexxScope,
   );
 
-  const updateBlockDataById = useCallback(
-    ({ id, data }: { id: string; data: any }) => {
-      setIdMap((s) => ({
-        ...s,
-        [id]: {
-          ...s[id],
-          data,
-        },
-      }));
-    },
-    [],
+  const replaceBlockById = useAtomCallback(
+    useCallback(
+      (get, set, { id, block }: { id: string; block: BlockType }) => {
+        set(blocksAtom, (s) =>
+          s.map((a) => (get(a).id === id ? createAtom(block) : a)),
+        );
+      },
+      [blocksAtom],
+    ),
+    _hexxScope,
   );
 
-  const removeBlockById = useCallback(({ id }: { id: string }) => {
-    setIdList((s) => s.filter((s) => s !== id));
-    blockMapFamily.remove(id);
-  }, []);
-
-  const batchRemoveBlocks = useCallback(
-    ({ ids }: { ids: string[] }) => {
-      const filterIds = (s) => !ids.includes(s);
-      setIdList((s) => s.filter(filterIds));
-      blockMapFamily.setShouldRemove(filterIds);
-    },
-    [],
+  const removeBlock = useAtomCallback(
+    useCallback(
+      (_, set, arg: BlockAtom) => {
+        set(blocksAtom, (s) => s.filter((b) => b !== arg));
+      },
+      [blocksAtom],
+    ),
+    _hexxScope,
   );
 
-  const splitBlock = useCallback(
-    ({
-      index,
-      block,
-      newBlock,
-      id,
-    }: {
-      id: string;
-      index: number;
-      block: any | null;
-      newBlock: any;
-    }) => {
-      insertBlock({ index: index + 1, block: newBlock });
-      if (block) {
-        updateBlockDataById({
-          id: block.id,
-          data: block.data,
-        });
-      } else {
-        removeBlockById({ id });
-      }
-    },
-    [updateBlockDataById, removeBlockById, insertBlock],
+  const batchRemoveBlocks = useAtomCallback(
+    useCallback((_get, set, arg: BlockAtom[]) => {
+      set(blocksAtom, (s) => s.filter((a) => !arg.includes(a)));
+    }, []),
+    _hexxScope,
   );
 
   const clear = useAtomCallback(
@@ -255,31 +197,26 @@ export function useEditor() {
         ...defaultBlock,
         id: v4(),
       };
-      setIdList(() => [value.id]);
-      setIdMap(() => ({ [value.id]: value }));
+      set(blocksAtom, [createAtom(value)]);
     }, []),
+    _hexxScope,
   );
 
   return {
     // method
-    setIdList,
     insertBlock,
     insertBlockAfter,
-    splitBlock,
-    updateBlockDataById,
     replaceBlockById,
-    setIdMap,
     batchRemoveBlocks,
-    removeBlockById,
     batchInsertBlocks,
     clear,
-    getBlock,
+    removeBlock,
     // data
     defaultBlock,
     blockSelect,
     blockMap,
-    hoverBlock,
-    lastHoverBlock,
+    hoverBlockAtom,
+    // lastHoverBlock,
     selectBlock,
   };
 }

@@ -1,7 +1,6 @@
 import type { Paragraph } from '@hexx/renderer';
-import { css } from '@hexx/theme';
 import * as mdast from 'mdast';
-import { memo, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock } from '../../hooks/use-editor';
 import { applyBlock, BlockProps } from '../../utils/blocks';
@@ -14,9 +13,10 @@ import {
   text as TextIcon,
 } from '../icons';
 
-function _TextBlock({ index, id }: BlockProps) {
+function _TextBlock(props: BlockProps) {
+  const { index, blockAtom } = props;
   const ref = useRef<HTMLDivElement>(null);
-  const { update, register, block } = useBlock(id, index);
+  const { update, register, block } = useBlock(blockAtom, index);
 
   useEffect(() => {
     ref.current?.focus();
@@ -25,7 +25,7 @@ function _TextBlock({ index, id }: BlockProps) {
     }
   }, [block.data.text]);
 
-  const props = {
+  const editableProps = {
     ref: composeRefs(ref, register),
     html: block.data.text || '',
     style: {
@@ -34,26 +34,19 @@ function _TextBlock({ index, id }: BlockProps) {
     onChange: (evt) => {
       update((s) => ({
         ...s,
-        [id]: {
-          ...s[id],
-          data: { ...s[id].data, text: evt.target.value },
+        data: {
+          ...s.data,
+          text: evt.target.value,
         },
       }));
     },
   };
 
-  return (
-    <Editable
-      className={css({
-        padding: '3px 2px',
-      })}
-      {...props}
-    />
-  );
+  return <Editable {...editableProps} />;
 }
 
 export const TextBlock = applyBlock<Paragraph['data'], {}>(
-  memo(_TextBlock),
+  _TextBlock,
   {
     type: 'paragraph',
     icon: {

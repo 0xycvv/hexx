@@ -25,6 +25,7 @@ import Linkify from 'linkify-it';
 import { ElementRef, useCallback, useRef, useState } from 'react';
 import tlds from 'tlds';
 import { DataViewer } from './data-viewer';
+import { editorStyles } from 'lib/common-style';
 
 const linkify = Linkify();
 
@@ -33,9 +34,8 @@ linkify.tlds(tlds);
 const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
   const [showDataViewer, setShowDataViewer] = useState(false);
   const editorRef = useRef<ElementRef<typeof Editor>>();
-  const localSaverRef = useRef<
-    ElementRef<typeof LocalStoragePlugin>
-  >();
+  const localSaverRef =
+    useRef<ElementRef<typeof LocalStoragePlugin>>();
 
   const onLoadLocalStorage = useCallback(() => {
     requestAnimationFrame(() => {
@@ -69,28 +69,22 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
       <Editor
         ref={editorRef as any}
         onLoad={onLoadLocalStorage}
-        blockCss={{
-          marginTop: 8,
-          marginBottom: 8,
-          maxWidth: '720px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-        css={{
-          paddingLeft: '2rem',
-          paddingRight: '3.75rem',
-          maxWidth: '960px',
-          margin: 'auto',
-        }}
+        {...editorStyles}
         {...props}
         blockMap={blockMap}
       >
         <PlusButton />
         <TuneButton />
-        <HistoryPlugin />
         <EditorWidthPlugin />
+        <HistoryPlugin />
         <SelectionPlugin />
         <HexxDevTool />
+        <LinkifyItPlugin linkifyIt={linkify} />
+        <InlineTool>
+          <InlineMarker />
+          <InlineCode />
+          <InlineLink />
+        </InlineTool>
         <Unstable_MarkdownShortcutPlugin />
         <Unstable_FileDropPlugin
           resolve={async (files) => {
@@ -106,12 +100,6 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
             }
           }}
         />
-        <LinkifyItPlugin linkifyIt={linkify} />
-        <InlineTool>
-          <InlineMarker />
-          <InlineCode />
-          <InlineLink />
-        </InlineTool>
         <LocalStoragePlugin ref={localSaverRef} />
         {/* <ChangeDetectPlugin
           onChange={() => {

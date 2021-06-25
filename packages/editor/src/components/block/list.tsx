@@ -1,37 +1,34 @@
-import * as React from 'react';
-import * as mdast from 'mdast';
 import { List, listStyle } from '@hexx/renderer';
-import { BackspaceKey } from '../../constants/key';
-import { useBlock, useEditor } from '../../hooks/use-editor';
 import { css, styled } from '@hexx/theme';
-import {
-  findContentEditable,
-  focusBlockByIndex,
-  lastCursor,
-} from '../../utils/find-blocks';
+import * as mdast from 'mdast';
+import * as React from 'react';
+import { BlockAtom } from '../../constants/atom';
+import { BackspaceKey } from '../../constants/key';
+import composeRefs from '../../hooks/use-compose-ref';
+import { useBlock, useEditor } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
+import { lastCursor } from '../../utils/find-blocks';
 import {
   extractFragmentFromPosition,
   getSelectionRange,
 } from '../../utils/ranges';
 import { Editable } from '../editable';
-import { list as ListSvg, IcNumList } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
+import { IcNumList, list as ListSvg } from '../icons';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
 
-const _ListBlock = React.memo(function ({
+function _ListBlock({
   index,
   id,
   config,
-}: BlockProps<{ placeholder: string }>) {
+  blockAtom,
+}: BlockProps<{ placeholder: string }, List['data']>) {
   const ref = React.useRef<HTMLElement>(null);
-  const [
-    activeListItemIndex,
-    setActiveListItemIndex,
-  ] = React.useState<number>(0);
+  const [activeListItemIndex, setActiveListItemIndex] =
+    React.useState<number>(0);
 
-  const { update, block } = useBlock(id, index);
+  const { update, block } = useBlock(blockAtom, index);
   const { defaultBlock, insertBlockAfter } = useEditor();
 
   const handleEmptyListItem = (i: number) => {
@@ -49,6 +46,7 @@ const _ListBlock = React.memo(function ({
     block.data.items.map((item, i) => (
       <ListItem
         index={i}
+        blockAtom={blockAtom}
         blockId={block.id}
         blockIndex={index}
         placeholder={config?.placeholder}
@@ -74,12 +72,12 @@ const _ListBlock = React.memo(function ({
       if (!block.data.items[activeListItemIndex]) {
         handleEmptyListItem(activeListItemIndex);
         insertBlockAfter({
-          id,
+          atom: blockAtom,
           block: defaultBlock,
         });
-        setTimeout(() => {
-          focusBlockByIndex(index + 1);
-        }, 0);
+        // setTimeout(() => {
+        //   focusBlockByIndex(index + 1);
+        // }, 0);
         e.stopPropagation();
         e.preventDefault();
       }
@@ -135,16 +133,6 @@ const _ListBlock = React.memo(function ({
     }
   };
 
-  React.useEffect(() => {
-    requestAnimationFrame(() => {
-      if (block.data.items.length > 0) {
-        // @ts-ignore
-        findContentEditable(ref.current)?.focus();
-        lastCursor();
-      }
-    });
-  }, [block.data.items.length]);
-
   return (
     <Ul
       onKeyDown={handleKeyDown}
@@ -158,7 +146,7 @@ const _ListBlock = React.memo(function ({
       {listItems}
     </Ul>
   );
-});
+}
 
 function ListItem(props: {
   data: string;
@@ -168,15 +156,23 @@ function ListItem(props: {
   index: number;
   blockId: string;
   blockIndex: number;
+  blockAtom: BlockAtom;
 }) {
   const { registerByIndex } = useBlock(
-    props.blockId,
+    props.blockAtom,
     props.blockIndex,
   );
+
+  const ref = React.useRef<HTMLLIElement>(null);
+
+  React.useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
   return (
-    <li className={css(listStyle.item)}>
+    <li className={css(listStyle.item)()}>
       <Editable
-        ref={registerByIndex(props.index)}
+        ref={composeRefs(registerByIndex(props.index), ref)}
         placeholder={props.placeholder}
         onFocus={props.onFocus}
         onChange={(e) => {

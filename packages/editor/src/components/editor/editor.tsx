@@ -1,14 +1,17 @@
 import { paragraphStyle } from '@hexx/renderer';
 import { css, StitchesCssProp, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
+import { splitAtom, useAtomCallback } from 'jotai/utils';
 import {
   forwardRef,
+  memo,
   MutableRefObject,
   ReactNode,
+  useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
-  useState,
 } from 'react';
 import {
   SortableContainer,
@@ -17,26 +20,28 @@ import {
 import { v4 } from 'uuid';
 import { CLIPBOARD_DATA_FORMAT } from '../../constants';
 import {
-  blockIdListAtom,
+  BlockAtom,
   blockMapAtom,
+  blocksAtom,
+  blocksDataAtom,
   blockSelectAtom,
-  blocksIdMapAtom,
+  createAtom,
   editorDefaultBlockAtom,
   editorIdAtom,
   editorWrapperAtom,
   isEditorSelectAllAtom,
   redo,
+  selectDataAtom,
   uiStateAtom,
   undo,
-  _blockIdListAtom,
-  _blocksIdMapAtom,
+  _blocksAtom,
   _hexxScope,
 } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
-import composeRefs from '../../hooks/use-compose-ref';
 import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
+import { useWhyDidYouUpdate } from '../../hooks/use-why-did-you-update';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
@@ -47,7 +52,6 @@ import {
   focusLastBlock,
   lastCursor,
 } from '../../utils/find-blocks';
-import { normalize } from '../../utils/normalize';
 import { Block } from '../block/block';
 import { TextBlock } from '../block/text';
 
@@ -93,7 +97,7 @@ const Wrapper = styled('div', {
 });
 
 interface HexxHandler {
-  getData: () => BlockType[];
+  getData: () => Promise<BlockType[]>;
   getEditor: () => UseEditorReturn;
   focus: (config?: {
     index?: number;
@@ -105,12 +109,12 @@ interface HexxHandler {
 function useBlockSelectCopy() {
   const {
     wrapperRef,
-    ids: [ids, setIdList],
     blockSelect: [blockSelect],
     selectAll: [isSelectAll],
-    editor,
   } = usePlugin();
-  const [blockIdMap] = useAtom(blocksIdMapAtom);
+
+  const [, setBlocks] = useAtom(blocksAtom);
+  const [selectData] = useAtom(selectDataAtom);
 
   const handleClipboardEvent = (e: ClipboardEvent) => {
     if (blockSelect.size > 0) {
@@ -119,34 +123,38 @@ function useBlockSelectCopy() {
     }
   };
 
-  const setData = (e: ClipboardEvent) => {
-    const blocksToClip = isSelectAll ? ids : [...blockSelect];
-    const selectedBlockNodeList = blocksToClip
-      .map((bId) =>
-        document.querySelector(`[data-block-id='${bId}']`),
-      )
-      .filter(Boolean);
-    const hexxCopy = blocksToClip
-      .map((id) => blockIdMap[id])
-      .filter(Boolean);
-    const text = selectedBlockNodeList
-      .map((s) => s?.textContent)
-      .join('\n\n');
+  const setData = useAtomCallback(
+    useCallback((get, set, e: ClipboardEvent) => {
+      const blocksData = get(blocksDataAtom);
+      const blocksToClip = isSelectAll ? blocksData : [...selectData];
+      const selectedBlockNodeList = blocksToClip
+        .map((b) =>
+          document.querySelector(`[data-block-id='${b.id}']`),
+        )
+        .filter(Boolean);
 
-    const htmlArray = selectedBlockNodeList.map((s) => s?.innerHTML); // TODO: xss
-    let html = document.createElement('div');
-    for (const innerHTML of htmlArray) {
-      const frag = document.createElement('p');
-      frag.innerHTML = innerHTML!;
-      html.appendChild(frag);
-    }
-    e.clipboardData?.setData(
-      CLIPBOARD_DATA_FORMAT,
-      JSON.stringify(hexxCopy),
-    );
-    e.clipboardData?.setData('text/plain', text);
-    e.clipboardData?.setData('text/html', html.innerHTML);
-  };
+      const text = selectedBlockNodeList
+        .map((s) => s?.textContent)
+        .join('\n\n');
+
+      const htmlArray = selectedBlockNodeList.map(
+        (s) => s?.innerHTML,
+      ); // TODO: xss
+      let html = document.createElement('div');
+      for (const innerHTML of htmlArray) {
+        const frag = document.createElement('p');
+        frag.innerHTML = innerHTML!;
+        html.appendChild(frag);
+      }
+      e.clipboardData?.setData(
+        CLIPBOARD_DATA_FORMAT,
+        JSON.stringify(blocksToClip),
+      );
+      e.clipboardData?.setData('text/plain', text);
+      e.clipboardData?.setData('text/html', html.innerHTML);
+    }, []),
+    _hexxScope,
+  );
 
   useEventListener('copy', handleClipboardEvent, wrapperRef);
   useEventListener(
@@ -154,11 +162,11 @@ function useBlockSelectCopy() {
     (e) => {
       if (blockSelect.size > 0) {
         setData(e);
-        setIdList((s) => s.filter((id) => !blockSelect.has(id)));
+        setBlocks((s) => s.filter((b) => !blockSelect.has(b)));
         e.preventDefault();
       } else if (isSelectAll) {
         setData(e);
-        setIdList([]);
+        setBlocks([]);
         e.preventDefault();
       }
     },
@@ -168,24 +176,25 @@ function useBlockSelectCopy() {
 
 const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   const [uiState, setUIState] = useAtom(uiStateAtom);
-  const [blockIdList, setBlockIdList] = useAtom(blockIdListAtom);
-  const [blockIdMap] = useAtom(blocksIdMapAtom);
   const [blockSelect, setBlockSelect] = useAtom(blockSelectAtom);
   const [isSelectAll, setIsSelectAll] = useAtom(
     isEditorSelectAllAtom,
   );
+
+  const [blocks, setBlocks] = useAtom(blocksAtom);
+
   const [, setWrapperRef] = useAtom(editorWrapperAtom);
   const editor = useEditor();
-  const { insertBlock, clear, batchRemoveBlocks } = editor;
+  const { clear, batchRemoveBlocks } = editor;
 
-  useEffect(() => {
-    if (
-      blockIdList.length === 0 ||
-      Object.keys(blockIdMap).length === 0
-    ) {
-      insertBlock({ block: props.defaultBlock, index: 0 });
-    }
-  }, [blockIdList, blockIdMap]);
+  // useEffect(() => {
+  //   if (
+  //     blockIdList.length === 0 ||
+  //     Object.keys(blockIdMap).length === 0
+  //   ) {
+  //     insertBlock({ block: props.defaultBlock, index: 0 });
+  //   }
+  // }, [blockIdList, blockIdMap]);
 
   useEffect(() => {
     props.onLoad?.();
@@ -200,20 +209,20 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
   }) => {
     if (blockSelect.size > 1) {
       const dragBlock = [...blockSelect].sort((a, b) => {
-        return blockIdList.indexOf(a) - blockIdList.indexOf(b);
+        return blocks.indexOf(a) - blocks.indexOf(b);
       });
-      const items = blockIdList.filter((v) => !blockSelect.has(v));
+      const items = blocks.filter((v) => !blockSelect.has(v));
       const newBlocks = [
         ...items.slice(0, newIndex),
         ...dragBlock,
         ...items.slice(newIndex, items.length),
       ];
-      setBlockIdList(newBlocks);
+      setBlocks(newBlocks);
     } else {
-      const newBlocks = [...blockIdList];
+      const newBlocks = [...blocks];
       const dragBlock = newBlocks.splice(oldIndex, 1);
       newBlocks.splice(newIndex, 0, dragBlock[0]);
-      setBlockIdList(newBlocks);
+      setBlocks(newBlocks);
     }
     setUIState((s) => ({
       ...s,
@@ -222,9 +231,15 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }));
   };
 
+  const getData = useAtomCallback(
+    useCallback((get) => {
+      return get(blocksDataAtom);
+    }, []),
+    _hexxScope,
+  );
+
   useImperativeHandle(ref, () => ({
-    getData: () =>
-      blockIdList.map((bId) => blockIdMap[bId]).filter(Boolean),
+    getData,
     focus: (
       { index, preventScroll } = {
         index: undefined,
@@ -244,13 +259,48 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     redo: redo,
   }));
 
+  const wrapperRef = useRef<HTMLDivElement>();
+
+  const composeRef = (node) => {
+    wrapperRef.current = node;
+    if (props.wrapperRef) {
+      props.wrapperRef.current = node;
+    }
+  };
+
+  useEffect(() => {
+    if (wrapperRef.current) {
+      setWrapperRef(wrapperRef.current);
+    }
+  }, []);
+
+  const blocksWithFilters = useMemo(() => {
+    return blocks.filter((block) => {
+      // Do not hide the ghost of the element currently being sorted
+      if (uiState.sortingItemKey === block) {
+        return true;
+      }
+
+      // Hide the other items that are selected
+      if (uiState.isSorting && blockSelect.has(block)) {
+        return false;
+      }
+
+      // Do not hide any other items
+      return true;
+    });
+  }, [
+    uiState.sortingItemKey,
+    uiState.isSorting,
+    blockSelect,
+    blocks,
+  ]);
+
   return (
     <Wrapper
       css={props.css}
-      ref={
-        composeRefs(props.wrapperRef, (s) => setWrapperRef(s)) as any
-      }
-      className={`hexx ${css(paragraphStyle)}`}
+      ref={composeRef}
+      className={`hexx ${css(paragraphStyle)()}`}
       onKeyDown={(e) => {
         if (e.key === BackspaceKey && isSelectAll) {
           clear();
@@ -260,7 +310,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
             lastCursor();
           });
         } else if (e.key === BackspaceKey && blockSelect.size > 0) {
-          batchRemoveBlocks({ ids: [...blockSelect] });
+          batchRemoveBlocks([...blockSelect]);
           setBlockSelect(new Set([]));
         }
       }}
@@ -278,28 +328,15 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
           setUIState((s) => ({
             ...s,
             isSorting: true,
-            sortingItemKey: blockIdList[index],
+            sortingItemKey: blocks[index],
           }));
         }}
         onSortStart={(_, event) => event.preventDefault()}
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
-        blockIdList={blockIdList.filter((id) => {
-          // Do not hide the ghost of the element currently being sorted
-          if (uiState.sortingItemKey === id) {
-            return true;
-          }
-
-          // Hide the other items that are selected
-          if (uiState.isSorting && blockSelect.has(id)) {
-            return false;
-          }
-
-          // Do not hide any other items
-          return true;
-        })}
-        blockIdMap={blockIdMap}
+        blocks={blocksWithFilters}
+        pressThreshold={300}
       />
       {!props.autoFocus && <AutoFocusInput />}
     </Wrapper>
@@ -330,29 +367,24 @@ function AutoFocusInput() {
 }
 
 const SortableBlockList = SortableContainer(
-  ({
-    blockCss,
-    blockIdList,
-    blockIdMap,
-  }: {
-    blockCss: any;
-    blockIdList: string[];
-    blockIdMap: Record<string, BlockType>;
-  }) => (
-    <div
-      className={css({
-        width: '100%',
-      })()}
-    >
-      {blockIdList.map(
-        (bId, i) =>
-          bId &&
-          blockIdMap[bId] && (
-            <Block key={bId} css={blockCss} id={bId} index={i} />
-          ),
-      )}
-    </div>
-  ),
+  ({ blockCss, blocks }: { blockCss: any; blocks: BlockAtom[] }) => {
+    return (
+      <div
+        className={css({
+          width: '100%',
+        })()}
+      >
+        {blocks.map((blockAtom, i) => (
+          <Block
+            index={i}
+            key={blockAtom.toString()}
+            blockAtom={blockAtom}
+            css={blockCss}
+          />
+        ))}
+      </div>
+    );
+  },
 );
 
 export const Editor = forwardRef<HexxHandler, EditorProps>(
@@ -361,18 +393,25 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
       type: TextBlock.block.type,
       data: TextBlock.block.defaultValue,
     };
-    const [initialData] = useState(() => normalize(props.data, 'id'));
+
+    const initDataAtom = useMemo(() => {
+      const dataAtom = createAtom(props.data || []);
+      return splitAtom(dataAtom);
+    }, []);
+
+    const [initData] = useAtom(initDataAtom);
+
     return (
       <Provider
         scope={_hexxScope}
-        // @ts-ignore
-        initialValues={[
-          [_blockIdListAtom, initialData.ids],
-          [_blocksIdMapAtom, initialData.byId],
-          [editorDefaultBlockAtom, defaultBlock],
-          [editorIdAtom, v4()],
-          [blockMapAtom, props.blockMap],
-        ]}
+        initialValues={
+          [
+            [editorDefaultBlockAtom, defaultBlock],
+            [editorIdAtom, v4()],
+            [blockMapAtom, props.blockMap],
+            [_blocksAtom, initData],
+          ] as const
+        }
       >
         <Hexx
           ref={ref}

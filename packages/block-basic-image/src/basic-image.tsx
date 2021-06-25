@@ -1,8 +1,7 @@
 import { applyBlock, BlockProps, useBlock } from '@hexx/editor';
 import { PlaceholderButton } from '@hexx/editor/components';
-import { memo } from 'react';
-import { Image } from 'mdast';
 import { css } from '@hexx/theme';
+import { Image } from 'mdast';
 import { AspectRatioImage } from './renderer';
 import { SvgImage } from './svg-image';
 
@@ -10,57 +9,60 @@ interface Config {
   onInput: (files: File[] | FileList) => Promise<string>;
 }
 
-const _BasicImageBlock = memo<BlockProps<Config>>(
-  ({ id, index, config }) => {
-    const { update, block } = useBlock(id, index);
-    const handleImageUpdate = (url: string) => {
-      update({
-        ...block,
-        data: {
-          ...block.data,
-          url,
-        },
-      });
-    };
+const _BasicImageBlock = ({
+  id,
+  index,
+  config,
+  blockAtom,
+}: BlockProps<Config>) => {
+  const { update, block } = useBlock(blockAtom, index);
+  const handleImageUpdate = (url: string) => {
+    update({
+      ...block,
+      data: {
+        ...block.data,
+        url,
+      },
+    });
+  };
 
-    if (block?.data?.url) {
-      return <AspectRatioImage data={block.data} />;
-    }
+  if (block?.data?.url) {
+    return <AspectRatioImage data={block.data} />;
+  }
 
-    return (
-      <PlaceholderButton
-        icon="leftIcon"
-        onClick={(e) => {
-          e.stopPropagation();
+  return (
+    <PlaceholderButton
+      icon="leftIcon"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <SvgImage />
+      <span>Add an image</span>
+      <input
+        hidden
+        type="file"
+        id={id}
+        accept="image/*"
+        onChange={(e) => {
+          if (e.target.files && config?.onInput) {
+            config.onInput(e.target.files).then(handleImageUpdate);
+          }
         }}
-      >
-        <SvgImage />
-        <span>Add an image</span>
-        <input
-          hidden
-          type="file"
-          id={id}
-          accept="image/*"
-          onChange={(e) => {
-            if (e.target.files && config?.onInput) {
-              config.onInput(e.target.files).then(handleImageUpdate);
-            }
-          }}
-        />
-        <label
-          className={css({
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-          })()}
-          htmlFor={id}
-        ></label>
-      </PlaceholderButton>
-    );
-  },
-);
+      />
+      <label
+        className={css({
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        })()}
+        htmlFor={id}
+      ></label>
+    </PlaceholderButton>
+  );
+};
 
 export const BasicImageBlock = applyBlock<any, Config>(
   _BasicImageBlock,

@@ -1,10 +1,12 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { activeBlockIdAtom } from '../constants/atom';
+import {
+  activeBlockAtom
+} from '../constants/atom';
 import { debounce } from '../utils/debounce';
 
 export const useActiveBlockId = () => {
-  const [active, setActive] = useAtom(activeBlockIdAtom);
+  const [active, setActive] = useAtom(activeBlockAtom);
 
   const handleClick = () => {
     if (document.activeElement) {
@@ -15,14 +17,13 @@ export const useActiveBlockId = () => {
       if (isActiveElementEditable) {
         editable = document.activeElement;
       }
-      const closetBlockId = document.activeElement.closest(
-        '[data-block-id]',
-      );
+      const closetBlockId =
+        document.activeElement.closest('[data-block-id]');
       if (closetBlockId) {
         const blockId = closetBlockId.getAttribute('data-block-id');
         setActive({
-          id: blockId,
-          blockEl: closetBlockId,
+          id: blockId!,
+          blockEl: closetBlockId as HTMLDivElement,
           editable,
         });
       } else {

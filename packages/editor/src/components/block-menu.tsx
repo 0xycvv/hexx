@@ -1,48 +1,35 @@
+import { useAtom } from 'jotai';
 import { createElement, Fragment, useMemo } from 'react';
+import { BlockAtom } from '../constants/atom';
 import { useEditor } from '../hooks';
-import { isBlockEmpty } from '../utils/blocks';
+import { BlockType, isBlockEmpty } from '../utils/blocks';
 
 export type BlockMenuItem = { type: string; config?: any } | string;
 
 export function BlockMenu(props: {
   onAdd?: () => void;
   menu?: BlockMenuItem[];
+  blockAtom: BlockAtom;
 }) {
-  const {
-    blockMap,
-    lastHoverBlock,
-    insertBlockAfter,
-    setIdMap,
-    getBlock,
-  } = useEditor();
+  const { blockMap, insertBlockAfter } = useEditor();
+  const [block, setBlock] = useAtom(props.blockAtom);
 
-  const handleAddBlock = (blockType) => {
-    if (!lastHoverBlock) return;
+  const handleAddBlock = (blockType: BlockType) => {
+    if (!block) return;
     const blockToAdd = {
-      type: blockType.block.type,
-      data: blockType.block.defaultValue,
+      type: blockType.type,
+      // @ts-ignore
+      data: blockType.defaultValue,
     };
-    getBlock({ id: lastHoverBlock.id }).then((block) => {
-      const isEmpty = isBlockEmpty(blockMap[block.type], block.data);
-      if (isEmpty) {
-        setIdMap((s) => ({
-          ...s,
-          [lastHoverBlock.id]: {
-            id: lastHoverBlock.id,
-            ...blockToAdd,
-          },
-        }));
-      } else {
-        insertBlockAfter({
-          block: {
-            type: blockType.block.type,
-            data: blockType.block.defaultValue,
-          },
-          id: lastHoverBlock.id,
-        });
-      }
-      props.onAdd?.();
-    });
+    if (isBlockEmpty(blockMap[block.type], block.data)) {
+      setBlock((s) => ({ ...s, ...blockToAdd }));
+    } else {
+      insertBlockAfter({
+        block: blockToAdd,
+        atom: props.blockAtom,
+      });
+    }
+    props.onAdd?.();
   };
 
   const menuList = useMemo(() => {
@@ -75,10 +62,10 @@ export function BlockMenu(props: {
             onKeyPress: (e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                handleAddBlock(blockType);
+                handleAddBlock(blockType.block);
               }
             },
-            onClick: () => handleAddBlock(blockType),
+            onClick: () => handleAddBlock(blockType.block),
           })}
         </Fragment>
       ))}

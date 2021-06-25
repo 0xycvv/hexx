@@ -1,20 +1,20 @@
-import * as React from 'react';
-import * as mdast from 'mdast';
-import { quoteStyle, Quote } from '@hexx/renderer';
-import composeRefs from '../..//hooks/use-compose-ref';
-import { useBlock } from '../../hooks/use-editor';
+import { Quote, quoteStyle } from '@hexx/renderer';
 import { css } from '@hexx/theme';
+import * as mdast from 'mdast';
+import * as React from 'react';
+import composeRefs from '../..//hooks/use-compose-ref';
 import { lastCursor } from '../..//utils/find-blocks';
+import { useBlock } from '../../hooks/use-editor';
+import { applyBlock, BlockProps } from '../../utils/blocks';
 import { Editable } from '../editable';
 import { quote as QuoteSvg } from '../icons';
-import { applyBlock, BlockProps } from '../../utils/blocks';
 
 function _QuoteBlock({
   config,
   index,
-  id,
+  blockAtom,
 }: BlockProps<{ placeholder: string }>) {
-  const { update, register, block } = useBlock(id, index);
+  const { update, register, block } = useBlock(blockAtom, index);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     ref.current?.focus();
@@ -22,10 +22,10 @@ function _QuoteBlock({
   }, []);
 
   return (
-    <blockquote className={css(quoteStyle.wrapper)}>
+    <blockquote className={css(quoteStyle.wrapper)()}>
       <Editable
         placeholder={config?.placeholder}
-        className={css(quoteStyle.text)}
+        className={css(quoteStyle.text)()}
         onChange={(evt) => {
           update({
             ...block,
@@ -44,7 +44,7 @@ function _QuoteBlock({
 export const QuoteBlock = applyBlock<
   Quote['data'],
   { placeholder: string }
->(React.memo(_QuoteBlock), {
+>(_QuoteBlock, {
   type: 'quote',
   icon: {
     text: 'Quote',

@@ -10,7 +10,8 @@ export function DataViewer(props: {
   const [data, setData] = useState<BlockType<any>[]>();
 
   useEffect(() => {
-    setData(props.editor.getData());
+    props.editor.getData().then(setData);
+    console.log('get data');
   }, [props.editor]);
 
   useEffect(() => {

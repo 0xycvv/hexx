@@ -6,15 +6,17 @@ import dynamic from 'next/dynamic';
 import { styled } from '@hexx/theme';
 import { GetStaticProps } from 'next';
 import { BlockType, createHexxMarkdownParser } from '@hexx/editor';
-import { blockMap } from 'lib/block-map';
 import { JSDOM } from 'jsdom';
 
-const EditorExample = dynamic(
-  () => import('../components/editor-example'),
-  {
-    ssr: true,
-  },
-);
+import { EditorRenderer, BlockMap } from '@hexx/renderer';
+import { blockMap } from 'lib/block-map';
+import { CodeBlockRenderer } from '@hexx/block-code';
+import { editorStyles } from 'lib/common-style';
+
+const renderBlockMap = {
+  ...BlockMap,
+  code: CodeBlockRenderer,
+};
 
 const Header = styled('header', {
   width: '100%',
@@ -54,7 +56,16 @@ export default function Home(props: { json?: BlockType<any>[] }) {
         </Logo>
       </Header>
       <main className={styles.main}>
-        <EditorExample data={props.json} />
+        <EditorRenderer
+          wrapper={{
+            css: editorStyles.css,
+          }}
+          blockWrapper={{
+            css: editorStyles.blockCss,
+          }}
+          blocks={props.json}
+          blockMap={renderBlockMap}
+        />
       </main>
     </div>
   );
