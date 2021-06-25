@@ -3,7 +3,6 @@ import { styled } from '@hexx/theme';
 import Highlight, { Prism, PrismTheme } from 'prism-react-renderer';
 import * as React from 'react';
 import Editor from 'react-simple-code-editor';
-import { BackspaceKey } from '../../editor/src/constants/key';
 import { codeBlockStyle, TCodeBlock } from './renderer';
 import SvgCode from './svg';
 
@@ -80,7 +79,7 @@ function _CodeBlock({
         if (e.key === 'Enter' && !e.shiftKey) {
           e.stopPropagation();
         }
-        if (e.key === BackspaceKey) {
+        if (e.key === 'Backspace') {
           e.stopPropagation();
         }
       }}
