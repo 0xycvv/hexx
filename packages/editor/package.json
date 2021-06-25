@@ -48,7 +48,6 @@
     "rehype-dom-parse": "^3.0.0",
     "rehype-remark": "^8.0.0",
     "unified": "^9.2.1",
-    "use-editable": "^2.3.3",
     "uuid": "^8.3.2"
   },
   "size-limit": [

@@ -25,6 +25,7 @@ import Linkify from 'linkify-it';
 import { ElementRef, useCallback, useRef, useState } from 'react';
 import tlds from 'tlds';
 import { DataViewer } from './data-viewer';
+import { editorStyles } from 'lib/common-style';
 
 const linkify = Linkify();
 
@@ -68,19 +69,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
       <Editor
         ref={editorRef as any}
         onLoad={onLoadLocalStorage}
-        blockCss={{
-          marginTop: 8,
-          marginBottom: 8,
-          maxWidth: '720px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-        css={{
-          paddingLeft: '2rem',
-          paddingRight: '3.75rem',
-          maxWidth: '960px',
-          margin: 'auto',
-        }}
+        {...editorStyles}
         {...props}
         blockMap={blockMap}
       >
@@ -88,7 +77,7 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         <TuneButton />
         <EditorWidthPlugin />
         <HistoryPlugin />
-        <SelectionPlugin enableInputCrossSelection />
+        {/* <SelectionPlugin  /> */}
         <HexxDevTool />
         <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>

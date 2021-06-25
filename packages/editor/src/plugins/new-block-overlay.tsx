@@ -62,7 +62,7 @@ export function NewBlockOverlayPlugin(props: {
             ) {
               const lastBlock = findLastBlock();
               if (lastBlock?.editable) {
-                lastBlock.editable.focus();
+                // lastBlock.editable.focus();
               } else {
                 insertBlock({ block: defaultBlock });
               }
@@ -73,7 +73,7 @@ export function NewBlockOverlayPlugin(props: {
             insertBlock({ block: defaultBlock });
           }
         } else {
-          activeBlock?.editable?.focus();
+          // activeBlock?.editable?.focus();
         }
       },
       [lastBlock],

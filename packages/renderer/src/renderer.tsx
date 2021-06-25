@@ -14,43 +14,16 @@ interface EditorRendererProps {
 
 const Wrapper = styled('div', {
   position: 'relative',
-  WebkitBoxSizing: 'border-box',
-  boxSizing: 'border-box',
+  width: '100%',
+  maxWidth: '100%',
+  fontSize: 16,
+  lineHeight: 1.5,
   zIndex: 1,
-  'div:first-of-type': {
-    marginTop: 0,
-  },
-  h1: {
-    fontSize: '2.5rem',
-    fontWeight: 700,
-  },
-  h2: {
-    fontSize: '2rem',
-    fontWeight: 700,
-  },
-  h3: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-  },
-  h4: {
-    fontSize: '1.25rem',
-    fontWeight: 700,
-  },
-  h5: {
-    fontSize: '1rem',
-    fontWeight: 700,
-  },
-  h6: {
-    fontSize: '0.875rem',
-    fontWeight: 700,
-  },
+  color: 'rgb(55, 53, 47)',
 });
 
 const BlockWrapper = styled('div', {
   position: 'relative',
-  paddingTop: 16,
-  paddingBottom: 16,
-  padding: '.4em 0',
   margin: '0 auto',
   maxWidth: 650,
 });

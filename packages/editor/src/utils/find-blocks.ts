@@ -198,14 +198,14 @@ export function focusWithLastCursor(
 }
 
 export function lastCursor() {
-  if (isBrowser()) {
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) {
-      return;
-    }
-    document.execCommand('selectAll', false);
-    document.getSelection()?.collapseToEnd();
-  }
+  // if (isBrowser()) {
+  //   const selection = window.getSelection();
+  //   if (!selection || !selection.rangeCount) {
+  //     return;
+  //   }
+  //   document.execCommand('selectAll', false);
+  //   document.getSelection()?.collapseToEnd();
+  // }
 }
 
 export function surround(

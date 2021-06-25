@@ -4,6 +4,7 @@ import { Provider, useAtom } from 'jotai';
 import { splitAtom, useAtomCallback } from 'jotai/utils';
 import {
   forwardRef,
+  memo,
   MutableRefObject,
   ReactNode,
   useCallback,
@@ -40,6 +41,7 @@ import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
+import { useWhyDidYouUpdate } from '../../hooks/use-why-did-you-update';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
 import { PastHtmlPlugin } from '../../plugins/paste';
@@ -272,6 +274,28 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
     }
   }, []);
 
+  const blocksWithFilters = useMemo(() => {
+    return blocks.filter((block) => {
+      // Do not hide the ghost of the element currently being sorted
+      if (uiState.sortingItemKey === block) {
+        return true;
+      }
+
+      // Hide the other items that are selected
+      if (uiState.isSorting && blockSelect.has(block)) {
+        return false;
+      }
+
+      // Do not hide any other items
+      return true;
+    });
+  }, [
+    uiState.sortingItemKey,
+    uiState.isSorting,
+    blockSelect,
+    blocks,
+  ]);
+
   return (
     <Wrapper
       css={props.css}
@@ -311,20 +335,8 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         useDragHandle
         onSortEnd={onDragEndHandler}
         blockCss={props.blockCss}
-        blocks={blocks.filter((block) => {
-          // Do not hide the ghost of the element currently being sorted
-          if (uiState.sortingItemKey === block) {
-            return true;
-          }
-
-          // Hide the other items that are selected
-          if (uiState.isSorting && blockSelect.has(block)) {
-            return false;
-          }
-
-          // Do not hide any other items
-          return true;
-        })}
+        blocks={blocksWithFilters}
+        pressThreshold={300}
       />
       {!props.autoFocus && <AutoFocusInput />}
     </Wrapper>

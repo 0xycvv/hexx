@@ -12,6 +12,7 @@ export function InlineMarker({
   highlightColor?: string;
 }) {
   const { getProps, setIsActive } = useInlineTool({
+    shortcut: '⌘ + h',
     onToggle: (isActive) => {
       if (!isActive) {
         document.execCommand('removeFormat');
@@ -21,6 +22,7 @@ export function InlineMarker({
         surround('span', {
           backgroundColor: 'rgba(228, 178, 2, 0.18)',
         });
+        document.execCommand('unlink'); // trigger onchange
         setIsActive(true);
       }
     },

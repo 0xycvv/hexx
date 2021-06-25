@@ -6,12 +6,14 @@ import { getSelectionRange } from '../../../utils/ranges';
 import { StitchesProps } from '@hexx/theme';
 export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
   const { getProps, setIsActive } = useInlineTool({
+    shortcut: '⌘ + e',
     onToggle: (isActive) => {
       if (!isActive) {
         document.execCommand('removeFormat');
         setIsActive(false);
       } else {
         surround('code');
+        document.execCommand('unlink'); // trigger onchange
         setIsActive(true);
       }
     },
