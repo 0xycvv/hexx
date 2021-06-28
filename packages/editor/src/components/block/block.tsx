@@ -19,7 +19,7 @@ import { useEditor } from '../../hooks/use-editor';
 import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
-  findContentEditable,
+  findInputs,
   focusContentEditable,
   focusLastBlock,
   lastCursor,
@@ -257,10 +257,12 @@ function useBlockWrapper({
       onMouseEnter: setHover,
       onClick: (e) => {
         if (!ref.current) return;
-        const editable = findContentEditable(ref.current);
-        if (!editable) {
-          setBlockSelect(new Set(block.id));
+        const inputs = findInputs(ref.current);
+        if (!inputs?.length) {
+          setBlockSelect(new Set([block.id]));
           e.stopPropagation();
+        } else {
+          setBlockSelect(new Set([]));
         }
         setHover();
       },

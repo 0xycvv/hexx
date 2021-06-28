@@ -153,6 +153,20 @@ export function findContentEditable(
   return editable as HTMLDivElement;
 }
 
+export function findInputs(el?: HTMLElement) {
+  if (!el) {
+    return;
+  }
+  const nodeList = el.querySelectorAll('[contenteditable]');
+  const inputs = el.querySelectorAll('input');
+  const textarea = el.querySelectorAll('textarea');
+  return [
+    ...Array.from(nodeList),
+    ...Array.from(inputs),
+    ...Array.from(textarea),
+  ];
+}
+
 export function findLastBlock() {
   const el =
     document.querySelectorAll(`[data-block-id]`)[

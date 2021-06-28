@@ -16,12 +16,12 @@
     "@preconstruct/next": "^3.0.0",
     "jsdom": "^16.6.0",
     "linkify-it": "^3.0.2",
-    "next": "10.2.3",
+    "next": "11.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "tlds": "^1.221.1"
   },
   "devDependencies": {
-    "@types/jsdom": "^16.2.11"
+    "@types/jsdom": "^16.2.12"
   }
 }
