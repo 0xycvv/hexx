@@ -1,4 +1,4 @@
-import { StitchesCssProp } from '@hexx/theme';
+import { CSS } from '@hexx/theme';
 import { PrimitiveAtom } from 'jotai';
 import { BlockContent, PhrasingContent } from 'mdast';
 import { FunctionComponent, ReactNode } from 'react';
@@ -12,10 +12,6 @@ export type BlockType<T = any> = {
 interface BlockConfig<Data, Config> {
   type: string;
   config?: Config;
-  icon?: {
-    text: string;
-    svg: any;
-  };
   defaultValue: Partial<Data>;
   isEmpty?: (d: Data) => boolean;
   mdast?: {
@@ -27,15 +23,7 @@ interface BlockConfig<Data, Config> {
       toHTML: (child: BlockContent['children']) => HTMLElement,
     ) => Data;
   };
-  tune?: Array<{
-    icon: {
-      text: string;
-      svg: any;
-      isActive?: (data: Data) => boolean;
-    };
-    updater: (data: Data) => Data;
-  }>;
-  css?: StitchesCssProp;
+  css?: CSS;
   [x: string]: any;
 }
 
@@ -45,7 +33,7 @@ export interface BlockProps<C = {}, D = any> {
   config?: C;
   children?: ReactNode;
   blockAtom: PrimitiveAtom<BlockType<D>>;
-  css?: StitchesCssProp;
+  css?: CSS;
 }
 
 interface BlockComponentBefore<BlockData = unknown, Config = unknown>

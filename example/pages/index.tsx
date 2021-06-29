@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { styled } from '@hexx/theme';
 import { GetStaticProps } from 'next';
 import { BlockType, createHexxMarkdownParser } from '@hexx/editor';
-import { blockMap } from 'lib/block-map';
+import { scope } from 'lib/edit-scope';
 import { JSDOM } from 'jsdom';
 
 const EditorExample = dynamic(
@@ -61,7 +61,7 @@ export default function Home(props: { json?: BlockType<any>[] }) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const markdownParser = createHexxMarkdownParser(blockMap, {
+  const markdownParser = createHexxMarkdownParser(scope, {
     // to support ssr or ssg you have to use jsdom in markdown parser
     document: new JSDOM().window.document,
     autoGenerateId: true,

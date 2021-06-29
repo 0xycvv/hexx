@@ -1,8 +1,7 @@
 import { atom, PrimitiveAtom } from 'jotai';
-import { atomFamily, atomWithReset } from 'jotai/utils';
+import { atomWithReset } from 'jotai/utils';
 import { SetStateAction } from 'react';
-import { BlockType, BlockComponent } from '../utils/blocks';
-import { debounce } from '../utils/debounce';
+import { BlockComponent, BlockType } from '../utils/blocks';
 
 export type BlockAtom<T = any> = PrimitiveAtom<BlockType<T>>;
 
@@ -155,10 +154,10 @@ export const blockSelectAtom = atom(
 
 blockSelectAtom.scope = _hexxScope;
 
-export const blockMapAtom = atom<
+export const blockScopeAtom = atom<
   Record<string, BlockComponent<any, any>>
 >({});
-blockMapAtom.scope = _hexxScope;
+blockScopeAtom.scope = _hexxScope;
 
 export const _blockIdListAtom = atom<string[]>([]);
 _blockIdListAtom.scope = _hexxScope;
@@ -199,27 +198,3 @@ function updateHistory(data) {
     history.shift();
   }
 }
-
-const debounceUpdateHistory = debounce(updateHistory, 200, false);
-
-export const blockIdListAtom = atom(
-  (get) => get(_blockIdListAtom),
-  (get, set, arg: SetStateAction<string[]>) => {
-    const oldValue = get(_blockIdListAtom);
-    set(_blockIdListAtom, arg);
-    const newValue = get(_blockIdListAtom);
-    updateHistory({
-      label: `${JSON.stringify(oldValue)} -> ${JSON.stringify(
-        newValue,
-      )}`,
-      undo: () => {
-        set(_blockIdListAtom, oldValue);
-      },
-      redo: () => {
-        set(_blockIdListAtom, newValue);
-      },
-    });
-  },
-);
-
-blockIdListAtom.scope = _hexxScope;

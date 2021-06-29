@@ -1,9 +1,4 @@
-import {
-  createCss,
-  TCssProp,
-  StitchesProps,
-  TCssWithBreakpoints,
-} from '@stitches/react';
+import { createCss, StitchesCss } from '@stitches/react';
 
 const config = {
   prefix: 'hexx',
@@ -28,15 +23,9 @@ const config = {
   },
 };
 
-export const { css, styled, global, getCssString } = createCss(
-  config,
-);
+export const stitchesCss = createCss(config);
 
-export type { StitchesProps };
+export const { css, styled, global, getCssString } = stitchesCss;
 
-export type StitchesStyleObject = Record<
-  string,
-  TCssProp<typeof config>
->;
+export type CSS = StitchesCss<typeof stitchesCss>;
 
-export type StitchesCssProp = TCssWithBreakpoints<typeof config>;

@@ -1,4 +1,4 @@
-import { css, StitchesStyleObject } from '@hexx/theme';
+import { css, CSS } from '@hexx/theme';
 import * as React from 'react';
 
 export type Delimiter = {
@@ -6,7 +6,7 @@ export type Delimiter = {
   data: {};
 };
 
-export const dividerStyles: StitchesStyleObject = {
+export const dividerStyles: CSS = {
   lineHeight: '1.6em',
   width: '100%',
   height: 'auto',

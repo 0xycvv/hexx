@@ -1,15 +1,15 @@
-import { StitchesProps, styled } from '@hexx/theme';
+import { styled } from '@hexx/theme';
 import * as React from 'react';
 import { BlockData } from './types';
 
 interface EditorRendererProps {
   blocks: BlockData[];
-  blockMap: {
+  scope: {
     [x: string]: any;
   };
   maxWidth?: string;
-  wrapper?: StitchesProps<typeof Wrapper>;
-  blockWrapper?: StitchesProps<typeof BlockWrapper>;
+  wrapper?: React.ComponentProps<typeof Wrapper>;
+  blockWrapper?: React.ComponentProps<typeof BlockWrapper>;
 }
 
 const Wrapper = styled('div', {
@@ -30,7 +30,7 @@ const BlockWrapper = styled('div', {
 
 export function EditorRenderer({
   blocks,
-  blockMap,
+  scope,
   maxWidth = '720px',
   blockWrapper,
   wrapper,
@@ -40,11 +40,8 @@ export function EditorRenderer({
   }
   const content = React.Children.toArray(
     blocks.map((block) => {
-      let Renderer = blockMap[block?.type];
+      let Renderer = scope[block?.type];
       if (!Renderer) {
-        return null;
-      }
-      if (typeof block.data !== 'object') {
         return null;
       }
       const hasStretched =

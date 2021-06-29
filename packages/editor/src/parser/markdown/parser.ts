@@ -4,15 +4,15 @@ import toDOM from 'hast-util-to-dom';
 import fromMarkdown from 'mdast-util-from-markdown';
 import { BlockComponent, BlockType } from '../../utils/blocks';
 import { isAvailableBlockContent } from '../html/parser';
-import { AllMdastConfig, MdastConfig } from '../types';
+import { MdastConfigs, MdastConfig } from '../types';
 import { BlockData } from '@hexx/renderer/src/types';
 import { v4 } from 'uuid';
 
 export function createHexxMarkdownParser(
-  blockMap: Record<string, BlockComponent<any, any>>,
+  blockScope: Record<string, BlockComponent<any, any>>,
   config?: MDToDataConfig,
 ) {
-  const allMdastConfig = getAllMdastConfig(blockMap);
+  const allMdastConfig = getAllMdastConfig(blockScope);
   return {
     toData: (markdown: string) =>
       markdownToData(allMdastConfig, markdown, config),
@@ -26,7 +26,7 @@ interface MDToDataConfig {
 }
 
 function markdownToData(
-  allMdastConfig: AllMdastConfig,
+  allMdastConfig: MdastConfigs,
   markdown: string,
   config?: MDToDataConfig,
 ) {
@@ -34,7 +34,7 @@ function markdownToData(
   return mdastToData(allMdastConfig, mdast, config);
 }
 export function mdastToData(
-  allMdastConfig: AllMdastConfig,
+  allMdastConfig: MdastConfigs,
   mdast: Parent,
   config?: MDToDataConfig,
 ) {
@@ -66,10 +66,10 @@ export function mdastToData(
 }
 
 export function getAllMdastConfig(
-  blockMap: Record<string, BlockComponent<any, any>>,
+  blockScope: Record<string, BlockComponent<any, any>>,
 ) {
-  let result = {} as AllMdastConfig;
-  const arrayTagsConfig = Object.values(blockMap)
+  let result = {} as MdastConfigs;
+  const arrayTagsConfig = Object.values(blockScope)
     .map((map) => {
       if (map.block?.mdast) {
         return {

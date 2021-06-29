@@ -9,3 +9,4 @@ export * from './local-storage';
 export * from './editor-width';
 export * from './linkify-it';
 export * from './markdown-shortcut';
+export * from './paste';

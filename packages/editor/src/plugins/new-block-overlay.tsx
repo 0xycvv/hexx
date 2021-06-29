@@ -27,7 +27,8 @@ export function NewBlockOverlayPlugin(props: {
 
   const [lastBlock] = useAtom($lastBlockAtom);
 
-  const { blockSelect, selectBlock, insertBlock, blockMap } = editor;
+  const { blockSelect, selectBlock, insertBlock, blockScope } =
+    editor;
 
   const handleClick = useAtomCallback(
     useCallback(
@@ -52,7 +53,7 @@ export function NewBlockOverlayPlugin(props: {
             if (!lastBlockType) {
               return;
             }
-            const blockType = blockMap[lastBlockType.type];
+            const blockType = blockScope[lastBlockType.type];
 
             if (
               blockType &&

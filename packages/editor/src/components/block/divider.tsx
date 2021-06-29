@@ -7,12 +7,5 @@ const Render = () => <DelimiterRenderer />;
 
 export const Divider = applyBlock<{}, {}>(Render, {
   type: 'delimiter',
-  icon: {
-    text: 'Divider',
-    svg: DividerSvg,
-  },
-  mdast: {
-    type: 'thematicBreak',
-  },
   defaultValue: {},
 });

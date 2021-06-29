@@ -8,13 +8,13 @@ import { GetStaticProps } from 'next';
 import { BlockType, createHexxMarkdownParser } from '@hexx/editor';
 import { JSDOM } from 'jsdom';
 
-import { EditorRenderer, BlockMap } from '@hexx/renderer';
-import { blockMap } from 'lib/block-map';
+import { EditorRenderer, PresetScope } from '@hexx/renderer';
+import { scope } from 'lib/edit-scope';
 import { CodeBlockRenderer } from '@hexx/block-code';
 import { editorStyles } from 'lib/common-style';
 
-const renderBlockMap = {
-  ...BlockMap,
+const renderScope = {
+  ...PresetScope,
   code: CodeBlockRenderer,
 };
 
@@ -64,7 +64,7 @@ export default function Home(props: { json?: BlockType<any>[] }) {
             css: editorStyles.blockCss,
           }}
           blocks={props.json}
-          blockMap={renderBlockMap}
+          scope={renderScope}
         />
       </main>
     </div>
@@ -72,7 +72,7 @@ export default function Home(props: { json?: BlockType<any>[] }) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const markdownParser = createHexxMarkdownParser(blockMap, {
+  const markdownParser = createHexxMarkdownParser(scope, {
     // to support ssr or ssg you have to use jsdom in markdown parser
     document: new JSDOM().window.document,
     autoGenerateId: true,

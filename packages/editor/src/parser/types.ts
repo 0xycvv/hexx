@@ -1,12 +1,12 @@
-import { Content } from 'mdast';
+import { BlockContent, Content } from 'mdast';
 import { BlockType } from '../utils/blocks';
 
 export type MdastConfig<K = Content['type']> = {
   type: K;
-  in: (content: Content, toHTML: Function) => BlockType['data'];
+  in?: (content: any, toHTML: Function) => any;
 };
-export type AllMdastConfig = {
-  [key in Content['type']]: {
+export type MdastConfigs = {
+  [key in string]: {
     blockType: string;
   } & MdastConfig;
 };

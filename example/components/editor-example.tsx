@@ -17,10 +17,11 @@ import {
   SelectionPlugin,
   Unstable_FileDropPlugin,
   Unstable_MarkdownShortcutPlugin,
+  PastHtmlPlugin,
 } from '@hexx/editor/plugins';
 import { BasicImageBlock } from '@hexx/block-basic-image';
 import { css } from '@hexx/theme';
-import { blockMap } from 'lib/block-map';
+import { mdastConfigs, scope } from 'lib/edit-scope';
 import Linkify from 'linkify-it';
 import { ElementRef, useCallback, useRef, useState } from 'react';
 import tlds from 'tlds';
@@ -31,7 +32,7 @@ const linkify = Linkify();
 
 linkify.tlds(tlds);
 
-const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
+const EditorExample = (props: Omit<EditorProps, 'scope'>) => {
   const [showDataViewer, setShowDataViewer] = useState(false);
   const editorRef = useRef<ElementRef<typeof Editor>>();
   const localSaverRef =
@@ -71,21 +72,25 @@ const EditorExample = (props: Omit<EditorProps, 'blockMap'>) => {
         onLoad={onLoadLocalStorage}
         {...editorStyles}
         {...props}
-        blockMap={blockMap}
+        scope={scope}
       >
         <PlusButton />
         <TuneButton />
-        <EditorWidthPlugin />
-        <HistoryPlugin />
-        <SelectionPlugin />
         <HexxDevTool />
-        <LinkifyItPlugin linkifyIt={linkify} />
         <InlineTool>
           <InlineMarker />
           <InlineCode />
           <InlineLink />
         </InlineTool>
-        <Unstable_MarkdownShortcutPlugin />
+        <LinkifyItPlugin linkifyIt={linkify} />
+        {/* plugin */}
+        <EditorWidthPlugin />
+        <HistoryPlugin />
+        <SelectionPlugin />
+        <PastHtmlPlugin mdastConfigs={mdastConfigs} />
+        <Unstable_MarkdownShortcutPlugin
+          mdastConfigs={mdastConfigs}
+        />
         <Unstable_FileDropPlugin
           resolve={async (files) => {
             if (files[0] && files[0].type.includes('image')) {

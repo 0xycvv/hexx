@@ -1,35 +1,26 @@
 import type { Paragraph } from '@hexx/renderer';
-import * as mdast from 'mdast';
-import { useEffect, useRef, useState } from 'react';
-import composeRefs from '../../hooks/use-compose-ref';
-import { useBlock } from '../../hooks/use-editor';
+import { useBlock, useEditor } from '../../hooks/use-editor';
 import { applyBlock, BlockProps } from '../../utils/blocks';
-import { lastCursor } from '../../utils/find-blocks';
 import { Editable } from '../editable';
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  text as TextIcon,
-} from '../icons';
 
 function _TextBlock(props: BlockProps) {
-  const { index, blockAtom } = props;
-  const ref = useRef<HTMLDivElement>(null);
-  const { update, register, block } = useBlock(blockAtom, index);
-
-  useEffect(() => {
-    ref.current?.focus();
-    if (!block.data.text) {
-      lastCursor();
-    }
-  }, [block.data.text]);
+  const { blockAtom, index } = props;
+  const { splitBlock } = useEditor();
+  const { update, block } = useBlock(blockAtom);
 
   const editableProps = {
-    ref: composeRefs(ref, register),
     html: block.data.text || '',
     style: {
       textAlign: block.data.alignment || 'left',
+    },
+    onKeyDown: (e) => {
+      if (!e.shiftKey && e.key === 'Enter') {
+        splitBlock({
+          atom: blockAtom,
+          updater: (s) => ({ text: s }),
+        });
+        e.preventDefault();
+      }
     },
     onChange: (evt) => {
       update((s) => ({
@@ -49,45 +40,9 @@ export const TextBlock = applyBlock<Paragraph['data'], {}>(
   _TextBlock,
   {
     type: 'paragraph',
-    icon: {
-      text: 'Text',
-      svg: TextIcon,
-    },
     defaultValue: {
       text: '',
     },
-    mdast: {
-      type: 'paragraph',
-      in: (content: mdast.Paragraph, toHTML) => ({
-        text: toHTML(content).outerHTML,
-      }),
-    },
-    tune: [
-      {
-        icon: {
-          text: 'Left',
-          svg: AlignLeft,
-          isActive: (data) => data.alignment === 'left',
-        },
-        updater: (data) => ({ ...data, alignment: 'left' }),
-      },
-      {
-        icon: {
-          text: 'Center',
-          svg: AlignCenter,
-          isActive: (data) => data.alignment === 'center',
-        },
-        updater: (data) => ({ ...data, alignment: 'center' }),
-      },
-      {
-        icon: {
-          text: 'Right',
-          svg: AlignRight,
-          isActive: (data) => data.alignment === 'right',
-        },
-        updater: (data) => ({ ...data, alignment: 'right' }),
-      },
-    ],
     isEmpty: (data) =>
       !data.text?.trim() ||
       // quick fix for safari

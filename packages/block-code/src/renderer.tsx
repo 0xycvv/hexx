@@ -1,4 +1,4 @@
-import { StitchesCssProp, StitchesProps, styled } from '@hexx/theme';
+import { styled, CSS } from '@hexx/theme';
 import Highlight, {
   Language,
   Prism,
@@ -13,7 +13,7 @@ export type TCodeBlock = {
   };
 };
 
-export const codeBlockStyle: StitchesCssProp = {
+export const codeBlockStyle: CSS = {
   fontFamily: 'monospace',
   padding: '24px',
   borderRadius: '4px',

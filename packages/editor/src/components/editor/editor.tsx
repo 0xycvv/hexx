@@ -1,10 +1,9 @@
 import { paragraphStyle } from '@hexx/renderer';
-import { css, StitchesCssProp, styled } from '@hexx/theme';
+import { css, CSS, styled } from '@hexx/theme';
 import { Provider, useAtom } from 'jotai';
 import { splitAtom, useAtomCallback } from 'jotai/utils';
 import {
   forwardRef,
-  memo,
   MutableRefObject,
   ReactNode,
   useCallback,
@@ -21,8 +20,8 @@ import { v4 } from 'uuid';
 import { CLIPBOARD_DATA_FORMAT } from '../../constants';
 import {
   BlockAtom,
-  blockMapAtom,
   blocksAtom,
+  blockScopeAtom,
   blocksDataAtom,
   blockSelectAtom,
   createAtom,
@@ -41,10 +40,8 @@ import { BackspaceKey } from '../../constants/key';
 import { useEventListener } from '../../hooks';
 import { useActiveBlockId } from '../../hooks/use-active-element';
 import { useEditor, UseEditorReturn } from '../../hooks/use-editor';
-import { useWhyDidYouUpdate } from '../../hooks/use-why-did-you-update';
 import { usePlugin } from '../../plugins';
 import { NewBlockOverlayPlugin } from '../../plugins/new-block-overlay';
-import { PastHtmlPlugin } from '../../plugins/paste';
 import { BlockType } from '../../utils/blocks';
 import {
   findBlockByIndex,
@@ -57,15 +54,15 @@ import { TextBlock } from '../block/text';
 
 export interface EditorProps extends HexxProps {
   data?: BlockType[];
-  blockMap: Record<string, any>;
+  scope: Record<string, any>;
 }
 
 interface HexxProps {
   wrapperRef?: MutableRefObject<HTMLDivElement>;
   children?: ReactNode;
   defaultBlock?: Omit<BlockType, 'id'>;
-  css?: StitchesCssProp;
-  blockCss?: StitchesCssProp;
+  css?: CSS;
+  blockCss?: CSS;
   onLoad?: () => void;
   autoFocus?: boolean;
 }
@@ -321,7 +318,6 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
       }}
     >
       <NewBlockOverlayPlugin />
-      <PastHtmlPlugin />
       {props.children}
       <SortableBlockList
         updateBeforeSortStart={({ index }) => {
@@ -338,7 +334,7 @@ const Hexx = forwardRef<HexxHandler, HexxProps>((props, ref) => {
         blocks={blocksWithFilters}
         pressThreshold={300}
       />
-      {!props.autoFocus && <AutoFocusInput />}
+      {/* {!props.autoFocus && <AutoFocusInput />} */}
     </Wrapper>
   );
 });
@@ -366,14 +362,15 @@ function AutoFocusInput() {
   );
 }
 
+const BlockListWrapper = styled('div', {
+  width: '100%',
+  position: 'relative',
+});
+
 const SortableBlockList = SortableContainer(
   ({ blockCss, blocks }: { blockCss: any; blocks: BlockAtom[] }) => {
     return (
-      <div
-        className={css({
-          width: '100%',
-        })()}
-      >
+      <BlockListWrapper className="hexx-block-list">
         {blocks.map((blockAtom, i) => (
           <Block
             index={i}
@@ -382,7 +379,7 @@ const SortableBlockList = SortableContainer(
             css={blockCss}
           />
         ))}
-      </div>
+      </BlockListWrapper>
     );
   },
 );
@@ -408,7 +405,7 @@ export const Editor = forwardRef<HexxHandler, EditorProps>(
           [
             [editorDefaultBlockAtom, defaultBlock],
             [editorIdAtom, v4()],
-            [blockMapAtom, props.blockMap],
+            [blockScopeAtom, props.scope],
             [_blocksAtom, initData],
           ] as const
         }

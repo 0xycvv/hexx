@@ -1,4 +1,4 @@
-import { styled } from '@hexx/theme';
+import { CSS, styled } from '@hexx/theme';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import {
   createElement,
@@ -25,12 +25,10 @@ import {
   lastCursor,
 } from '../../utils/find-blocks';
 import {
-  extractFragmentFromPosition,
   getSelectionRange,
   isEditableSelectAll,
   removeRanges,
 } from '../../utils/ranges';
-import { TextBlock } from './text';
 
 const Wrapper = styled('div', {
   width: '100%',
@@ -107,7 +105,7 @@ function useBlockWrapper({
   blockAtom: PrimitiveAtom<BlockType<any>>;
   index: number;
 }) {
-  const { removeBlock, blockMap, insertBlock } = useEditor();
+  const { removeBlock, blockScope, insertBlock } = useEditor();
   const [editorId] = useAtom(editorIdAtom);
   const [isEditorSelectAll, setIsEditorSelectAll] = useAtom(
     isEditorSelectAllAtom,
@@ -119,7 +117,7 @@ function useBlockWrapper({
   const [hoverBlock, setHoverBlock] = useAtom($hoverAtom);
 
   const isHovering = hoverBlock === blockAtom;
-  const currentBlock = block && blockMap[block.type];
+  const currentBlock = block && blockScope[block.type];
 
   const isBlockSelect = blockSelect.has(blockAtom);
   const [drop] = useAtom(dropAtom);
@@ -133,8 +131,9 @@ function useBlockWrapper({
       if (!range) {
         return;
       }
-      if (range.startOffset === 0) {
-        focusContentEditable('up');
+      if (!range.commonAncestorContainer.previousSibling) {
+        e.preventDefault();
+        focusContentEditable('up', range.startOffset);
       }
     }
     if (e.key === 'ArrowDown') {
@@ -142,42 +141,10 @@ function useBlockWrapper({
       if (!range) {
         return;
       }
-      if (
-        !(range.commonAncestorContainer as Text)?.length ||
-        ((range.commonAncestorContainer as Text)?.length ===
-          range.endOffset &&
-          range.collapsed)
-      ) {
-        focusContentEditable('down');
+      if (!range.commonAncestorContainer.nextSibling) {
+        e.preventDefault();
+        focusContentEditable('down', range.startOffset);
       }
-    }
-    if (!e.shiftKey && e.key === 'Enter') {
-      const fragment = extractFragmentFromPosition();
-
-      if (!fragment) {
-        return;
-      }
-
-      const { current, next } = fragment;
-      insertBlock({
-        index: index + 1,
-        block: {
-          type: TextBlock.block.type,
-          data: {
-            ...TextBlock.block.defaultValue,
-            text: next,
-          },
-        },
-      });
-
-      setBlock((s) => ({
-        ...s,
-        data: {
-          ...s.data,
-          text: current,
-        },
-      }));
-      e.preventDefault();
     }
     if (e[commandKey] && e.key === 'a') {
       if (isEditorSelectAll) {
@@ -318,7 +285,7 @@ export function Block({
 }: {
   index: number;
   blockAtom: PrimitiveAtom<BlockType<any>>;
-  css?: any;
+  css?: CSS;
 }) {
   const {
     block,

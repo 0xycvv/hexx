@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { css, StitchesStyleObject } from '@hexx/theme';
+import { css, CSS } from '@hexx/theme';
 export type Paragraph = {
   type: 'paragraph';
   data: {
@@ -9,7 +9,7 @@ export type Paragraph = {
   };
 };
 
-export const paragraphStyle: StitchesStyleObject = {
+export const paragraphStyle: CSS = {
   p: {
     lineHeight: '24px',
     fontSize: '16px',

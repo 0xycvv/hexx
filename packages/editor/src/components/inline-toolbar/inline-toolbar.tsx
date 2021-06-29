@@ -1,5 +1,5 @@
-import { StitchesProps, styled } from '@hexx/theme';
-import { ReactNode, useCallback } from 'react';
+import { styled } from '@hexx/theme';
+import { ComponentProps, ReactNode, useCallback } from 'react';
 import { SelectionChangePlugin } from '../../plugins';
 import { generateGetBoundingClientRect } from '../../utils/virtual-element';
 import Bold from '../icons/bold';
@@ -60,7 +60,7 @@ function DefaultInlineTool({
   ...props
 }: UseInlineToolConfig & {
   children: ReactNode;
-} & StitchesProps<typeof IconWrapper>) {
+} & ComponentProps<typeof IconWrapper>) {
   const { getProps } = useDefaultInlineTool({
     type,
     shortcut,
@@ -76,11 +76,13 @@ function DefaultInlineTool({
 export function InlineToolBar({
   children,
   ...props
-}: { children?: ReactNode } & StitchesProps<typeof Wrapper>) {
+}: { children?: ReactNode } & ComponentProps<typeof Wrapper>) {
   return <Wrapper {...props}>{children}</Wrapper>;
 }
 
-export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
+export function InlineBold(
+  props: ComponentProps<typeof IconWrapper>,
+) {
   return (
     <DefaultInlineTool
       shortcut="⌘ + b"
@@ -96,7 +98,7 @@ export function InlineBold(props: StitchesProps<typeof IconWrapper>) {
 }
 
 export function InlineItalic(
-  props: StitchesProps<typeof IconWrapper>,
+  props: ComponentProps<typeof IconWrapper>,
 ) {
   return (
     <DefaultInlineTool
@@ -113,7 +115,7 @@ export function InlineItalic(
 }
 
 export function InlineUnderline(
-  props: StitchesProps<typeof IconWrapper>,
+  props: ComponentProps<typeof IconWrapper>,
 ) {
   return (
     <DefaultInlineTool
@@ -134,7 +136,7 @@ export { InlineLink };
 export function InlineToolBarPreset({
   children,
   ...props
-}: { children?: ReactNode } & StitchesProps<typeof Wrapper>) {
+}: { children?: ReactNode } & ComponentProps<typeof Wrapper>) {
   return (
     <Wrapper {...props}>
       <InlineBold />
@@ -145,7 +147,7 @@ export function InlineToolBarPreset({
   );
 }
 
-export function InlineTool({ children  }: { children?: ReactNode }) {
+export function InlineTool({ children }: { children?: ReactNode }) {
   const popper = useReactPopper({
     placement: 'bottom-start',
     modifiers: [
