@@ -50,7 +50,7 @@ import {
   lastCursor,
 } from '../../utils/find-blocks';
 import { Block } from '../block/block';
-import { ParagraphBlock } from '../block/text';
+import { ParagraphBlock } from '../block/paragraph';
 
 export interface EditorProps extends HexxProps {
   data?: BlockType[];

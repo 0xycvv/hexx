@@ -1,4 +1,4 @@
-import toDOM from 'hast-util-to-dom';
+import toDom from 'hast-util-to-dom';
 import toHast from 'mdast-util-to-hast';
 import { useEditor, useEventListener } from '../hooks';
 import { isContentEditableDiv } from '../utils/is';
@@ -58,7 +58,9 @@ type MarkdownShortcutPluginProps = {
   mdastConfigs: MdastConfigs;
 };
 
-export function Unstable_MarkdownShortcutPlugin({ mdastConfigs }: MarkdownShortcutPluginProps) {
+export function Unstable_MarkdownShortcutPlugin({
+  mdastConfigs,
+}: MarkdownShortcutPluginProps) {
   const { wrapperRef } = usePlugin();
   const { replaceBlockById } = useEditor();
 
@@ -83,12 +85,12 @@ export function Unstable_MarkdownShortcutPlugin({ mdastConfigs }: MarkdownShortc
               replaceBlockById({
                 id: currentBlockId,
                 block: {
-                  type: mdastConfig.blockType,
+                  type: mdastConfig.type,
                   id: v4(),
                   data:
                     typeof mdastConfig.in === 'function'
                       ? mdastConfig.in(firstMdast, (c) =>
-                          toDOM(toHast(c)),
+                          toDom(toHast(c)),
                         )
                       : {},
                 },

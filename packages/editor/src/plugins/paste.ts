@@ -41,9 +41,7 @@ export function PastHtmlPlugin({
       } else if (html) {
         const mdastParent = htmlToMdast(html);
         try {
-          console.log(mdastParent, 'mdastParent');
           const results = mdastToData(mdastConfigs, mdastParent);
-          console.log(results, 'results');
           if (results.length > 0) {
             batchInsertBlocks({ blocks: results, index });
           }
@@ -53,7 +51,6 @@ export function PastHtmlPlugin({
         e.preventDefault();
       } else if (text) {
         const mdast = fromMarkdown(text) as Parent;
-        console.log(mdast, 'mdast');
         if (
           mdast.children.length == 1 &&
           mdast.children[0].type === 'paragraph'

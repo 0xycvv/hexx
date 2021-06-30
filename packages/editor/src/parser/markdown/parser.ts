@@ -1,5 +1,5 @@
 import { BlockData } from '@hexx/renderer/src/types';
-import toDOM from 'hast-util-to-dom';
+import toDom from 'hast-util-to-dom';
 import { Parent } from 'mdast';
 import fromMarkdown from 'mdast-util-from-markdown';
 import toHast from 'mdast-util-to-hast';
@@ -48,8 +48,7 @@ export function mdastToData(
             typeof mdastConfig.in === 'function'
               ? mdastConfig.in(children, (c) => {
                   const hast = toHast(c);
-                  console.log(hast);
-                  const dom = toDOM(hast, {
+                  const dom = toDom(hast, {
                     document: config?.document,
                   });
                   return dom;
