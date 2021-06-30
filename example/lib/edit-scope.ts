@@ -15,6 +15,6 @@ export const scope = {
 
 export const mdastConfigs: MdastConfigs = {
   ...presetMDASTConfig,
-  'basic-image': basicImageMdast,
+  image: basicImageMdast,
   code: codeMdast,
 };

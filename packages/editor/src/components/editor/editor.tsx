@@ -50,7 +50,7 @@ import {
   lastCursor,
 } from '../../utils/find-blocks';
 import { Block } from '../block/block';
-import { TextBlock } from '../block/text';
+import { ParagraphBlock } from '../block/text';
 
 export interface EditorProps extends HexxProps {
   data?: BlockType[];
@@ -387,8 +387,8 @@ const SortableBlockList = SortableContainer(
 export const Editor = forwardRef<HexxHandler, EditorProps>(
   (props, ref) => {
     const defaultBlock = props.defaultBlock || {
-      type: TextBlock.block.type,
-      data: TextBlock.block.defaultValue,
+      type: ParagraphBlock.block.type,
+      data: ParagraphBlock.block.defaultValue,
     };
 
     const initDataAtom = useMemo(() => {

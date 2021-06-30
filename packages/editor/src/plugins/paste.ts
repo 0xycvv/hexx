@@ -28,6 +28,7 @@ export function PastHtmlPlugin({
       const text = e.clipboardData?.getData('text/plain');
       const hexx = e.clipboardData?.getData(CLIPBOARD_DATA_FORMAT);
       const index = idList.findIndex((id) => id === activeBlock?.id);
+      console.log(html, text);
       if (hexx) {
         batchInsertBlocks({
           index,
@@ -40,16 +41,19 @@ export function PastHtmlPlugin({
       } else if (html) {
         const mdastParent = htmlToMdast(html);
         try {
+          console.log(mdastParent, 'mdastParent');
           const results = mdastToData(mdastConfigs, mdastParent);
+          console.log(results, 'results');
           if (results.length > 0) {
             batchInsertBlocks({ blocks: results, index });
-            e.preventDefault();
           }
         } catch (error) {
           console.error('[hexx] error when pasting html', error);
         }
+        e.preventDefault();
       } else if (text) {
         const mdast = fromMarkdown(text) as Parent;
+        console.log(mdast, 'mdast');
         if (
           mdast.children.length == 1 &&
           mdast.children[0].type === 'paragraph'
@@ -60,11 +64,11 @@ export function PastHtmlPlugin({
           const results = mdastToData(mdastConfigs, mdast);
           if (results.length > 0) {
             batchInsertBlocks({ blocks: results, index });
-            e.preventDefault();
           }
         } catch (error) {
           console.error('[hexx] error when pasting markdown', error);
         }
+        e.preventDefault();
       }
     },
     wrapperRef,

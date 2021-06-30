@@ -3,7 +3,7 @@ import { useBlock, useEditor } from '../../hooks/use-editor';
 import { applyBlock, BlockProps } from '../../utils/blocks';
 import { Editable } from '../editable';
 
-function _TextBlock(props: BlockProps) {
+function _ParagraphBlock(props: BlockProps) {
   const { blockAtom, index } = props;
   const { splitBlock } = useEditor();
   const { update, block } = useBlock(blockAtom);
@@ -36,8 +36,8 @@ function _TextBlock(props: BlockProps) {
   return <Editable {...editableProps} />;
 }
 
-export const TextBlock = applyBlock<Paragraph['data'], {}>(
-  _TextBlock,
+export const ParagraphBlock = applyBlock<Paragraph['data'], {}>(
+  _ParagraphBlock,
   {
     type: 'paragraph',
     defaultValue: {
