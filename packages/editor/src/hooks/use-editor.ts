@@ -1,12 +1,13 @@
-import { atom, PrimitiveAtom, useAtom } from 'jotai';
+import { atom, PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { useAtomCallback, useAtomValue } from 'jotai/utils';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import { v4 } from 'uuid';
+import { BlockData } from '../../../renderer/src/types';
 import {
   $hoverAtom,
   BlockAtom,
-  blockMapAtom,
   blocksAtom,
+  blockScopeAtom,
   createAtom,
   editorDefaultBlockAtom,
   selectAtom,
@@ -14,77 +15,37 @@ import {
 } from '../constants/atom';
 import { insert, insertArray } from '../utils/array';
 import { BlockType } from '../utils/blocks';
-
-export const EditableWeakMap = new WeakMap<
-  HTMLDivElement | HTMLElement | Element,
-  {
-    blockIndex: number;
-    index: number;
-    id: string;
-  }
->();
+import { findBlockById } from '../utils/find-blocks';
+import { extractFragmentFromPosition } from '../utils/ranges';
 
 export function useBlock<T = unknown>(
   blockAtom: PrimitiveAtom<BlockType<T>>,
-  blockIndex: number,
 ) {
   const [block, setBlock] = useAtom(blockAtom);
   const [, setBlocks] = useAtom(blocksAtom);
-  const registeredRef = useRef<Array<any>>();
 
   const remove = () => {
     setBlocks((s) => s.filter((item) => item !== blockAtom));
   };
 
-  const register = useCallback(
-    (ref, index: number = 0) => {
-      if (typeof blockIndex === 'undefined') {
-        throw new Error(
-          'register editable block must provide blockIndex.',
-        );
-      }
-      if (ref) {
-        EditableWeakMap.set(ref, { index, id: block.id, blockIndex });
-        registeredRef.current?.push(ref);
-      }
-    },
-    [blockIndex],
-  );
-
-  const registerByIndex = useCallback(
-    (index: number) =>
-      useCallback((ref) => {
-        register(ref, index);
-      }, []),
-    [register],
-  );
-
-  useEffect(() => {
-    return () => {
-      const registeredList = registeredRef.current;
-      if (registeredList && registeredList.length > 0) {
-        for (const registered of registeredList) {
-          EditableWeakMap.delete(registered);
-        }
-      }
-    };
-  }, []);
-
   return {
     block,
     remove,
     update: setBlock,
-    registerByIndex,
-    register,
   };
 }
 
-export function useRemoveBlock() {}
+function newBlockOnMount(id: string) {
+  requestAnimationFrame(() => {
+    const blockEl = findBlockById(id, true);
+    blockEl?.editable?.focus();
+  });
+}
 
 export type UseEditorReturn = ReturnType<typeof useEditor>;
 export function useEditor() {
   const [hoverBlockAtom] = useAtom($hoverAtom);
-  const blockMap = useAtomValue(blockMapAtom);
+  const blockScope = useAtomValue(blockScopeAtom);
   const [blockSelect, setBlockSelect] = useAtom(selectAtom);
   const defaultBlock = useAtomValue(editorDefaultBlockAtom);
 
@@ -92,10 +53,51 @@ export function useEditor() {
     setBlockSelect(blockAtom ? new Set([blockAtom]) : new Set([]));
   };
 
+  const splitBlock = useAtomCallback(
+    useCallback(
+      (
+        get,
+        set,
+        {
+          atom,
+          updater,
+        }: { atom: BlockAtom; updater: SetStateAction<any> },
+      ) => {
+        const fragment = extractFragmentFromPosition();
+
+        if (!fragment) {
+          return;
+        }
+
+        const { current, next } = fragment;
+        const currentBlock = get(atom);
+        set(atom, (s) => ({
+          ...s,
+          data: {
+            ...s.data,
+            ...updater(current),
+          },
+        }));
+        insertBlockAfter({
+          atom,
+          block: {
+            type: currentBlock.type,
+            data: {
+              ...currentBlock.data,
+              ...updater(next),
+            },
+          },
+        });
+      },
+      [],
+    ),
+    _hexxScope,
+  );
+
   const insertBlockAfter = useAtomCallback(
     useCallback(
-      (get, set, arg: { atom: BlockAtom; block: any }) => {
-        let newBlock = {
+      (get, set, arg: { atom: BlockAtom; block: BlockData }) => {
+        let newBlock: BlockType = {
           ...arg.block,
           id: v4(),
         };
@@ -105,16 +107,17 @@ export function useEditor() {
           (d) => d === arg.atom,
         );
         if (currentBockIndex > -1) {
+          const newBlockAtom = atom(newBlock);
+          newBlockAtom.scope = _hexxScope;
+          newBlockAtom.onMount = () => {
+            newBlockOnMount(newBlock.id);
+          };
           set(
             blocksAtom,
-            insert(
-              blockData,
-              currentBockIndex + 1,
-              createAtom(newBlock),
-            ),
+            insert(blockData, currentBockIndex + 1, newBlockAtom),
           );
+          return newBlockAtom;
         }
-        return newBlock;
       },
       [blocksAtom],
     ),
@@ -123,11 +126,16 @@ export function useEditor() {
 
   const insertBlock = useAtomCallback(
     useCallback(
-      (_, set, arg: { index?: number; block: any }) => {
-        let newBlock = createAtom({
+      (_, set, arg: { index?: number; block: BlockData }) => {
+        const id = v4();
+        let newBlock = atom({
           ...arg.block,
-          id: v4(),
+          id,
         });
+        newBlock.scope = _hexxScope;
+        newBlock.onMount = () => {
+          newBlockOnMount(id);
+        };
         if (typeof arg.index === 'undefined') {
           set(blocksAtom, (s) => [...s, newBlock]);
         } else {
@@ -209,12 +217,13 @@ export function useEditor() {
     replaceBlockById,
     batchRemoveBlocks,
     batchInsertBlocks,
+    splitBlock,
     clear,
     removeBlock,
     // data
     defaultBlock,
     blockSelect,
-    blockMap,
+    blockScope,
     hoverBlockAtom,
     // lastHoverBlock,
     selectBlock,

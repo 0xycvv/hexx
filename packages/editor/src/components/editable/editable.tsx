@@ -1,4 +1,4 @@
-import { css, StitchesCssProp } from '@hexx/theme';
+import { css, CSS } from '@hexx/theme';
 import { forwardRef } from 'react';
 import {
   ContentEditable,
@@ -31,7 +31,7 @@ const styles = {
 export const Editable = forwardRef<
   any,
   ContentEditableProps & {
-    css?: StitchesCssProp;
+    css?: CSS;
   }
 >(({ html = '', css: overrideCss, ...props }, ref) => {
   const combineStyles = css({ ...styles, ...(overrideCss as any) });

@@ -1,9 +1,9 @@
-import { StitchesProps, styled } from '@hexx/theme';
+import { styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
-import { useEffect, useRef, useState } from 'react';
+import { ComponentProps, useEffect, useRef, useState } from 'react';
 import {
   ActiveBlock,
-  activeBlockAtom,
+  activeBlockAtom
 } from '../../../constants/atom';
 import { getSelectionRange } from '../../../utils/ranges';
 import Link from '../../icons/link';
@@ -12,7 +12,7 @@ import { useReactPopper } from '../../popper/use-react-popper';
 import {
   isAnchorElement,
   useEventChangeSelection,
-  useInlineTool,
+  useInlineTool
 } from '../hooks';
 import { IconWrapper } from '../inline-toolbar';
 
@@ -58,13 +58,13 @@ function highlight(r: Range | null) {
   return el;
 }
 
-export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
+export function InlineLink(
+  props: ComponentProps<typeof IconWrapper>,
+) {
   const [activeBlock] = useAtom(activeBlockAtom);
   const [initialValue, setInitialValue] = useState('');
-  const [
-    currentActiveBlock,
-    setCurrentActiveBlock,
-  ] = useState<ActiveBlock | null>(null);
+  const [currentActiveBlock, setCurrentActiveBlock] =
+    useState<ActiveBlock | null>(null);
   const snapHTML = useRef<string>();
   const editableSnap = useRef<HTMLDivElement>();
   const [hasChanged, setHasChanged] = useState(false);
@@ -131,9 +131,10 @@ export function InlineLink(props: StitchesProps<typeof IconWrapper>) {
                 return;
               }
               // @ts-ignore
-              const target = currentActiveBlock?.blockEl?.querySelector(
-                '.hexx-link-target',
-              );
+              const target =
+                currentActiveBlock?.blockEl?.querySelector(
+                  '.hexx-link-target',
+                );
               if (!target) return;
               r.selectNodeContents(target);
               selection.removeAllRanges();

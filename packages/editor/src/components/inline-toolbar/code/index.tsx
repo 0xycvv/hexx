@@ -3,8 +3,10 @@ import SvgCode from '../../icons/code';
 import { useEventChangeSelection, useInlineTool } from '../hooks';
 import { surround } from '../../../utils/find-blocks';
 import { getSelectionRange } from '../../../utils/ranges';
-import { StitchesProps } from '@hexx/theme';
-export function InlineCode(props: StitchesProps<typeof IconWrapper>) {
+import { ComponentProps } from 'react';
+export function InlineCode(
+  props: ComponentProps<typeof IconWrapper>,
+) {
   const { getProps, setIsActive } = useInlineTool({
     shortcut: '⌘ + e',
     onToggle: (isActive) => {

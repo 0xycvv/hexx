@@ -1,14 +1,29 @@
-import { StitchesProps, styled } from '@hexx/theme';
+import { styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
-import { forwardRef, ReactNode, useEffect } from 'react';
+import {
+  ComponentProps,
+  forwardRef,
+  ReactNode,
+  useEffect
+} from 'react';
 import { $lastHoverAtom, BlockAtom } from '../constants/atom';
 import { useEditor } from '../hooks';
 import { findBlockById } from '../utils/find-blocks';
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  h1,
+  h2,
+  h3,
+  IcNumList,
+  list as ListSvg
+} from './icons';
 import { PortalPopper } from './popper/portal-popper';
 import {
   useReactPopper,
   UseReactPopperProps,
-  UseReactPopperReturn,
+  UseReactPopperReturn
 } from './popper/use-react-popper';
 
 const Tune = styled('div', {
@@ -51,8 +66,9 @@ const Icon = styled('svg', {
 
 interface TuneButtonProps {
   popper?: UseReactPopperProps;
-  buttonProps?: StitchesProps<typeof Tune>;
+  buttonProps?: ComponentProps<typeof Tune>;
   icon?: ReactNode;
+  config?: TuneConfig;
 }
 
 const Tunes = ({
@@ -60,20 +76,22 @@ const Tunes = ({
   icon,
   popper,
   isSelecting,
+  config,
 }: {
   blockAtom: BlockAtom;
   icon?: ReactNode;
   popper: UseReactPopperReturn;
   isSelecting?: boolean;
+  config: TuneConfig;
 }) => {
-  const { blockMap, removeBlock, selectBlock } = useEditor();
+  const { removeBlock, selectBlock } = useEditor();
 
   const [currentBlockData, setBlockData] = useAtom(blockAtom);
   const tunes =
     currentBlockData &&
     currentBlockData.type &&
     typeof currentBlockData.type === 'string' &&
-    blockMap[currentBlockData.type]?.block?.tune;
+    config[currentBlockData.type];
 
   useEffect(() => {
     if (currentBlockData) {
@@ -95,30 +113,31 @@ const Tunes = ({
     <>
       {isSelecting ? (
         <>
-          {tunes?.map((tune, i) => {
-            return (
-              <Icon
-                key={i}
-                title={tune.icon.text}
-                as={tune.icon.svg}
-                color={
-                  tune.icon.isActive(currentBlockData?.data)
-                    ? 'active'
-                    : 'inactive'
-                }
-                onClick={(e) => {
-                  if (!currentBlockData) return;
-                  setBlockData((s) => ({
-                    ...s,
-                    data: tune.updater(currentBlockData?.data),
-                  }));
-                  selectBlock();
-                  popper.popperJs.update?.();
-                  e.stopPropagation();
-                }}
-              />
-            );
-          })}
+          {Array.isArray(tunes) &&
+            tunes.map((tune, i) => {
+              return (
+                <Icon
+                  key={i}
+                  title={tune.icon.text}
+                  as={tune.icon.svg}
+                  color={
+                    tune.icon.isActive?.(currentBlockData?.data)
+                      ? 'active'
+                      : 'inactive'
+                  }
+                  onClick={(e) => {
+                    if (!currentBlockData) return;
+                    setBlockData((s) => ({
+                      ...s,
+                      data: tune.updater(currentBlockData?.data),
+                    }));
+                    selectBlock();
+                    popper.popperJs.update?.();
+                    e.stopPropagation();
+                  }}
+                />
+              );
+            })}
           <svg
             onClick={() => {
               if (!currentBlockData) return;
@@ -152,8 +171,94 @@ const Tunes = ({
   );
 };
 
+type TuneConfig = Record<
+  string,
+  {
+    icon: {
+      text: string;
+      svg: any;
+      isActive?: (data: any) => void;
+    };
+    updater: (data: any) => any;
+  }[]
+>;
+
+export const presetTuneConfig: TuneConfig = {
+  paragraph: [
+    {
+      icon: {
+        text: 'Left',
+        svg: AlignLeft,
+        isActive: (data) => data.alignment === 'left',
+      },
+      updater: (data) => ({ ...data, alignment: 'left' }),
+    },
+    {
+      icon: {
+        text: 'Center',
+        svg: AlignCenter,
+        isActive: (data) => data.alignment === 'center',
+      },
+      updater: (data) => ({ ...data, alignment: 'center' }),
+    },
+    {
+      icon: {
+        text: 'Right',
+        svg: AlignRight,
+        isActive: (data) => data.alignment === 'right',
+      },
+      updater: (data) => ({ ...data, alignment: 'right' }),
+    },
+  ],
+  list: [
+    {
+      icon: {
+        text: 'Bullet',
+        svg: ListSvg,
+        isActive: (data) => data.style === 'unordered',
+      },
+      updater: (data) => ({ ...data, style: 'unordered' }),
+    },
+    {
+      icon: {
+        text: 'Number',
+        svg: IcNumList,
+        isActive: (data) => data.style === 'ordered',
+      },
+      updater: (data) => ({ ...data, style: 'ordered' }),
+    },
+  ],
+  header: [
+    {
+      icon: {
+        text: 'H1',
+        svg: h1,
+        isActive: (data) => data.level === 1,
+      },
+      updater: (data) => ({ ...data, level: 1 }),
+    },
+    {
+      icon: {
+        text: 'H2',
+        svg: h2,
+        isActive: (data) => data.level === 2,
+      },
+      updater: (data) => ({ ...data, level: 2 }),
+    },
+    {
+      icon: {
+        text: 'H3',
+        svg: h3,
+        isActive: (data) => data.level === 3,
+      },
+      updater: (data) => ({ ...data, level: 3 }),
+    },
+  ],
+};
+
 export const TuneButton = forwardRef(
   (props: TuneButtonProps, ref) => {
+    const { config = presetTuneConfig } = props;
     const popper = useReactPopper({
       defaultActive: false,
       placement: 'right-start',
@@ -193,6 +298,7 @@ export const TuneButton = forwardRef(
               blockAtom={lastHoverBlock}
               popper={popper}
               icon={props.icon}
+              config={config}
             />
           )}
         </Tune>

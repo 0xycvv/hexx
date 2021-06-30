@@ -1,3 +1,3 @@
 export { EditorRenderer } from './renderer';
-export { BlockMap } from './block-map';
+export { PresetScope } from './preset-scope';
 export * from './block';

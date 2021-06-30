@@ -1,12 +1,19 @@
-import { StitchesProps, styled } from '@hexx/theme';
+import { styled } from '@hexx/theme';
 import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { ComponentProps, useEffect, useState } from 'react';
 import { BlockAtom } from '../constants/atom';
 import { useEditor, useEventListener } from '../hooks';
 import { usePlugin } from '../plugins';
 import { BlockType, isBlockEmpty } from '../utils/blocks';
 import { findBlockById } from '../utils/find-blocks';
 import { BlockMenu, BlockMenuItem } from './block-menu';
+import {
+  divider as DividerSvg,
+  header as HeaderSvg,
+  list as ListSvg,
+  quote as QuoteSvg,
+  text as TextIcon,
+} from './icons';
 import { PortalPopper } from './popper/portal-popper';
 import {
   useReactPopper,
@@ -68,8 +75,8 @@ const AddMenu = styled('div', {
 interface PlusButtonProps {
   popper?: UseReactPopperProps;
   menuPopper?: UseReactPopperProps;
-  iconProps?: StitchesProps<typeof Plus>;
-  menuProps?: StitchesProps<typeof AddMenu>;
+  iconProps?: ComponentProps<typeof Plus>;
+  menuProps?: ComponentProps<typeof AddMenu>;
   menu?: BlockMenuItem[];
 }
 
@@ -84,8 +91,7 @@ function useTabMenu(
   block: BlockType<any> | null,
 ) {
   const { wrapperRef } = usePlugin();
-  const { blockMap } = useEditor();
-;
+  const { blockScope } = useEditor();
   useEventListener(
     'keydown',
     (e) => {
@@ -95,7 +101,7 @@ function useTabMenu(
       if (e.key === 'Tab' && !e.shiftKey) {
         if (block) {
           const isEmpty = isBlockEmpty(
-            blockMap[block.type],
+            blockScope[block.type],
             block.data,
           );
           if (isEmpty) {
@@ -148,9 +154,59 @@ function _PlusButton({
   return null;
 }
 
+export const presetPlusButtonMenu = [
+  {
+    type: 'paragraph',
+    icon: {
+      text: 'text',
+      svg: TextIcon,
+    },
+  },
+  {
+    type: 'header',
+    icon: {
+      text: 'Header',
+      svg: HeaderSvg,
+    },
+  },
+  {
+    type: 'quote',
+    icon: {
+      text: 'Quote',
+      svg: QuoteSvg,
+    },
+  },
+  {
+    type: 'delimiter',
+    icon: {
+      text: 'Divider',
+      svg: DividerSvg,
+    },
+  },
+  {
+    type: 'list',
+    icon: {
+      text: 'Unordered List',
+      svg: ListSvg,
+    },
+  },
+  {
+    type: 'list',
+    icon: {
+      text: 'Ordered List',
+      svg: ListSvg,
+    },
+    defaultValue: {
+      style: 'ordered',
+    },
+  },
+];
+
 export function PlusButton(props: PlusButtonProps) {
+  const { menu = presetPlusButtonMenu } = props;
   const { hoverBlockAtom } = useEditor();
-  const [activeAddingBlockAtom, setActiveAddingBlockAtom] = useState<BlockAtom>();
+  const [activeAddingBlockAtom, setActiveAddingBlockAtom] =
+    useState<BlockAtom>();
 
   const popper = useReactPopper({
     defaultActive: false,
@@ -206,7 +262,7 @@ export function PlusButton(props: PlusButtonProps) {
           <AddMenu {...props.menuProps}>
             <BlockMenu
               blockAtom={activeAddingBlockAtom}
-              menu={props.menu}
+              menu={menu}
               onAdd={() => menuPopper.setActive(false)}
             />
           </AddMenu>

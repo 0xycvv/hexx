@@ -1,7 +1,7 @@
 import { Block } from './types';
 import * as DefaultBlocks from './block';
 
-export const BlockMap: {
+export const PresetScope: {
   [key in Block['type'] | string]: any;
 } = {
   paragraph: DefaultBlocks.ParagraphRenderer,

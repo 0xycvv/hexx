@@ -8,12 +8,12 @@ npm install @hexx/editor
 yarn add @hexx/editor
 ```
 
-## Example
+### Example
 
 ```jsx
 import { Editor } from '@hexx/editor';
 import {
-  BlockMap, // default block mapping
+  PresetEditableScope, // default block mapping
   // preset
   PlusButton,
   TuneButton,
@@ -21,10 +21,10 @@ import {
   // additional inline tool
   InlineCode,
   InlineMarker,
-  InlineLink
+  InlineLink,
 } from '@hexx/editor/components';
 
-<Editor blockMap={BlockMap}>
+<Editor scope={PresetEditableScope}>
   <PlusButton />
   <TuneButton />
   <InlineTool>
@@ -32,5 +32,5 @@ import {
     <InlineCode />
     <InlineLink />
   </InlineTool>
-</Editor>
+</Editor>;
 ```

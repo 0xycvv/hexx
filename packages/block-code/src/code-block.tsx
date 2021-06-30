@@ -17,13 +17,8 @@ type Config = {
   theme?: PrismTheme;
 };
 
-function _CodeBlock({
-  id,
-  index,
-  config,
-  blockAtom,
-}: BlockProps<Config>) {
-  const { update, block } = useBlock(blockAtom, index);
+function _CodeBlock({ config, blockAtom }: BlockProps<Config>) {
+  const { update, block } = useBlock(blockAtom);
 
   const { padding, ...restCodeBlockStyle } = codeBlockStyle;
 
@@ -73,8 +68,8 @@ function _CodeBlock({
       value={block.data.value}
       onValueChange={onChange}
       highlight={highlightCode}
-      padding={padding}
-      style={restCodeBlockStyle}
+      padding={padding as string}
+      style={restCodeBlockStyle as any}
       onKeyDown={(e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.stopPropagation();
@@ -96,10 +91,6 @@ export const CodeBlock = applyBlock<TCodeBlock['data'], Config>(
       text: 'Code Block',
       svg: SvgCode,
     },
-    mdast: {
-      type: 'code',
-      in: ({ lang, value }) => ({ value, lang }),
-    },
     config: {
       placeholder: 'Code...',
     },
@@ -108,3 +99,9 @@ export const CodeBlock = applyBlock<TCodeBlock['data'], Config>(
     },
   },
 );
+
+export const codeMdast = {
+  type: 'code',
+  blockType: 'code',
+  in: ({ lang, value }) => ({ value, lang }),
+};

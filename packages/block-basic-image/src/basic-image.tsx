@@ -11,11 +11,10 @@ interface Config {
 
 const _BasicImageBlock = ({
   id,
-  index,
   config,
   blockAtom,
 }: BlockProps<Config>) => {
-  const { update, block } = useBlock(blockAtom, index);
+  const { update, block } = useBlock(blockAtom);
   const handleImageUpdate = (url: string) => {
     update({
       ...block,
@@ -68,10 +67,6 @@ export const BasicImageBlock = applyBlock<any, Config>(
   _BasicImageBlock,
   {
     type: 'basic-image',
-    icon: {
-      svg: SvgImage,
-      text: 'Image',
-    },
     config: {
       onInput: (files: File[] | FileList) => {
         return new Promise<string>((res, rej) => {
@@ -84,14 +79,21 @@ export const BasicImageBlock = applyBlock<any, Config>(
       },
     },
     isEmpty: (d) => !d.file?.url,
-    mdast: {
-      type: 'html.image',
-      in: (content: Image) => ({
-        url: content.url,
-      }),
-    },
     defaultValue: {
       url: '',
     },
   },
 );
+
+export const ImageIcon = {
+  svg: SvgImage,
+  text: 'Image',
+};
+
+export const basicImageMdast = {
+  type: 'html.image',
+  blockType: 'basic-image',
+  in: (content: Image) => ({
+    url: content.url,
+  }),
+};

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import { css, StitchesStyleObject } from '@hexx/theme';
+import { css, CSS } from '@hexx/theme';
 
 export type Quote = {
   type: 'quote';
@@ -11,13 +11,13 @@ export type Quote = {
   };
 };
 
-export const quoteStyle: StitchesStyleObject = {
+export const quoteStyle = {
   wrapper: {
     paddingLeft: '24px',
     paddingRight: '24px',
     paddingTop: 3,
     paddingBottom: 3,
-  },
+  } as CSS,
   text: {
     borderTop: 'none',
     borderRight: 'none',
@@ -37,7 +37,7 @@ export const quoteStyle: StitchesStyleObject = {
     fontStyle: 'italic',
     color: 'rgb(36, 37, 38)',
     minHeight: 'unset !important',
-  },
+  } as CSS,
 };
 
 export const QuoteRenderer = ({ data }: { data: Quote['data'] }) => {

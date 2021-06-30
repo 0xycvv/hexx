@@ -7,14 +7,19 @@ import { blocksIdsAtom } from '../constants/atom';
 import { useEventListener } from '../hooks';
 import { htmlToMdast } from '../parser/html/parser';
 import { mdastToData } from '../parser/markdown/parser';
-import { useBlockMdast } from '../parser/markdown/use-block-mdast';
+import { MdastConfigs } from '../parser/types';
 import { usePlugin } from './plugin';
 
-export function PastHtmlPlugin() {
+type PastHtmlPluginProps = {
+  mdastConfigs: MdastConfigs;
+};
+
+export function PastHtmlPlugin({
+  mdastConfigs,
+}: PastHtmlPluginProps) {
   const { wrapperRef, activeBlock, editor } = usePlugin();
   const { batchInsertBlocks } = editor;
   const [idList] = useAtom(blocksIdsAtom);
-  const { allMdastConfig } = useBlockMdast();
 
   useEventListener(
     'paste',
@@ -23,6 +28,7 @@ export function PastHtmlPlugin() {
       const text = e.clipboardData?.getData('text/plain');
       const hexx = e.clipboardData?.getData(CLIPBOARD_DATA_FORMAT);
       const index = idList.findIndex((id) => id === activeBlock?.id);
+      console.log(html, text);
       if (hexx) {
         batchInsertBlocks({
           index,
@@ -35,14 +41,14 @@ export function PastHtmlPlugin() {
       } else if (html) {
         const mdastParent = htmlToMdast(html);
         try {
-          const results = mdastToData(allMdastConfig, mdastParent);
+          const results = mdastToData(mdastConfigs, mdastParent);
           if (results.length > 0) {
             batchInsertBlocks({ blocks: results, index });
-            e.preventDefault();
           }
         } catch (error) {
           console.error('[hexx] error when pasting html', error);
         }
+        e.preventDefault();
       } else if (text) {
         const mdast = fromMarkdown(text) as Parent;
         if (
@@ -52,14 +58,14 @@ export function PastHtmlPlugin() {
           return;
         }
         try {
-          const results = mdastToData(allMdastConfig, mdast);
+          const results = mdastToData(mdastConfigs, mdast);
           if (results.length > 0) {
             batchInsertBlocks({ blocks: results, index });
-            e.preventDefault();
           }
         } catch (error) {
           console.error('[hexx] error when pasting markdown', error);
         }
+        e.preventDefault();
       }
     },
     wrapperRef,

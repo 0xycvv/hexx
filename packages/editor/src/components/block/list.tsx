@@ -4,7 +4,6 @@ import * as mdast from 'mdast';
 import * as React from 'react';
 import { BlockAtom } from '../../constants/atom';
 import { BackspaceKey } from '../../constants/key';
-import composeRefs from '../../hooks/use-compose-ref';
 import { useBlock, useEditor } from '../../hooks/use-editor';
 import { applyBlock, BlockProps } from '../../utils/blocks';
 import { lastCursor } from '../../utils/find-blocks';
@@ -13,7 +12,6 @@ import {
   getSelectionRange,
 } from '../../utils/ranges';
 import { Editable } from '../editable';
-import { IcNumList, list as ListSvg } from '../icons';
 
 const Ul = styled('ul', listStyle.ul);
 const Ol = styled('ol', listStyle.ol);
@@ -28,7 +26,7 @@ function _ListBlock({
   const [activeListItemIndex, setActiveListItemIndex] =
     React.useState<number>(0);
 
-  const { update, block } = useBlock(blockAtom, index);
+  const { update, block } = useBlock(blockAtom);
   const { defaultBlock, insertBlockAfter } = useEditor();
 
   const handleEmptyListItem = (i: number) => {
@@ -158,11 +156,6 @@ function ListItem(props: {
   blockIndex: number;
   blockAtom: BlockAtom;
 }) {
-  const { registerByIndex } = useBlock(
-    props.blockAtom,
-    props.blockIndex,
-  );
-
   const ref = React.useRef<HTMLLIElement>(null);
 
   React.useEffect(() => {
@@ -172,7 +165,7 @@ function ListItem(props: {
   return (
     <li className={css(listStyle.item)()}>
       <Editable
-        ref={composeRefs(registerByIndex(props.index), ref)}
+        ref={ref}
         placeholder={props.placeholder}
         onFocus={props.onFocus}
         onChange={(e) => {
@@ -189,10 +182,6 @@ export const ListBlock = applyBlock<
   { placeholder: string }
 >(_ListBlock, {
   type: 'list',
-  icon: {
-    text: 'List',
-    svg: ListSvg,
-  },
   config: {
     placeholder: 'list',
   },
@@ -200,31 +189,6 @@ export const ListBlock = applyBlock<
     items: [''],
     style: 'unordered',
   },
-  mdast: {
-    type: 'list',
-    in: (content: mdast.List, toHTML) => ({
-      style: content.ordered ? 'ordered' : 'unordered',
-      items: content.children.map((child) => toHTML(child).innerHTML),
-    }),
-  },
-  tune: [
-    {
-      icon: {
-        text: 'Bullet',
-        svg: ListSvg,
-        isActive: (data) => data.style === 'unordered',
-      },
-      updater: (data) => ({ ...data, style: 'unordered' }),
-    },
-    {
-      icon: {
-        text: 'Number',
-        svg: IcNumList,
-        isActive: (data) => data.style === 'ordered',
-      },
-      updater: (data) => ({ ...data, style: 'ordered' }),
-    },
-  ],
   isEmpty: (data) => data.items.length === 0,
 });
 

@@ -1,56 +1,89 @@
-import { EditableWeakMap } from '../hooks/use-editor';
 import { getSelectionRange } from './ranges';
 
 function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+function focusWithCaretIndex(
+  el: HTMLDivElement,
+  direction: 'up' | 'down',
+  caretIndex: number,
+) {
+  const range = document.createRange();
+  const sel = window.getSelection();
+  const treeWalker = document.createTreeWalker(
+    el,
+    NodeFilter.SHOW_TEXT,
+  );
+
+  try {
+    if (direction === 'down') {
+      const nextTextNode = treeWalker.nextNode();
+      let textLength = nextTextNode?.textContent?.length ?? 0;
+      if (nextTextNode) {
+        range.setStart(
+          nextTextNode,
+          textLength >= caretIndex ? caretIndex : textLength,
+        );
+        el.scrollIntoView({ block: 'end' });
+      }
+    } else {
+      const nextTextNode = treeWalker.nextNode();
+      let textLength = nextTextNode?.textContent?.length ?? 0;
+      if (nextTextNode) {
+        range.setStart(
+          nextTextNode,
+          textLength >= caretIndex ? caretIndex : textLength,
+        );
+        el.scrollIntoView({ block: 'start' });
+      }
+    }
+    range.collapse(true);
+
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  } catch (error) {}
+}
+
 function focusContentEditableWithOffset(
-  currentActiveEl?: HTMLDivElement | HTMLElement | Element | null,
-  offset: number = 0,
+  currentActiveEl: HTMLDivElement | HTMLElement | Element | null,
+  direction: 'up' | 'down',
+  caretOffset: number,
 ) {
   if (!currentActiveEl) {
     return;
   }
-  const editableWeakData = EditableWeakMap.get(currentActiveEl);
-  if (editableWeakData && editableWeakData.blockIndex + offset >= 0) {
-    // first contenteditable
-    if (editableWeakData.index === 0) {
-      // find next contenteditable if existed
-      const offsetBlock = findBlockByIndex(
-        editableWeakData.blockIndex + offset,
-      );
-      if (offsetBlock?.editable) {
-        focusWithLastCursor(offsetBlock.editable, offset <= 0);
-      } else {
-        focusContentEditableWithOffset(
-          findPreviousContentEditable(
-            editableWeakData.blockIndex,
-            offset,
-          ),
-          0,
-        );
-      }
-    } else {
-      const currentBlockDiv = findBlockById(editableWeakData.id)?.el;
-      const nodeList = currentBlockDiv?.querySelectorAll(
+  if (direction === 'down') {
+    if (!currentActiveEl.nextElementSibling) return;
+    const nextEditable =
+      currentActiveEl.nextElementSibling.querySelector(
         '[contenteditable]',
+      ) as HTMLDivElement;
+
+    if (!nextEditable) {
+      focusContentEditableWithOffset(
+        currentActiveEl.nextElementSibling,
+        direction,
+        caretOffset,
       );
-      if (
-        nodeList &&
-        nodeList?.length > 0 &&
-        nodeList?.[editableWeakData.index + offset]
-      ) {
-        focusWithLastCursor(
-          nodeList[editableWeakData.index + offset] as HTMLDivElement,
-          offset > 0,
-        );
-      } else {
-        focusContentEditableWithOffset(
-          currentBlockDiv,
-          offset + offset,
-        );
-      }
+    } else {
+      focusWithCaretIndex(nextEditable, direction, caretOffset);
+    }
+  }
+  if (direction === 'up') {
+    if (!currentActiveEl.previousElementSibling) return;
+    const prevEditable =
+      currentActiveEl.previousElementSibling?.querySelector(
+        '[contenteditable]',
+      ) as HTMLDivElement;
+    if (!prevEditable) {
+      focusContentEditableWithOffset(
+        currentActiveEl.previousElementSibling,
+        direction,
+        caretOffset,
+      );
+    } else {
+      focusWithCaretIndex(prevEditable, direction, caretOffset);
     }
   }
 }
@@ -72,10 +105,18 @@ function findPreviousContentEditable(
 
 export function focusContentEditable(
   query: 'up' | 'down' | 'current',
+  caretOffset: number,
 ) {
   const isActiveElementEditable =
     document.activeElement?.getAttribute('contenteditable') ===
     'true';
+  let activeBlockElement;
+
+  if (isActiveElementEditable) {
+    activeBlockElement = document.activeElement?.closest(
+      '.hexx-block-wrapper',
+    );
+  }
   switch (query) {
     case 'current':
       if (isActiveElementEditable) {
@@ -90,10 +131,22 @@ export function focusContentEditable(
       }
       break;
     case 'up':
-      focusContentEditableWithOffset(document.activeElement, -1);
+      if (activeBlockElement) {
+        focusContentEditableWithOffset(
+          activeBlockElement,
+          'up',
+          caretOffset,
+        );
+      }
       break;
     case 'down':
-      focusContentEditableWithOffset(document.activeElement, 1);
+      if (activeBlockElement) {
+        focusContentEditableWithOffset(
+          activeBlockElement,
+          'down',
+          caretOffset,
+        );
+      }
       break;
     default:
       break;

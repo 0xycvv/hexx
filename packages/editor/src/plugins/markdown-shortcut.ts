@@ -1,7 +1,6 @@
-import toDOM from 'hast-util-to-dom';
+import toDom from 'hast-util-to-dom';
 import toHast from 'mdast-util-to-hast';
 import { useEditor, useEventListener } from '../hooks';
-import { useBlockMdast } from '../parser/markdown/use-block-mdast';
 import { isContentEditableDiv } from '../utils/is';
 import { usePlugin } from './plugin';
 import fromMarkdown from 'mdast-util-from-markdown';
@@ -15,6 +14,7 @@ import {
   Content,
 } from 'mdast';
 import { v4 } from 'uuid';
+import { MdastConfigs } from '../parser/types';
 
 type WholeBlock = Heading | ThematicBreak | Blockquote | List | Code;
 
@@ -54,10 +54,14 @@ const replaceInlineMarkdown = (
   replace: string,
 ) => str.replace(match, replace);
 
-// it's a very rough version of markdown parser for editor
-export function Unstable_MarkdownShortcutPlugin() {
+type MarkdownShortcutPluginProps = {
+  mdastConfigs: MdastConfigs;
+};
+
+export function Unstable_MarkdownShortcutPlugin({
+  mdastConfigs,
+}: MarkdownShortcutPluginProps) {
   const { wrapperRef } = usePlugin();
-  const { allMdastConfig } = useBlockMdast();
   const { replaceBlockById } = useEditor();
 
   useEventListener(
@@ -76,17 +80,17 @@ export function Unstable_MarkdownShortcutPlugin() {
           const content = mdast.children[0];
           if (content && isWholeBlock(content)) {
             const firstMdast = mdast.children[0];
-            const mdastConfig = allMdastConfig[firstMdast.type];
+            const mdastConfig = mdastConfigs[firstMdast.type];
             if (mdastConfig) {
               replaceBlockById({
                 id: currentBlockId,
                 block: {
-                  type: mdastConfig.blockType,
+                  type: mdastConfig.type,
                   id: v4(),
                   data:
                     typeof mdastConfig.in === 'function'
                       ? mdastConfig.in(firstMdast, (c) =>
-                          toDOM(toHast(c)),
+                          toDom(toHast(c)),
                         )
                       : {},
                 },
@@ -181,7 +185,7 @@ function getTextNodeAtPosition(root, index) {
   let treeWalker = document.createTreeWalker(
     root,
     NodeFilter.SHOW_TEXT,
-    function next(elem) {
+    function (elem) {
       if (index >= elem.textContent.length) {
         index -= elem.textContent.length;
         lastNode = elem;
